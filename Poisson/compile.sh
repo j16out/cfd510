@@ -13,9 +13,9 @@ echo "Starting compilation"
 echo "Reminder: Make sure root is sourced"
 #rm mtest2
 
-rm exlaplace2
+rm poiss1
 #macro2
-g++ mainl2.cpp laplace/laplace.cpp vroot/root.cpp -o2 -o exlaplace2 `root-config --cflags --glibs` -std=c++0x -pthread
+g++ poisson.cpp laplace/laplace.cpp vroot/root.cpp -o2 -o poiss1 `root-config --cflags --glibs` -std=c++0x -pthread
 #macro1
 
 #g++ muon.cpp gPT/GPT.cpp mROOT/mroot.cpp -o2 -o mugo `root-config --cflags --glibs` -std=c++0x -pthread

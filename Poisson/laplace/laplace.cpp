@@ -41,89 +41,6 @@ for(int i = 0; i < myarray.sizex-1; ++i)
         }
 }
 
-//--------------------------Guass-Seidel----------------------------//
-
-float gs_iter(carray & myarray)
-{
-float maxdiff = -1;
-float Tip1_j, Tim1_j, Ti_jp1, Ti_jm1;
-float l2sum = 0;
-float sx = maxx-2;
-float sy = maxy-2;
-
-//------over then down------//
-
-       for(int j = 1; j < myarray.sizey-1; ++j)
-	{
-	
-	
-		for(int i = 1; i < myarray.sizex-1; ++i)
-		{
-		
-		bool fcon = get_cells(myarray, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1, i, j);
-		
-		if(fcon == false)
-		{
-		cout << "****ERROR****  couldn't find match";
-		break;
-		} 
-		
-		float newcell = ((Tip1_j+Tim1_j+Ti_jp1+Ti_jm1)/(4));
-		
-		float diff = abs(newcell - myarray.mcell[i][j]);
-		if(diff > maxdiff)
-		maxdiff = diff;
-		
-		myarray.mcell[i][j] = newcell;
-		set_ghostcells(myarray);
-
-		}
-	
-	}
-	
-//------down then over------//	
-	
-       for(int i = 1; i < myarray.sizey-1; ++i)
-	{
-	
-	
-		for(int j = 1; j < myarray.sizex-1; ++j)
-		{
-		
-		bool fcon = get_cells(myarray, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1, i, j);
-		
-		if(fcon == false)
-		{
-		cout << "****ERROR****  couldn't find match";
-		break;
-		} 
-
-		float newcell = ((Tip1_j+Tim1_j+Ti_jp1+Ti_jm1)/(4));
-		
-		float diff = abs(newcell - myarray.mcell[i][j]);
-		if(diff > maxdiff)
-		maxdiff = diff;
-		
-		myarray.mcell[i][j] = newcell;		
-		set_ghostcells(myarray);
-		
-		//-----error compare----//
-		float dx = DIM1*i;
-		float dy = DIM1*j;
-		float T = (cos(PI*dx)*sinh(PI*dy))/sinh(PI);
-
-		l2sum =  l2sum + pow((newcell-T),2);
-		 
-		}
-	
-	}
-float l2 = sqrt(l2sum/(sx*sy));
-myarray.l2norm.push_back(l2);
-myarray.diff.push_back(maxdiff);
-++myarray.iterations; 
-
-return maxdiff;
-}
 
 
 //--------------------------Guass-Seidel SOR----------------------------//
@@ -136,6 +53,12 @@ float l2sum = 0;
 float sx = maxx-2;
 float sy = maxy-2;
 
+float dx = 0;
+float dy = 0;
+
+float chx = DIM1;
+float chy = DIM1;
+
 //-----over then down-----//
 
        for(int j = 1; j < myarray.sizey-1; ++j)
@@ -144,16 +67,15 @@ float sy = maxy-2;
 	
 		for(int i = 1; i < myarray.sizex-1; ++i)
 		{
+		dx = DIM1*i;
+		dy = DIM1*j;
 		
 		bool fcon = get_cells(myarray, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1, i, j);
 		
-		if(fcon == false)
-		{
-		cout << "****ERROR****  couldn't find match";
-		break;
-		} 
+		float source = (72.0*(dx)*(dy) - 6*(dx)+2);
+		float temp = (pow(chx,2)*pow(chy,2)) /  (2*(pow(chx,2)+pow(chy,2)));
 		
-		float newcell = ((Tip1_j+Tim1_j+Ti_jp1+Ti_jm1)/(4));
+		float newcell = ((  ((Tip1_j+Tim1_j)/pow(chx,2))  +  ((Ti_jp1+Ti_jm1)/pow(chy,2))  ) * temp) - source;
 		
 		float diff = abs(newcell - myarray.mcell[i][j]);
 		float delta = newcell - myarray.mcell[i][j];
@@ -178,16 +100,16 @@ float sy = maxy-2;
 	
 		for(int j = 1; j < myarray.sizex-1; ++j)
 		{
+		dx = DIM1*i;
+		dy = DIM1*j;
 		
 		bool fcon = get_cells(myarray, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1, i, j);
 		
-		if(fcon == false)
-		{
-		cout << "****ERROR****  couldn't find match";
-		break;
-		} 
-
-		float newcell = ((Tip1_j+Tim1_j+Ti_jp1+Ti_jm1)/(4));
+		float source = (72.0*(dx)*(dy) - 6*(dx)+2);
+		
+		float temp = (pow(chx,2)*pow(chy,2)) /  (2*(pow(chx,2)+pow(chy,2)));
+		
+		float newcell = ((  ((Tip1_j+Tim1_j)/pow(chx,2))  +  ((Ti_jp1+Ti_jm1)/pow(chy,2))  ) * temp) - source;
 		
 		float diff = abs(newcell - myarray.mcell[i][j]);
 		float delta = newcell - myarray.mcell[i][j];
@@ -201,8 +123,7 @@ float sy = maxy-2;
 		set_ghostcells(myarray);
 		
 		//-------error compare-------//
-		float dx = DIM1*i;
-		float dy = DIM1*j;
+		
 		float T = (cos(PI*dx)*sinh(PI*dy))/sinh(PI);
 
 		l2sum =  l2sum + pow((newcellSOR-T),2);

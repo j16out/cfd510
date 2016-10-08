@@ -39,7 +39,7 @@
 #include <iterator>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "/home/jerin/cfd510/laplace/laplace.hpp"
+#include "/home/jerin/cfd510/Poisson/laplace/laplace.hpp"
 
 using namespace std;
 
@@ -47,7 +47,7 @@ using namespace std;
 
 void draw_graph(carray myarray, carray myarray2);
 
-void draw_3Dgraph(carray myarray, carray myarray2);
+void draw_3Dgraph(carray myarray);
 
 void draw_graph_diff3(carray myarray, carray myarray2, carray myarray3);
 
