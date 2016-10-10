@@ -31,7 +31,10 @@ carray gsarraySOR1;//my main array
 carray gsarraySOR13;
 carray gsarraySOR15;
 
-
+//set size
+set_array_size(gsarraySOR1, 20, 20, 1.0);
+set_array_size(gsarraySOR13, 20, 20, 1.0);
+set_array_size(gsarraySOR15, 20, 20, 1.0);
 
 
 //set ghost cells as boundary conditions

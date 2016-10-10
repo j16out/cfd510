@@ -1,16 +1,29 @@
 #include "numerical.hpp"
 
 
-float DIM1 = DIM/(maxx-2);
 
 
+
+//----------set array size (working area excluding ghost)---------------//
+
+void set_array_size(carray & myarray, int x, int y, float DIM)
+{
+	if(x < 160 && y < 160)
+	{
+	myarray.sizex = x+2;
+	myarray.sizey = y+2;
+	myarray.DIM1 = DIM/(x);
+	}
+	else
+	cout << "Array size to big, setting to default 160" << "\n";
+
+}
 
 
 //--------------------------zero array----------------------------//
 
 void set_zero(carray & myarray)
 {
-
 	for(int i = 0; i < myarray.sizex; ++i)
 	{
 		for(int j = 0; j < myarray.sizey; ++j)
@@ -18,16 +31,15 @@ void set_zero(carray & myarray)
 		myarray.mcell[i][j] = 0;
 
 		}
-
 	}
-
-
 }
+
 
 //--------------------------set ghost cells----------------------------//
 
 void set_ghostcells(carray & myarray)//boundary conditions
 {
+float DIM1 = myarray.DIM1;
  
 for(int i = 0; i < myarray.sizex-1; ++i)
 	{
@@ -45,6 +57,7 @@ for(int i = 0; i < myarray.sizex-1; ++i)
 
 float gs_iter_SOR(carray & myarray, float omega)
 {
+float DIM1 = myarray.DIM1;
 float maxdiff = -1;
 float Tip1_j, Tim1_j, Ti_jp1, Ti_jm1;
 float l2sum = 0;
@@ -69,8 +82,8 @@ float dy = 0;
 		
 		//----get surrounding cells and compute new cell-------//
 		get_surcells(myarray, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1, i, j);		
-		float source = calc_source(i, j);
-		float newcell = calc_newcell(source, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1); 
+		float source = calc_source(myarray, i, j);
+		float newcell = calc_newcell(myarray, source, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1); 
 		
 		//----apply over-relaxation-----//
 		float delta = newcell - myarray.mcell[i][j];
@@ -103,8 +116,8 @@ float dy = 0;
 		
 		//----get surrounding cells and compute new cell-------//
 		get_surcells(myarray, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1, i, j);		
-		float source = calc_source(i, j);
-		float newcell = calc_newcell(source, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1); 
+		float source = calc_source(myarray, i, j);
+		float newcell = calc_newcell(myarray, source, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1); 
 		
 		//----apply over-relaxation-----//
 		float delta = newcell - myarray.mcell[i][j];
@@ -142,7 +155,7 @@ return maxdiff;
 
 //--------------------------Print array in terminal----------------------------//
 
-void print_mcell(carray & myarray)
+void print_array(carray & myarray)
 {
 cout << "\n";
 for(int j = 0; j < myarray.sizey; ++j)
@@ -163,8 +176,9 @@ cout << "\n";
 //--------------------Calculate new cell value from neibhors ---------------------//
 
 
-float calc_newcell(float source, float Tip1_j, float Tim1_j, float Ti_jp1 ,float Ti_jm1)
+float calc_newcell(carray & myarray, float source, float Tip1_j, float Tim1_j, float Ti_jp1 ,float Ti_jm1)
 {
+float DIM1 = myarray.DIM1;
 float chx = DIM1;
 float chy = DIM1;
 float temp = (pow(chx,2)*pow(chy,2)) /  (2*(pow(chx,2)+pow(chy,2)));
@@ -172,9 +186,10 @@ float newcell = ((  ((Tip1_j+Tim1_j)/pow(chx,2))  +  ((Ti_jp1+Ti_jm1)/pow(chy,2)
 
 return newcell;
 }
-//---------------------Get source term for Laplace problem----------------------//
-float calc_source(int i, int j)
+//---------------------Get source term for poisson problem----------------------//
+float calc_source(carray & myarray, int i, int j)
 {
+float DIM1 = myarray.DIM1;
 float dx = DIM1*i;
 float dy = DIM1*j;
 float source = 0;

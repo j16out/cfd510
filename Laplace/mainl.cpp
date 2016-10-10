@@ -30,7 +30,9 @@ carray gsarray;//my main array
 carray gsarraySOR;
 
 
-
+//set size
+set_array_size(gsarray, 10, 10, 1.0);
+set_array_size(gsarraySOR, 10, 10, 1.0);
 
 
 //set ghost cells as boundary conditions
@@ -40,7 +42,7 @@ set_ghostcells(gsarray);
 set_zero(gsarraySOR);
 set_ghostcells(gsarraySOR);
 
-print_mcell(gsarraySOR);
+print_array(gsarraySOR);
 
 
 
@@ -58,7 +60,7 @@ break;
 
 }
 
-print_mcell(gsarray);
+print_array(gsarray);
 cout << "Iterations: " << gsarray.iterations << "\n";
 
 //---------------------GS SOR loop----------------------//
@@ -72,7 +74,7 @@ if(diff2 > BIG)
 break;
 
 }
-print_mcell(gsarraySOR);
+print_array(gsarraySOR);
 cout << "Iterations: " << gsarraySOR.iterations << "\n";
 
 
