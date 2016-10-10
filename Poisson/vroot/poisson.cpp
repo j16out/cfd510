@@ -11,12 +11,11 @@
 #include "vroot/root.hpp"
 #include "numerical/numerical.hpp"
 
+
+//g++ rocketSIM.cpp calc.cpp -Wall -o2 -o test1 `root-config --cflags --glibs` -std=c++0x -pthread
+
 using namespace std;
 
-#define BIG 1000000
-#define E07 0.0000001
-#define E08 0.00000001
-#define E09 0.000000001
 
 
 int main(int argc, char **argv)
@@ -42,20 +41,17 @@ diff = 1;
 int update = 0;
 int update2 = 100;
 
-while(diff > E07)
+while(diff > 0.0000001)
 {
-diff = gs_iter_SOR(poisson1, 1.4);
-
-
-
-if(diff > BIG)
+diff = gs_iter_SOR(poisson1, 1.3);
+//cout << "difference " << diff <<"\n"; 
+if(diff > 100000000)
 break;
+	if(poisson1.iterations > 100000){
+	break;
+	cout << "solution failed to converge\n";
+	}
 	
-if(poisson1.iterations > 100000){
-break;
-cout << "solution failed to converge\n";
-}
-
 if(update >= update2)
 {cout << "Update: step " << update << " divergence " << diff << " \n"; 
  update2 = update2 + 100;
@@ -75,7 +71,7 @@ cout << "Iterations: " << poisson1.iterations << "\n";
 if(1)
 {
 	TApplication theApp("App", &argc, argv);
-	draw_3DgraphP(poisson1);
+	draw_3Dgraph(poisson1);
 	theApp.Run();
 }
 

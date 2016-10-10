@@ -11,12 +11,13 @@
 #include <algorithm>
 #include <sstream>
 #include <math.h> 
+#include <iomanip>
 
 using namespace std;
 
 
-#define maxx 22
-#define maxy 22
+#define maxx 42
+#define maxy 42
 #define DIM 1.00000000
 #define PI 3.141592654
 

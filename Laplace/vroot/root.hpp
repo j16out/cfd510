@@ -39,7 +39,7 @@
 #include <iterator>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "/home/jerin/cfd510/laplace/laplace.hpp"
+#include "/home/jerin/cfd510/Laplace/numerical/numerical.hpp"
 
 using namespace std;
 

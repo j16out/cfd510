@@ -6,7 +6,7 @@ float DIM2 = DIM/(maxx-2);
 
 //--------------------------3D graphs----------------------------//
 
-void draw_3Dgraph(carray myarray)
+void draw_3DgraphP(carray myarray)
 {
 
 
@@ -67,6 +67,86 @@ c2->cd();
    gr1->Draw("surf1");
    
 
+   
+}
+
+//--------------------------3D graphs----------------------------//
+
+void draw_3Dgraph(carray myarray, carray myarray2)
+{
+
+
+TCanvas *c1 = new TCanvas("c1","The FillRandom example",200,50,900,700);
+TCanvas *c2 = new TCanvas("c2","The FillRandom example",200,50,900,700);
+TCanvas *c4 = new TCanvas("c4","The FillRandom example",200,50,900,700);
+
+c1->cd();
+string titlefile = "Laplace Numerical; x; y; z";
+const char* c; 
+c = titlefile.c_str();	
+
+TGraph2D *gr = new TGraph2D();
+TGraph2D *gr1 = new TGraph2D();
+TGraph2D *gr5 = new TGraph2D();
+gr->SetTitle(c);
+
+titlefile = "Laplace Analytical; x; y; z";
+c = titlefile.c_str();
+gr1->SetTitle(c);	
+
+int N = 0;
+for (int i = 1; i < myarray.sizex-1; i++) 
+{
+	
+	for (int j = 1; j < myarray.sizey-1; j++) 
+	{ float dx = DIM2*i;
+	  float dy = DIM2*j;
+	      float T = (cos(PI*dx)*sinh(PI*dy))/sinh(PI);
+
+	      gr1->SetPoint(N,dx,dy,T);
+	      ++N;
+	 }     
+}
+
+N = 0;
+for (int i = 1; i < myarray.sizex-1; i++) 
+{
+	
+	for (int j = 0; j < myarray.sizey; j++) 
+	{ float dx = DIM2*i;
+	  float dy = DIM2*j;
+	  float T = myarray.mcell[i][j];
+
+	      gr->SetPoint(N,dx,dy,T);
+	      ++N;
+	 }     
+}
+
+
+N = 0;
+for (int i = 1; i < myarray2.sizex-1; i++) 
+{
+	
+	for (int j = 0; j < myarray2.sizey; j++) 
+	{ float dx = DIM2*i;
+	  float dy = DIM2*j;
+	  float T = myarray2.mcell[i][j];
+
+	      gr5->SetPoint(N,dx,dy,T);
+	      ++N;
+	 }     
+}
+c1->cd();
+
+   gStyle->SetPalette(1);
+   gr->Draw("surf1");
+c2->cd();   
+   gStyle->SetPalette(1);
+   gr1->Draw("surf1");
+   
+c4->cd();   
+   gStyle->SetPalette(1);
+   gr5->Draw("surf1");   
    
 }
 

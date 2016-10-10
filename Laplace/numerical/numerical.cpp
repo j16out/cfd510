@@ -29,15 +29,13 @@ void set_zero(carray & myarray)
 void set_ghostcells(carray & myarray)//boundary conditions
 {
  
-
-
 for(int i = 0; i < myarray.sizex-1; ++i)
 	{
 	float d = i*DIM1;
-	myarray.mcell[i][0] = myarray.mcell[i][1];// y = 0 ie top
-	myarray.mcell[0][i] = myarray.mcell[1][i];// x = 0 ie left
-	myarray.mcell[i][myarray.sizex-1] = 5-((1/2)*pow((1+pow(d, 2)),3));//y = 1 ie bottom
-	myarray.mcell[myarray.sizey-1][i] = 5-((1/2)*pow((1+pow(d, 2)),3));//x = 1 right
+	myarray.mcell[i][0] = 0;//top
+	myarray.mcell[0][i] = myarray.mcell[1][i];//left
+	myarray.mcell[i][myarray.sizex-1] = cos(PI*d);//bottom
+	myarray.mcell[myarray.sizey-1][i] = myarray.mcell[myarray.sizey-2][i];//right
         }
 }
 
@@ -174,12 +172,12 @@ float newcell = ((  ((Tip1_j+Tim1_j)/pow(chx,2))  +  ((Ti_jp1+Ti_jm1)/pow(chy,2)
 
 return newcell;
 }
-//---------------------Get source term for poisson problem----------------------//
+//---------------------Get source term for Laplace problem----------------------//
 float calc_source(int i, int j)
 {
 float dx = DIM1*i;
 float dy = DIM1*j;
-float source = pow(3*pow(dx,2)-3*pow(dy,2),2)+72*(pow(dx,2)*pow(dy,2))+pow(3*pow(dy,2)-3*pow(dx,2),2);
+float source = 0;
 
 return source;
 }
