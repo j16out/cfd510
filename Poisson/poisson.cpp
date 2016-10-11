@@ -19,6 +19,8 @@ using namespace std;
 #define E09 0.000000001
 
 
+
+
 int main(int argc, char **argv)
 {
 
@@ -28,7 +30,7 @@ carray poisson2;
 carray poisson3;
 
 //set array size or default used 162x162
-set_array_size(poisson1, 20, 20, 1.0);
+set_array_size(poisson1, 10, 10, 1.0);
 set_array_size(poisson2, 40, 40, 1.0);
 set_array_size(poisson3, 60, 60, 1.0);
 
@@ -140,9 +142,14 @@ if(update >= update2)
 cout << "Iterations: " << poisson3.iterations << "\n";
 cout << "Solution: " << get_solution(poisson3) << "\n";
 
+//---------------------calc error----------------------//
+
+get_discrete_Error(poisson1, poisson2, poisson3, 1.0);
+
+
 //----------------------Draw Data---------------------//
 
-if(1)
+if(0)
 {
 	TApplication theApp("App", &argc, argv);
 	draw_3DgraphP(poisson2);
@@ -154,3 +161,6 @@ if(1)
 
 //end
 }
+
+
+

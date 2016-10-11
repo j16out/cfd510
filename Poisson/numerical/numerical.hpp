@@ -53,7 +53,7 @@ float calc_newcell(carray & myarray, float source, float Tip1_j, float Tim1_j, f
 void get_surcells(carray & myarray, float & Tip1_j, float & Tim1_j, float & Ti_jp1 ,float & Ti_jm1, int i, int j);
 
 
-
+void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM);
 
 
 

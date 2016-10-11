@@ -225,3 +225,71 @@ float sizey = myarray.sizey;
 
 }
 
+//--------------------------Get descrete error----------------------------//
+
+void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM)
+{
+//Calculating error as described in paper "procedure for estimation and reporting of uncertainty due to discretization in CFD applications"//
+
+printf("\nCalculating Error...\n");
+
+float h1 = sqrt((1.0/ray1.sizex)*(DIM));
+float h2 = sqrt((1.0/ray2.sizex)*(DIM));
+float h3 = sqrt((1.0/ray3.sizex)*(DIM));
+
+float sol1 = get_solution(ray1);
+float sol2 = get_solution(ray2);
+float sol3 = get_solution(ray3);
+
+
+printf("h1: %f h2: %f h3: %f, sol1: %f sol2: %f sol3: %f\n",h1, h2, h3, sol1, sol2, sol3);
+
+float r21 = h2/h1;
+float r32 = h3/h2;
+
+printf("r32: %f r21: %f\n",r32, r21);
+
+float e32 = sol3-sol2;
+float e21 = sol2-sol1;
+
+float s = (e32/e21);
+if(s >= 0)
+s = 1;
+else
+s = -1;
+
+float p_n = 0;
+float p = (1/log(r21))*(abs(log(abs(e32/e21))+0));
+
+printf("intial guess: %f \n", p);
+
+float diff = 1;
+while(diff > 0.0000001)
+{
+
+float p_n = (1/log(r21))*(abs(log(abs(e32/e21))+log((pow(r21,p)-s)/(pow(r32,p)-s)) ));
+diff = abs(p_n -p);
+printf("p_n: %f p: %f diff: %f\n",p_n, p, diff);
+
+p = p_n;
+}
+
+//
+float sol_ext21 = (pow(r21, p)*sol1-sol2)/(pow(r21,p)-1.0);
+float sol_ext32 = (pow(r32, p)*sol2-sol3)/(pow(r32,p)-1.0);
+
+printf("phi_ext21: %f phi_ext32 %f\n", sol_ext21, sol_ext32);
+
+float ea21 = abs((sol1-sol2)/sol1);
+float ea32 = abs((sol2-sol3)/sol2);
+
+float e_ext21 = abs((sol_ext21-sol1)/sol_ext21);
+float e_ext32 = abs((sol_ext32-sol2)/sol_ext32);
+
+float GCI_21 = (1.25*ea21)/(pow(r21,p)-1.0);
+float GCI_32 = (1.25*ea32)/(pow(r32,p)-1.0);
+
+printf("ea21/32: %f %f e_ext21/32: %f %f GC121/32 %f %f\n", ea21, ea32, e_ext21, e_ext32, GCI_21, GCI_32);
+
+}
+
