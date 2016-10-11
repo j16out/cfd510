@@ -77,6 +77,7 @@ if(update >= update2)
 }
 
 cout << "Iterations: " << poisson1.iterations << "\n";
+cout << "Solution: " << get_solution(poisson1) << "\n";
 
 
 //---------------------GS SOR w=1 loop 2----------------------//
@@ -107,16 +108,16 @@ if(update >= update2)
 }
 
 cout << "Iterations: " << poisson2.iterations << "\n";
-
+cout << "Solution: " << get_solution(poisson2) << "\n";
 //---------------------GS SOR w=1 loop 3----------------------//
-/*
+
 diff = 1;
 update = 0;
 update2 = 100;
 
 while(diff > E07)
 {
-diff = gs_iter_SOR(poisson3, 1.3);
+diff = gs_iter_SOR(poisson3, 1.35);
 
 
 
@@ -136,8 +137,8 @@ if(update >= update2)
 ++update;	
 }
 
-cout << "Iterations: " << poisson3.iterations << "\n";*/
-
+cout << "Iterations: " << poisson3.iterations << "\n";
+cout << "Solution: " << get_solution(poisson3) << "\n";
 
 //----------------------Draw Data---------------------//
 

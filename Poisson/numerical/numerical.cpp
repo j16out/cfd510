@@ -197,6 +197,18 @@ float source = pow(3*pow(dx,2)-3*pow(dy,2),2)+72*(pow(dx,2)*pow(dy,2))+pow(3*pow
 return source;
 }
 
+//--------------------------Get average solution at point------------------------//
+
+float get_solution(carray & myarray)
+{
+int sx = (myarray.sizex-2)/2;
+int sy = (myarray.sizey-2)/2;
+float sol = (myarray.mcell[sx-1][sy+1]+myarray.mcell[sx+1][sy+1]+myarray.mcell[sx+1][sy-1]+myarray.mcell[sx+1][sy-1])/4;
+
+
+
+return sol;
+}
 
 //--------------------------Get current cell values----------------------------//
 

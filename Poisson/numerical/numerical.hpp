@@ -34,6 +34,8 @@ float DIM1 = 0;
 };
 
 
+float get_solution(carray & myarray);
+
 void set_array_size(carray & myarray, int x, int y, float DIM);
 
 void set_ghostcells(carray & myarray);
