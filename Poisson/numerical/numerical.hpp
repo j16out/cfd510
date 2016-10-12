@@ -56,30 +56,7 @@ void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM);
 
 float get_solution(carray & myarray);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void get_l2norm(carray & myarray, carray myarray2);
 
 
 #endif

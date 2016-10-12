@@ -132,24 +132,38 @@ float dy = 0;//change in y
 		//-----update current cell----//
 		myarray.mcell[i][j] = newcellSOR;
 		set_ghostcells(myarray);
-		
-		//-------error compare-------//
-		
-		float T = (cos(PI*dx)*sinh(PI*dy))/sinh(PI);
-		l2sum =  l2sum + pow((newcellSOR-T),2);
-		 
 		}
 	
 	}
-//---get l2norm value------//	
-float l2 = sqrt(l2sum/(sx*sy));
 
-//----store data-------//
-myarray.l2norm.push_back(l2);
 myarray.diff.push_back(maxdiff);
 ++myarray.iterations; 
 
 return maxdiff;
+}
+//-------------------------Get L2 nrom for unknown analytical----------------------//
+
+void get_l2norm(carray & myarray, carray myarray2)
+{
+float l2sum =0;
+float sx = myarray.sizex-2;
+float sy = myarray.sizey-2;
+
+       for(int j = 1; j < myarray.sizey-1; ++j)
+	{	
+		for(int i = 1; i < myarray.sizex-1; ++i)
+		{
+	
+		float P = myarray.mcell[i][j];
+		float T = myarray2.mcell[i][j];
+		l2sum =  l2sum + pow((P-T),2);
+
+		}
+	
+	}
+
+float l2 = sqrt(l2sum/(sx*sy));
+cout << "L2 norm: " << l2 << "\n";
 }
 
 //--------------------------Solve array using GS-iterations----------------------------//
@@ -193,7 +207,7 @@ int update2 = 100;
 	++update;	
 	}
 
-cout << "Iterations: " << myarray.iterations << "   L2 norm: " << setprecision(6) << fixed << myarray.l2norm.at(myarray.iterations-1) <<  "\n";
+cout << "Iterations: " << myarray.iterations <<  "\n";
 }
 
 
@@ -202,7 +216,8 @@ cout << "Iterations: " << myarray.iterations << "   L2 norm: " << setprecision(6
 void print_array(carray & myarray)
 {
 cout << "\n";
-for(int j = 0; j < myarray.sizey; ++j)
+
+	for(int j = 0; j < myarray.sizey; ++j)
 	{
 	cout << "\n|";	
 		for(int i = 0; i < myarray.sizex; ++i)
@@ -226,7 +241,7 @@ float DIM1 = myarray.DIM1;
 float chx = DIM1;
 float chy = DIM1;
 float temp = (pow(chx,2)*pow(chy,2)) /  (2*(pow(chx,2)+pow(chy,2)));
-float newcell = ((  ((Tip1_j+Tim1_j)/pow(chx,2))  +  ((Ti_jp1+Ti_jm1)/pow(chy,2))  ) * temp) - source;
+float newcell = ((  ((Tip1_j+Tim1_j)/pow(chx,2))  +  ((Ti_jp1+Ti_jm1)/pow(chy,2)) - source ) * temp) ;
 
 return newcell;
 }
@@ -236,7 +251,7 @@ float calc_source(carray & myarray, int i, int j)
 float DIM1 = myarray.DIM1;
 float dx = DIM1*i;
 float dy = DIM1*j;
-float source = pow(3*pow(dx,2)-3*pow(dy,2),2)+72*(pow(dx,2)*pow(dy,2))+pow(3*pow(dy,2)-3*pow(dx,2),2);
+float source = -1*(pow(3*pow(dx,2)-3*pow(dy,2),2)+72*(pow(dx,2)*pow(dy,2))+pow(3*pow(dy,2)-3*pow(dx,2),2));
 //source = 0 for Laplace problem
 
 return source;
@@ -309,15 +324,16 @@ float p = (1/log(r21))*(abs(log(abs(e32/e21))+0));
 printf("intial guess: %f \n", p);
 
 float diff = 1;
-while(diff > 0.0000001)
-{
 
-float p_n = (1/log(r21))*(abs(log(abs(e32/e21))+log((pow(r21,p)-s)/(pow(r32,p)-s)) ));
-diff = abs(p_n -p);
-printf("p_n: %f p: %f diff: %f\n",p_n, p, diff);
+	while(diff > 0.0000001)
+	{
 
-p = p_n;
-}
+	float p_n = (1/log(r21))*(abs(log(abs(e32/e21))+log((pow(r21,p)-s)/(pow(r32,p)-s)) ));
+	diff = abs(p_n -p);
+	printf("p_n: %f p: %f diff: %f\n",p_n, p, diff);
+
+	p = p_n;
+	}
 
 //
 float sol_ext21 = (pow(r21, p)*sol1-sol2)/(pow(r21,p)-1.0);

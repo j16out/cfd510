@@ -41,9 +41,9 @@ carray poisson2;
 carray poisson3;
 
 //set array size or default used 162x162
-set_array_size(poisson1, 10, 10, 1.0);//array, xsize, ysize, dimension
+set_array_size(poisson1, 20, 20, 1.0);//array, xsize, ysize, dimension
 set_array_size(poisson2, 40, 40, 1.0);
-set_array_size(poisson3, 60, 60, 1.0);
+set_array_size(poisson3, 80, 80, 1.0);
 
 
 //set ghost cells as boundary conditions
@@ -81,14 +81,15 @@ cout << "Solution: " << get_solution(poisson3) << "\n";
 //---------------------calc error based on ASME---------------//
 
 get_discrete_Error(poisson1, poisson2, poisson3, 1.0);
-
+get_l2norm(poisson1, poisson2);
+get_l2norm(poisson2, poisson3);
 
 //----------------------Draw Data---------------------//
 
 if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);
-	draw_3DgraphP(poisson3);//draw 3d graph
+	draw_3DgraphP(poisson2);//draw 3d graph
 	theApp.Run();
 }
 
