@@ -48,7 +48,7 @@ N = 0;
 c1->cd();
 
    gStyle->SetPalette(1);
-   gr->Draw("surf1");
+   gr->Draw("colz");
 
    
 
@@ -124,19 +124,19 @@ for (int i = 1; i < myarray2.sizex-1; i++)
 c1->cd();
 
    gStyle->SetPalette(1);
-   gr->Draw("surf1");
+   gr->Draw("colz");
 c2->cd();   
    gStyle->SetPalette(1);
-   gr1->Draw("surf1");
+   gr1->Draw("colz");
    
 c4->cd();   
    gStyle->SetPalette(1);
-   gr5->Draw("surf1");   
+   gr5->Draw("colz");   
    
 }
 
 
-//--------------------------error graphs----------------------------//
+//--------------------------diff graphs----------------------------//
 
 void draw_graph(carray myarray, carray myarray2)
 {TCanvas *c1 = new TCanvas("c1","The FillRandom example",200,50,900,700);  
@@ -221,7 +221,7 @@ leg2->Draw();
 }
 
 
-//--------------------------error graphs----------------------------//
+//--------------------------diff graphs----------------------------//
 
 void draw_graph_diff3(carray myarray, carray myarray2, carray myarray3)
 {TCanvas *c1 = new TCanvas("c1","The FillRandom example",200,50,900,700);   
@@ -284,6 +284,7 @@ leg1->Draw();
 
 }
 
+//--------------------------l2 graphs----------------------------//
 
 void draw_graph_l2norm3(carray myarray, carray myarray2, carray myarray3)
 {TCanvas *c1 = new TCanvas("c1","The FillRandom example",200,50,900,700);   

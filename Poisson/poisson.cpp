@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------------//
+Main Program for finding pressure for imcompressible flows using Poisson equations.
+Finds solution at P(1/2,1/2) for Land descretization error for w values of 1 for 
+20x20,40x40 and 60x60 array
+
+Jerin Roberts 2016
+compiled using g++/gcc version 5.4.0 on Ubuntu 16.04.02 and are available for clone 
+via the link provided: url{https://github.com/j16out/
+//-------------------------------------------------------------------------------*/
+
+
 #include <vector>
 #include <iostream>
 #include <cstdlib>
@@ -13,7 +24,7 @@
 
 using namespace std;
 
-#define BIG 1000000
+
 #define E07 0.0000001
 #define E08 0.00000001
 #define E09 0.000000001
@@ -24,13 +35,13 @@ using namespace std;
 int main(int argc, char **argv)
 {
 
-float diff = 1;
+
 carray poisson1;//my main array
 carray poisson2;
 carray poisson3;
 
 //set array size or default used 162x162
-set_array_size(poisson1, 10, 10, 1.0);
+set_array_size(poisson1, 10, 10, 1.0);//array, xsize, ysize, dimension
 set_array_size(poisson2, 40, 40, 1.0);
 set_array_size(poisson3, 60, 60, 1.0);
 
@@ -38,9 +49,9 @@ set_array_size(poisson3, 60, 60, 1.0);
 //set ghost cells as boundary conditions
 
 
-set_zero(poisson1);
-set_ghostcells(poisson1);
-print_array(poisson1);
+set_zero(poisson1);//zero
+set_ghostcells(poisson1);//set ghost cells/boundaries
+print_array(poisson1);//print array in terminal
 
 set_zero(poisson2);
 set_ghostcells(poisson2);
@@ -51,109 +62,33 @@ set_ghostcells(poisson3);
 print_array(poisson3);
 
 
-//---------------------GS SOR w=1 loop 1----------------------//
-diff = 1;
-int update = 0;
-int update2 = 100;
+//---------------------GS SOR w=1.3 loop 1----------------------//
 
-while(diff > E07)
-{
-diff = gs_iter_SOR(poisson1, 1.3);
-
-
-
-if(diff > BIG)
-break;
-	
-if(poisson1.iterations > 100000){
-break;
-cout << "solution failed to converge\n";
-}
-
-if(update >= update2)
-{cout << "Update: step " << update << " divergence " << diff << " \n"; 
- update2 = update2 + 100;
-}	
-
-++update;	
-}
-
-cout << "Iterations: " << poisson1.iterations << "\n";
+solve_arraySOR(poisson1, E07, 1.3);
 cout << "Solution: " << get_solution(poisson1) << "\n";
 
 
-//---------------------GS SOR w=1 loop 2----------------------//
-diff = 1;
-update = 0;
-update2 = 100;
+//---------------------GS SOR w=1.3 loop 2----------------------//
 
-while(diff > E07)
-{
-diff = gs_iter_SOR(poisson2, 1.3);
-
-
-
-if(diff > BIG)
-break;
-	
-if(poisson2.iterations > 100000){
-break;
-cout << "solution failed to converge\n";
-}
-
-if(update >= update2)
-{cout << "Update: step " << update << " divergence " << diff << " \n"; 
- update2 = update2 + 100;
-}	
-
-++update;	
-}
-
-cout << "Iterations: " << poisson2.iterations << "\n";
+solve_arraySOR(poisson2, E07, 1.3);
 cout << "Solution: " << get_solution(poisson2) << "\n";
+
 //---------------------GS SOR w=1 loop 3----------------------//
 
-diff = 1;
-update = 0;
-update2 = 100;
-
-while(diff > E07)
-{
-diff = gs_iter_SOR(poisson3, 1.35);
-
-
-
-if(diff > BIG)
-break;
-	
-if(poisson3.iterations > 100000){
-break;
-cout << "solution failed to converge\n";
-}
-
-if(update >= update2)
-{cout << "Update: step " << update << " divergence " << diff << " \n"; 
- update2 = update2 + 100;
-}	
-
-++update;	
-}
-
-cout << "Iterations: " << poisson3.iterations << "\n";
+solve_arraySOR(poisson3, E07, 1.3);
 cout << "Solution: " << get_solution(poisson3) << "\n";
 
-//---------------------calc error----------------------//
+//---------------------calc error based on ASME---------------//
 
 get_discrete_Error(poisson1, poisson2, poisson3, 1.0);
 
 
 //----------------------Draw Data---------------------//
 
-if(0)
+if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);
-	draw_3DgraphP(poisson2);
-
+	draw_3DgraphP(poisson3);//draw 3d graph
 	theApp.Run();
 }
 

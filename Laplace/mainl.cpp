@@ -1,3 +1,13 @@
+/*-------------------------------------------------------------------------------//
+Main Program for looking at Point Guass-Seidel Scheme for Laplace Problem.
+Finds maximum change in solution and L2 norm for w values of 1, 1.5 for10x10 array
+
+
+Jerin Roberts 2016
+compiled using g++/gcc version 5.4.0 on Ubuntu 16.04.02 and are available for clone
+ via the link provided: url{https://github.com/j16out/
+//-------------------------------------------------------------------------------*/
+
 #include <vector>
 #include <iostream>
 #include <cstdlib>
@@ -12,11 +22,11 @@
 #include "numerical/numerical.hpp"
 
 #define BIG 1000000
+#define E06 0.000001
 #define E07 0.0000001
 #define E08 0.00000001
 #define E09 0.000000001
 
-//g++ rocketSIM.cpp calc.cpp -Wall -o2 -o test1 `root-config --cflags --glibs` -std=c++0x -pthread
 
 using namespace std;
 
@@ -51,33 +61,11 @@ cout << "done!\n";
 
 //---------------------GS loop----------------------//
 
-while(diff > E07)
-{
-diff = gs_iter_SOR(gsarray, 1.0);
-//cout << "difference " << diff << "\n"; 
-if(diff > BIG)
-break;
-
-}
-
-print_array(gsarray);
-cout << "Iterations: " << gsarray.iterations << "\n";
+solve_arraySOR(gsarray, E09, 1.0);
 
 //---------------------GS SOR loop----------------------//
-float diff2 = 1;
 
-while(diff2 > E07)
-{
-diff2 = gs_iter_SOR(gsarraySOR, 1.5);
-//cout << "difference " << diff << "\n"; 
-if(diff2 > BIG)
-break;
-
-}
-print_array(gsarraySOR);
-cout << "Iterations: " << gsarraySOR.iterations << "\n";
-
-
+solve_arraySOR(gsarraySOR, E09, 1.5);
 
 //----------------------Draw Data---------------------//
 
@@ -85,6 +73,7 @@ if(1)
 {
 	TApplication theApp("App", &argc, argv);
 	draw_graph(gsarray, gsarraySOR);
+	draw_3Dgraph(gsarray, gsarraySOR);
 	theApp.Run();
 }
 

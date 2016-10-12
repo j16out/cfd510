@@ -28,26 +28,26 @@ void set_zero(carray & myarray)
 	{
 		for(int j = 0; j < myarray.sizey; ++j)
 		{
-		myarray.mcell[i][j] = 0;
+		myarray.mcell[i][j] = 0;//set everything to zero
 
 		}
 	}
 }
 
 
-//--------------------------set ghost cells----------------------------//
+//--------------------------set ghost cells for Poisson----------------------------//
 
-void set_ghostcells(carray & myarray)//boundary conditions
+void set_ghostcells(carray & myarray)
 {
 float DIM1 = myarray.DIM1;
 
-
+//set boundary conditions in ghost cells
 for(int i = 1; i < myarray.sizex-1; ++i)
 	{float d = i*DIM1;	
-	myarray.mcell[i][0] = myarray.mcell[i][1];// y = 0 ie top
-	myarray.mcell[0][i] = myarray.mcell[1][i];// x = 0 ie left
-	myarray.mcell[i][myarray.sizex-1] = 5+((1/2)*pow((1+pow(d, 2)),3));//y = 1 ie bottom
-	myarray.mcell[myarray.sizey-1][i] = 5+((1/2)*pow((1+pow(d, 2)),3));//x = 1 right
+	myarray.mcell[i][0] = myarray.mcell[i][1];//top boundary
+	myarray.mcell[0][i] = myarray.mcell[1][i];//left boundary
+	myarray.mcell[i][myarray.sizex-1] = 5+((1/2)*pow((1+pow(d, 2)),3));//bottom boundary
+	myarray.mcell[myarray.sizey-1][i] = 5+((1/2)*pow((1+pow(d, 2)),3));//right boundary
         }
 }
 
@@ -57,19 +57,19 @@ for(int i = 1; i < myarray.sizex-1; ++i)
 
 float gs_iter_SOR(carray & myarray, float omega)
 {
-float DIM1 = myarray.DIM1;
+float DIM1 = myarray.DIM1;//get dimensions of array (not grid size)
 float maxdiff = -1;
-float Tip1_j, Tim1_j, Ti_jp1, Ti_jm1;
+float Tip1_j, Tim1_j, Ti_jp1, Ti_jm1;//define values for surrounding cells
 float l2sum = 0;
-float sx = maxx-2;
-float sy = maxy-2;
+float sx = myarray.sizex-2;
+float sy = myarray.sizey-2;
 
-float dx = 0;
-float dy = 0;
+float dx = 0;//change in x
+float dy = 0;//change in y
 
 
 
-//-----iterate through all y for steps x -----//
+//-----iterate through all x for steps y -----//
 
        for(int j = 1; j < myarray.sizey-1; ++j)
 	{
@@ -103,7 +103,7 @@ float dy = 0;
 	
 	}
 	
-//-----iterate through all x for steps y -----//	
+//-----iterate through all y for steps x -----//	
 	
        for(int i = 1; i < myarray.sizey-1; ++i)
 	{
@@ -152,6 +152,50 @@ myarray.diff.push_back(maxdiff);
 return maxdiff;
 }
 
+//--------------------------Solve array using GS-iterations----------------------------//
+
+void solve_arraySOR(carray & myarray, float E0, float w)
+{
+printf("\n\nSolving Grid size: %d Relaxation: %f\n", myarray.sizex, w);
+bool relax_on = true; 
+float diff = 1;// current difference
+float ldiff = BIG;// previous difference
+int div = 0;
+int update = 0;
+int update2 = 100;
+
+	while(diff > E0)
+	{
+	diff = gs_iter_SOR(myarray, w);
+
+
+		if(diff > BIG)//avoid infinite loops if diverges
+		break;
+	
+		if(update >= update2)//report difference every 100 steps
+		{cout << "Update: step " << update << " Solution Change: " << setprecision(9) << fixed << diff << " \n"; 
+		 update2 = update2 + 100;
+		}
+		
+		if(ldiff == diff)//checks for repeated values indication of instability for high w
+		++div;
+		else
+		div = 0;
+	
+		if(div > 20 && relax_on && w > 1.3)//reduces over-relaxation for high w when unstable
+		{
+		w = 1.3;
+		relax_on = false;
+		cout << "Relaxation Reduced to 1.0 @ " << myarray.iterations << " \n";
+		}
+			
+	ldiff = diff;
+	++update;	
+	}
+
+cout << "Iterations: " << myarray.iterations << "   L2 norm: " << setprecision(6) << fixed << myarray.l2norm.at(myarray.iterations-1) <<  "\n";
+}
+
 
 //--------------------------Print array in terminal----------------------------//
 
@@ -173,7 +217,7 @@ for(int j = 0; j < myarray.sizey; ++j)
 cout << "\n";
 }
 
-//--------------------Calculate new cell value from neibhors ---------------------//
+//--------------------Calculate new cell value from neighbors ---------------------//
 
 
 float calc_newcell(carray & myarray, float source, float Tip1_j, float Tim1_j, float Ti_jp1 ,float Ti_jm1)
@@ -193,11 +237,12 @@ float DIM1 = myarray.DIM1;
 float dx = DIM1*i;
 float dy = DIM1*j;
 float source = pow(3*pow(dx,2)-3*pow(dy,2),2)+72*(pow(dx,2)*pow(dy,2))+pow(3*pow(dy,2)-3*pow(dx,2),2);
+//source = 0 for Laplace problem
 
 return source;
 }
 
-//--------------------------Get average solution at point------------------------//
+//-----------------------Get average solution at point (1/2)(1/2)--------------------//
 
 float get_solution(carray & myarray)
 {
@@ -205,7 +250,7 @@ int sx = (myarray.sizex-2)/2;
 int sy = (myarray.sizey-2)/2;
 float sol = (myarray.mcell[sx-1][sy+1]+myarray.mcell[sx+1][sy+1]+myarray.mcell[sx+1][sy-1]+myarray.mcell[sx+1][sy-1])/4;
 
-
+//for Poisson problem only, finds value based on average of four surrounding cells
 
 return sol;
 }

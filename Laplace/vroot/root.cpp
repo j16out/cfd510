@@ -14,7 +14,7 @@ TCanvas *c2 = new TCanvas("c2","The FillRandom example",200,50,900,700);
 TCanvas *c4 = new TCanvas("c4","The FillRandom example",200,50,900,700);
 
 c1->cd();
-string titlefile = "Laplace Numerical; x; y; z";
+string titlefile = "Numerical Solution 10x10 mesh; x; y; z";
 const char* c; 
 c = titlefile.c_str();	
 
@@ -23,7 +23,7 @@ TGraph2D *gr1 = new TGraph2D();
 TGraph2D *gr5 = new TGraph2D();
 gr->SetTitle(c);
 
-titlefile = "Laplace Analytical; x; y; z";
+titlefile = "Solution Error 10x10 mesh; x; y; z";
 c = titlefile.c_str();
 gr1->SetTitle(c);	
 
@@ -35,8 +35,8 @@ for (int i = 1; i < myarray.sizex-1; i++)
 	{ float dx = DIM2*i;
 	  float dy = DIM2*j;
 	      float T = (cos(PI*dx)*sinh(PI*dy))/sinh(PI);
-
-	      gr1->SetPoint(N,dx,dy,T);
+		float nT = myarray.mcell[i][j];		
+	      gr1->SetPoint(N,dx,dy,abs(nT-T));
 	      ++N;
 	 }     
 }
@@ -72,10 +72,10 @@ for (int i = 1; i < myarray2.sizex-1; i++)
 c1->cd();
 
    gStyle->SetPalette(1);
-   gr->Draw("surf1");
+   gr->Draw("colz");
 c2->cd();   
    gStyle->SetPalette(1);
-   gr1->Draw("surf1");
+   gr1->Draw("colz");
    
 c4->cd();   
    gStyle->SetPalette(1);
@@ -87,13 +87,13 @@ c4->cd();
 //--------------------------error graphs----------------------------//
 
 void draw_graph(carray myarray, carray myarray2)
-{TCanvas *c1 = new TCanvas("c1","The FillRandom example",200,50,900,700);  
- TCanvas *c2 = new TCanvas("c2","The FillRandom example",200,50,900,700); 
+{TCanvas *c6 = new TCanvas("c6","The FillRandom example",200,50,900,700);  
+ TCanvas *c7 = new TCanvas("c7","The FillRandom example",200,50,900,700); 
 string titlefile;
 const char* c;  
 float DIM2 = myarray.DIM1;
 
-c1->cd();
+c6->cd();
 titlefile = "Convergence Behavior for a 10 x 10 mesh; Iterations (N); T(K)-T(K+1)";
 c = titlefile.c_str();
 TGraph *gr1 = new TGraph();	
@@ -116,7 +116,7 @@ for (int i = 0; i < myarray2.diff.size(); ++i)
 	gr2->SetPoint(i,i,temp);		
 	}
 
- c1->SetLogy();	
+ c6->SetLogy();	
 gr1->Draw("ALP");
 gr2->Draw("sameLP");
 	 
@@ -129,7 +129,7 @@ leg1->AddEntry(gr2,"Gauss-Seidel SOR 1.5","AP");
 //leg->AddEntry(fitb,"this one","l");
 leg1->Draw();
 
-c2->cd();
+c7->cd();
 titlefile = "L2 norm Converged Solution for 10 x 10 mesh; Iterations (N); L2";
 c = titlefile.c_str();
 TGraph *gr3 = new TGraph();	
@@ -214,9 +214,9 @@ for (int i = 0; i < myarray3.diff.size(); ++i)
  
  c1->SetLogy();	
 
-gr1->Draw("AP");
-gr2->Draw("sameP");
-gr3->Draw("sameP");
+gr1->Draw("AcP");
+gr2->Draw("samecP");
+gr3->Draw("samecP");
 	 
 
 TLegend *leg1 = new TLegend(0.75,0.9,0.9,0.8);
@@ -234,13 +234,15 @@ leg1->Draw();
 
 
 void draw_graph_l2norm3(carray myarray, carray myarray2, carray myarray3)
-{TCanvas *c1 = new TCanvas("c1","The FillRandom example",200,50,900,700);   
+{TCanvas *c1 = new TCanvas("c1","The FillRandom example",200,50,900,700); 
+//c1->SetLeftMargin(0.15);
+  
 string titlefile;
 const char* c;  
 float DIM2 = myarray.DIM1;
 
 c1->cd();
-titlefile = "Accuracy Behavior for a 40 x 40 mesh; Iterations (N); L2 norm                 ";
+titlefile = "Accuracy Behavior for a 40 x 40 mesh; Iterations (N); L2 norm (10^-2)";
 c = titlefile.c_str();
 TGraph *gr1 = new TGraph();	
 	gr1->SetMarkerColor(4);

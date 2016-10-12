@@ -35,13 +35,13 @@ void set_zero(carray & myarray)
 }
 
 
-//--------------------------set ghost cells----------------------------//
+//--------------------------set ghost cells for Laplace----------------------------//
 
 void set_ghostcells(carray & myarray)//boundary conditions
 {
 float DIM1 = myarray.DIM1;
  
-for(int i = 0; i < myarray.sizex-1; ++i)
+for(int i = 1; i < myarray.sizex-1; ++i)
 	{
 	float d = i*DIM1;
 	myarray.mcell[i][0] = 0;//top
@@ -61,8 +61,8 @@ float DIM1 = myarray.DIM1;
 float maxdiff = -1;
 float Tip1_j, Tim1_j, Ti_jp1, Ti_jm1;
 float l2sum = 0;
-float sx = maxx-2;
-float sy = maxy-2;
+float sx = myarray.sizex-2;
+float sy = myarray.sizey-2;
 
 float dx = 0;
 float dy = 0;
@@ -137,6 +137,7 @@ float dy = 0;
 		
 		float T = (cos(PI*dx)*sinh(PI*dy))/sinh(PI);
 		l2sum =  l2sum + pow((newcellSOR-T),2);
+		
 		 
 		}
 	
@@ -153,6 +154,49 @@ return maxdiff;
 }
 
 
+//--------------------------Solve array using GS-iterations----------------------------//
+
+void solve_arraySOR(carray & myarray, float E0, float w)
+{
+printf("\n\nSolving Grid size: %d Relaxation: %f\n", myarray.sizex, w);
+bool relax_on = true; 
+float diff = 1;// current difference
+float ldiff = BIG;// previous difference
+int div = 0;
+int update = 0;
+int update2 = 100;
+
+	while(diff > E0)
+	{
+	diff = gs_iter_SOR(myarray, w);
+
+
+		if(diff > BIG)//avoid infinite loops if diverges
+		break;
+	
+		if(update >= update2)//report difference every 100 steps
+		{cout << "Update: step " << update << " Solution Change: " << setprecision(9) << fixed << diff << " \n"; 
+		 update2 = update2 + 100;
+		}
+		
+		if(ldiff == diff)//checks for repeated values indication of instability for high w
+		++div;
+		else
+		div = 0;
+	
+		if(div > 20 && relax_on && w > 1.3)//reduces over-relaxation for high w when unstable
+		{
+		w = 1.3;
+		relax_on = false;
+		cout << "Relaxation Reduced to 1.0 @ " << myarray.iterations << " \n";
+		}
+			
+	ldiff = diff;
+	++update;	
+	}
+
+cout << "Iterations: " << myarray.iterations << "   L2 norm: " << setprecision(6) << fixed << myarray.l2norm.at(myarray.iterations-1) <<  "\n";
+}
 //--------------------------Print array in terminal----------------------------//
 
 void print_array(carray & myarray)
@@ -186,7 +230,7 @@ float newcell = ((  ((Tip1_j+Tim1_j)/pow(chx,2))  +  ((Ti_jp1+Ti_jm1)/pow(chy,2)
 
 return newcell;
 }
-//---------------------Get source term for poisson problem----------------------//
+//---------------------Get source term for Laplace problem----------------------//
 float calc_source(carray & myarray, int i, int j)
 {
 float DIM1 = myarray.DIM1;
