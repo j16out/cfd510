@@ -293,13 +293,13 @@ void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM)
 
 printf("\nCalculating Error...\n");
 
-float h1 = sqrt((1.0/ray1.sizex)*(DIM));
+float h3 = sqrt((1.0/ray1.sizex)*(DIM));
 float h2 = sqrt((1.0/ray2.sizex)*(DIM));
-float h3 = sqrt((1.0/ray3.sizex)*(DIM));
+float h1 = sqrt((1.0/ray3.sizex)*(DIM));
 
-float sol1 = get_solution(ray1);
+float sol3 = get_solution(ray1);
 float sol2 = get_solution(ray2);
-float sol3 = get_solution(ray3);
+float sol1 = get_solution(ray3);
 
 
 printf("h1: %f h2: %f h3: %f, sol1: %f sol2: %f sol3: %f\n",h1, h2, h3, sol1, sol2, sol3);
