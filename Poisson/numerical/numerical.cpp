@@ -277,9 +277,9 @@ return source;
 
 float get_solution(carray & myarray)
 {
-int sx = (myarray.sizex-2.0)/2.0;
-int sy = (myarray.sizey-2.0)/2.0;
-float sol = (myarray.mcell[sx-1][sy+1]+myarray.mcell[sx+1][sy+1]+myarray.mcell[sx+1][sy-1]+myarray.mcell[sx+1][sy-1])/4;
+int sx = (myarray.sizex)/2.0;
+int sy = (myarray.sizey)/2.0;
+float sol = (myarray.mcell[sx-1][sy]+myarray.mcell[sx][sy]+myarray.mcell[sx][sy-1]+myarray.mcell[sx-1][sy-1])/4;
 
 //for Poisson problem only, finds value based on average of four surrounding cells
 

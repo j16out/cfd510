@@ -43,7 +43,7 @@ carray poisson3;
 //set array size or default used 162x162
 set_array_size(poisson1, 20, 20, 1.0);//array, xsize, ysize, dimension
 set_array_size(poisson2, 40, 40, 1.0);
-set_array_size(poisson3, 158, 158, 1.0);
+set_array_size(poisson3, 80, 80, 1.0);
 
 
 //set ghost cells as boundary conditions
