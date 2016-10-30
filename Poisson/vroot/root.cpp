@@ -32,9 +32,9 @@ int N = 0;
 for (int i = 1; i < myarray.sizex-1; i++) 
 {
 	
-	for (int j = 0; j < myarray.sizey; j++) 
-	{ float dx = DIM2*i;
-	  float dy = DIM2*j;
+	for (int j = 1; j < myarray.sizey-1; j++) 
+	{ float dx = DIM2*(i-0.5);
+	  float dy = DIM2*(j-0.5);
 	  float T = myarray.mcell[i][j];
 
 	      gr->SetPoint(N,dx,dy,T);
@@ -84,8 +84,8 @@ for (int i = 1; i < myarray.sizex-1; i++)
 {
 	
 	for (int j = 1; j < myarray.sizey-1; j++) 
-	{ float dx = DIM2*i;
-	  float dy = DIM2*j;
+	{ float dx = DIM2*(i-1);
+	  float dy = DIM2*(j-1);
 	      float T = (cos(PI*dx)*sinh(PI*dy))/sinh(PI);
 
 	      gr1->SetPoint(N,dx,dy,T);
@@ -98,8 +98,8 @@ for (int i = 1; i < myarray.sizex-1; i++)
 {
 	
 	for (int j = 0; j < myarray.sizey; j++) 
-	{ float dx = DIM2*i;
-	  float dy = DIM2*j;
+	{ float dx = DIM2*(i-1);
+	  float dy = DIM2*(j-1);
 	  float T = myarray.mcell[i][j];
 
 	      gr->SetPoint(N,dx,dy,T);
@@ -113,8 +113,8 @@ for (int i = 1; i < myarray2.sizex-1; i++)
 {
 	
 	for (int j = 0; j < myarray2.sizey; j++) 
-	{ float dx = DIM2*i;
-	  float dy = DIM2*j;
+	{ float dx = DIM2*(i-1);
+	  float dy = DIM2*(j-1);
 	  float T = myarray2.mcell[i][j];
 
 	      gr5->SetPoint(N,dx,dy,T);

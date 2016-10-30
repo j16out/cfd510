@@ -13,9 +13,9 @@ echo "Starting compilation"
 echo "Reminder: Make sure root is sourced"
 #rm mtest2
 
-rm exlaplace
+rm BCtest
 #macro2
-g++ mainl.cpp numerical/numerical.cpp vroot/root.cpp -o2 -o exlaplace `root-config --cflags --glibs` -std=c++0x -pthread
+g++ BC-test.c -o2 -o BCtest `root-config --cflags --glibs` -std=c++0x -pthread
 
 #macro1
 

@@ -22,6 +22,7 @@ using namespace std;
 
 
 
+
 struct carray{
 float mcell [maxx][maxy];
 vector<float> l2norm;
@@ -53,6 +54,10 @@ void get_surcells(carray & myarray, float & Tip1_j, float & Tim1_j, float & Ti_j
 void solve_arraySOR(carray & myarray, float E0, float w);//solve the array using gs-iterations
 
 
+//-----------------------testing--------------------------//
+
+
+void testmyBC(carray & myarray);
 
 
 

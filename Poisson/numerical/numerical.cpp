@@ -37,17 +37,23 @@ void set_zero(carray & myarray)
 
 //--------------------------set ghost cells for Poisson----------------------------//
 
+
 void set_ghostcells(carray & myarray)
 {
 float DIM1 = myarray.DIM1;
 
 //set boundary conditions in ghost cells
 for(int i = 1; i < myarray.sizex-1; ++i)
-	{float d = i*DIM1;	
-	myarray.mcell[i][0] = myarray.mcell[i][1];//top boundary
-	myarray.mcell[0][i] = myarray.mcell[1][i];//left boundary
-	myarray.mcell[i][myarray.sizex-1] = 5+((1/2)*pow((1+pow(d, 2)),3));//bottom boundary
-	myarray.mcell[myarray.sizey-1][i] = 5+((1/2)*pow((1+pow(d, 2)),3));//right boundary
+	{float d = (i-0.5)*DIM1;
+	
+	//neumann boundaries	
+	myarray.mcell[i][0] = myarray.mcell[i][1];//top ghost cells 
+	myarray.mcell[0][i] = myarray.mcell[1][i];//left ghost cells
+		
+	//dirichlet boundaries	
+	myarray.mcell[i][myarray.sizex-1] = 2.0*(5.0-((1.0/2.0)*pow((1.0+pow(d, 2)),3))) - myarray.mcell[i][myarray.sizex-2];
+	myarray.mcell[myarray.sizey-1][i] = 2.0*(5.0-((1.0/2.0)*pow((1.0+pow(d, 2)),3))) - myarray.mcell[myarray.sizex-2][i];
+	
         }
 }
 
@@ -58,83 +64,93 @@ for(int i = 1; i < myarray.sizex-1; ++i)
 float gs_iter_SOR(carray & myarray, float omega)
 {
 float DIM1 = myarray.DIM1;//get dimensions of array (not grid size)
-float maxdiff = -1;
 float Tip1_j, Tim1_j, Ti_jp1, Ti_jm1;//define values for surrounding cells
-float l2sum = 0;
+float l2sum = 0.0;
 float sx = myarray.sizex-2;
 float sy = myarray.sizey-2;
 
-float dx = 0;//change in x
-float dy = 0;//change in y
+float dx = 0.0;//change in x
+float dy = 0.0;//change in y
 
+carray oldarray=myarray;
 
 
 //-----iterate through all x for steps y -----//
+set_ghostcells(myarray);
 
-       for(int j = 1; j < myarray.sizey-1; ++j)
+for(int j = 1; j < myarray.sizey-1; ++j)
+{
+
+
+	for(int i = 1; i < myarray.sizex-1; ++i)
 	{
 	
+	dx = (i-0.5)*DIM1;
+	dy = (j-0.5)*DIM1;
 	
-		for(int i = 1; i < myarray.sizex-1; ++i)
-		{
-		dx = DIM1*i;
-		dy = DIM1*j;
-		
-		//----get surrounding cells and compute new cell-------//
-		get_surcells(myarray, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1, i, j);		
-		float source = calc_source(myarray, i, j);
-		float newcell = calc_newcell(myarray, source, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1); 
-		
-		//----apply over-relaxation-----//
-		float delta = newcell - myarray.mcell[i][j];
-		float newcellSOR = myarray.mcell[i][j] + omega*(delta);
-		
-		//-----find difference between new and old cell-----//
-		float diff = abs(newcell - myarray.mcell[i][j]);
-		if(diff > maxdiff)
-		maxdiff = diff;
-		
-		
-		//-----update current cell----//
-		myarray.mcell[i][j] = newcellSOR;
-		set_ghostcells(myarray);
+	//----get surrounding cells and compute new cell-------//
+	get_surcells(myarray, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1, i, j);		
+	float source = calc_source(myarray, i, j);
+	float newcell = calc_newcell(myarray, source, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1); 
+	
+	//----apply over-relaxation-----//
+	float delta = newcell - myarray.mcell[i][j];
+	float newcellSOR = myarray.mcell[i][j] + omega*(delta);
+	
+	//-----update current cell----//
+	myarray.mcell[i][j] = newcellSOR;
+	
 
-		}
-	
 	}
+
+}
 	
-//-----iterate through all y for steps x -----//	
-	
-       for(int i = 1; i < myarray.sizey-1; ++i)
+set_ghostcells(myarray);	
+//-----iterate through all y for steps x -----//		
+for(int i = 1; i < myarray.sizey-1; ++i)
+{
+
+
+	for(int j = 1; j < myarray.sizex-1; ++j)
 	{
 	
+	dx = (i-0.5)*DIM1;
+	dy = (j-0.5)*DIM1;
 	
-		for(int j = 1; j < myarray.sizex-1; ++j)
-		{
-		dx = DIM1*i;
-		dy = DIM1*j;
-		
-		//----get surrounding cells and compute new cell-------//
-		get_surcells(myarray, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1, i, j);		
-		float source = calc_source(myarray, i, j);
-		float newcell = calc_newcell(myarray, source, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1); 
-		
-		//----apply over-relaxation-----//
-		float delta = newcell - myarray.mcell[i][j];
-		float newcellSOR = myarray.mcell[i][j] + omega*(delta);
-		
-		//-----find difference between new and old cell-----//
-		float diff = abs(newcell - myarray.mcell[i][j]);
-		if(diff > maxdiff)
-		maxdiff = diff;
-		
-		
-		//-----update current cell----//
-		myarray.mcell[i][j] = newcellSOR;
-		set_ghostcells(myarray);
-		}
+	//----get surrounding cells and compute new cell-------//
+	get_surcells(myarray, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1, i, j);		
+	float source = calc_source(myarray, i, j);
+	float newcell = calc_newcell(myarray, source, Tip1_j, Tim1_j, Ti_jp1 , Ti_jm1); 
+	
+	//----apply over-relaxation-----//
+	float delta = newcell - myarray.mcell[i][j];
+	float newcellSOR = myarray.mcell[i][j] + omega*(delta);
+
+	
+	//-----update current cell----//
+	myarray.mcell[i][j] = newcellSOR;
 	
 	}
+
+}
+
+
+float maxdiff = -1.0;
+
+for(int i = 2; i < myarray.sizey-2; ++i)
+{	
+	for(int j = 2; j < myarray.sizex-2; ++j)
+	{
+	float diff = abs(oldarray.mcell[i][j] - myarray.mcell[i][j]);
+		if(diff > maxdiff)
+		{
+		maxdiff = diff;
+		//cout << "coord " << maxdiff << " " << i << "  " << j << "\n";
+		}
+	}	
+
+}
+	
 
 myarray.diff.push_back(maxdiff);
 ++myarray.iterations; 
@@ -149,18 +165,18 @@ float l2sum =0;
 float sx = myarray.sizex-2;
 float sy = myarray.sizey-2;
 
-       for(int j = 1; j < myarray.sizey-1; ++j)
-	{	
-		for(int i = 1; i < myarray.sizex-1; ++i)
-		{
-	
-		float P = myarray.mcell[i][j];
-		float T = myarray2.mcell[i][j];
-		l2sum =  l2sum + pow((P-T),2);
+for(int j = 1; j < myarray.sizey-1; ++j)
+{	
+	for(int i = 1; i < myarray.sizex-1; ++i)
+	{
 
-		}
-	
+	float P = myarray.mcell[i][j];
+	float T = myarray2.mcell[i][j];
+	l2sum =  l2sum + pow((P-T),2);
+
 	}
+
+}
 
 float l2 = sqrt(l2sum/(sx*sy));
 cout << "L2 norm: " << l2 << "\n";
@@ -178,34 +194,34 @@ int div = 0;
 int update = 0;
 int update2 = 100;
 
-	while(diff > E0)
-	{
-	diff = gs_iter_SOR(myarray, w);
+while(diff > E0)
+{
+diff = gs_iter_SOR(myarray, w);
 
 
-		if(diff > BIG)//avoid infinite loops if diverges
-		break;
-	
-		if(update >= update2)//report difference every 100 steps
-		{cout << "Update: step " << update << " Solution Change: " << setprecision(9) << fixed << diff << " \n"; 
-		 update2 = update2 + 100;
-		}
-		
-		if(ldiff == diff)//checks for repeated values indication of instability for high w
-		++div;
-		else
-		div = 0;
-	
-		if(div > 20 && relax_on && w > 1.3)//reduces over-relaxation for high w when unstable
-		{
-		w = 1.3;
-		relax_on = false;
-		cout << "Relaxation Reduced to 1.0 @ " << myarray.iterations << " \n";
-		}
-			
-	ldiff = diff;
-	++update;	
+	if(diff > BIG)//avoid infinite loops if diverges
+	break;
+
+	if(update >= update2)//report difference every 100 steps
+	{cout << "Update: step " << update << " Solution Change: " << setprecision(9) << fixed << diff << " \n"; 
+	//print_array(myarray);
+	 update2 = update2 + 100;
 	}
+	
+	if(ldiff == diff)//checks for repeated values indication of instability for high w
+	++div;
+	else
+	div = 0;
+
+	if(div > 10 && w > 1.1)//reduces over-relaxation for high w when unstable
+	{
+	w = 1.0;
+	cout << "Relaxation Reduced to "<<w<<" @ " << myarray.iterations << " \n";
+	}
+		
+ldiff = diff;
+++update;	
+}
 
 cout << "Iterations: " << myarray.iterations <<  "\n";
 }
@@ -249,9 +265,9 @@ return newcell;
 float calc_source(carray & myarray, int i, int j)
 {
 float DIM1 = myarray.DIM1;
-float dx = DIM1*i;
-float dy = DIM1*j;
-float source = -1*(pow(3*pow(dx,2)-3*pow(dy,2),2)+72*(pow(dx,2)*pow(dy,2))+pow(3*pow(dy,2)-3*pow(dx,2),2));
+float dx = (i-0.5)*DIM1;
+float dy = (j-0.5)*DIM1;
+float source = -1.0*(pow(3*pow(dx,2)-3*pow(dy,2),2)+72.0*(pow(dx,2)*pow(dy,2))+pow(3*pow(dy,2)-3.0*pow(dx,2),2));
 //source = 0 for Laplace problem
 
 return source;
@@ -261,8 +277,8 @@ return source;
 
 float get_solution(carray & myarray)
 {
-int sx = (myarray.sizex-2)/2;
-int sy = (myarray.sizey-2)/2;
+int sx = (myarray.sizex-2.0)/2.0;
+int sy = (myarray.sizey-2.0)/2.0;
 float sol = (myarray.mcell[sx-1][sy+1]+myarray.mcell[sx+1][sy+1]+myarray.mcell[sx+1][sy-1]+myarray.mcell[sx+1][sy-1])/4;
 
 //for Poisson problem only, finds value based on average of four surrounding cells

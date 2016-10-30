@@ -41,41 +41,44 @@ carray poisson2;
 carray poisson3;
 
 //set array size or default used 162x162
-set_array_size(poisson1, 10, 10, 1.0);//array, xsize, ysize, dimension
-set_array_size(poisson2, 20, 20, 1.0);
-set_array_size(poisson3, 40, 40, 1.0);
+set_array_size(poisson1, 20, 20, 1.0);//array, xsize, ysize, dimension
+set_array_size(poisson2, 40, 40, 1.0);
+set_array_size(poisson3, 158, 158, 1.0);
 
 
 //set ghost cells as boundary conditions
 
 
-set_zero(poisson1);//zero
+set_zero(poisson1);
 set_ghostcells(poisson1);//set ghost cells/boundaries
 print_array(poisson1);//print array in terminal
 
+/*
 set_zero(poisson2);
 set_ghostcells(poisson2);
 print_array(poisson2);
 
 set_zero(poisson3);
 set_ghostcells(poisson3);
-print_array(poisson3);
+print_array(poisson3);*/
+
+
 
 
 //---------------------GS SOR w=1.3 loop 1----------------------//
 
-solve_arraySOR(poisson1, E07, 1.3);
+solve_arraySOR(poisson1, E09, 1.5);
 cout << "Solution: " << get_solution(poisson1) << "\n";
 
 
 //---------------------GS SOR w=1.3 loop 2----------------------//
 
-solve_arraySOR(poisson2, E07, 1.3);
+solve_arraySOR(poisson2, E09, 1.5);
 cout << "Solution: " << get_solution(poisson2) << "\n";
 
 //---------------------GS SOR w=1 loop 3----------------------//
 
-solve_arraySOR(poisson3, E07, 1.3);
+solve_arraySOR(poisson3, E09, 1.5);
 cout << "Solution: " << get_solution(poisson3) << "\n";
 
 //---------------------calc error based on ASME---------------//
@@ -85,6 +88,8 @@ get_l2norm(poisson1, poisson2);
 get_l2norm(poisson2, poisson3);
 
 //----------------------Draw Data---------------------//
+
+
 
 if(1)//start root application
 {

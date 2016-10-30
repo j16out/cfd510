@@ -36,7 +36,8 @@ float DIM1 = 0;
 
 void set_array_size(carray & myarray, int x, int y, float DIM);//set array size
 
-void set_ghostcells(carray & myarray);//set boundaries/ghost cells
+void set_ghostcells(carray & myarray);//set ghost cells
+
 
 void set_zero(carray & myarray);//zero entire array
 
