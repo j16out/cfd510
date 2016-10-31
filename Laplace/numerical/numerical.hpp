@@ -37,7 +37,8 @@ float DIM1 = 0;
 
 void set_array_size(carray & myarray, int x, int y, float DIM);//set array size
 
-void set_ghostcells(carray & myarray);//set boundaries/ghost cells
+void set_ghostcells(carray & myarray);//set ghost cells
+
 
 void set_zero(carray & myarray);//zero entire array
 
@@ -53,7 +54,13 @@ void get_surcells(carray & myarray, float & Tip1_j, float & Tim1_j, float & Ti_j
 
 void solve_arraySOR(carray & myarray, float E0, float w);//solve the array using gs-iterations
 
+void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM);//get error using 3 arrays based on ASME solution accuarcy handout
 
+float get_solution(carray & myarray);//find solution at p(1/2,1/2) for Poisson
+
+void get_l2norm(carray & myarray, carray myarray2);//get estimated vale for l2 norm between arrays
+
+void set_analytic(carray & myarray);
 //-----------------------testing--------------------------//
 
 

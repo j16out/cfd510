@@ -47,7 +47,7 @@ using namespace std;
 
 void draw_graph(carray myarray, carray myarray2);
 
-void draw_3Dgraph(carray myarray, carray myarray2);
+void draw_3Dgraph(carray myarray, carray myarray2, carray myarrayA);
 
 void draw_graph_diff3(carray myarray, carray myarray2, carray myarray3);
 

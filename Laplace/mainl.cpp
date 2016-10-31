@@ -38,11 +38,16 @@ int main(int argc, char **argv)
 float diff = 1;
 carray gsarray;//my main array
 carray gsarraySOR;
+carray analytic;
 
 
 //set size
 set_array_size(gsarray, 10, 10, 1.0);
 set_array_size(gsarraySOR, 10, 10, 1.0);
+set_array_size(analytic, 10, 10, 1.0);
+
+//set analytic solution
+set_analytic(analytic);
 
 
 //set ghost cells as boundary conditions
@@ -73,7 +78,7 @@ if(1)
 {
 	TApplication theApp("App", &argc, argv);
 	draw_graph(gsarray, gsarraySOR);
-	draw_3Dgraph(gsarray, gsarraySOR);
+	draw_3Dgraph(gsarray, gsarraySOR, analytic);
 	theApp.Run();
 }
 

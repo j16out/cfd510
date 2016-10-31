@@ -5,7 +5,7 @@ using namespace std;
 
 //--------------------------3D graphs----------------------------//
 
-void draw_3Dgraph(carray myarray, carray myarray2)
+void draw_3Dgraph(carray myarray, carray myarray2, carray myarrayA)
 {
 
 float DIM2 = myarray.DIM1;
@@ -28,15 +28,16 @@ c = titlefile.c_str();
 gr1->SetTitle(c);	
 
 int N = 0;
-for (int i = 1; i < myarray.sizex-1; i++) 
+
+for (int i = 1; i < myarrayA.sizex-1; i++) 
 {
 	
-	for (int j = 1; j < myarray.sizey-1; j++) 
-	{ float dx = DIM2*i;
-	  float dy = DIM2*j;
-	      float T = (cos(PI*dx)*sinh(PI*dy))/sinh(PI);
-		float nT = myarray.mcell[i][j];		
-	      gr1->SetPoint(N,dx,dy,abs(nT-T));
+	for (int j = 1; j < myarrayA.sizey-1; j++) 
+	{ float dx = DIM2*(i-0.5);
+	  float dy = DIM2*(j-0.5);
+	  float T = myarrayA.mcell[i][j]-myarray.mcell[i][j];
+
+	      gr1->SetPoint(N,dx,dy,T);
 	      ++N;
 	 }     
 }
@@ -45,9 +46,9 @@ N = 0;
 for (int i = 1; i < myarray.sizex-1; i++) 
 {
 	
-	for (int j = 0; j < myarray.sizey; j++) 
-	{ float dx = DIM2*i;
-	  float dy = DIM2*j;
+	for (int j = 1; j < myarray.sizey-1; j++) 
+	{ float dx = DIM2*(i-0.5);
+	  float dy = DIM2*(j-0.5);
 	  float T = myarray.mcell[i][j];
 
 	      gr->SetPoint(N,dx,dy,T);
@@ -60,9 +61,9 @@ N = 0;
 for (int i = 1; i < myarray2.sizex-1; i++) 
 {
 	
-	for (int j = 0; j < myarray2.sizey; j++) 
-	{ float dx = DIM2*i;
-	  float dy = DIM2*j;
+	for (int j = 1; j < myarray2.sizey-1; j++) 
+	{ float dx = DIM2*(i-0.5);
+	  float dy = DIM2*(j-0.5);
 	  float T = myarray2.mcell[i][j];
 
 	      gr5->SetPoint(N,dx,dy,T);
