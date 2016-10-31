@@ -54,8 +54,10 @@ set_analytic(analytic);
 set_zero(gsarray);
 set_ghostcells(gsarray);
 
+
 set_zero(gsarraySOR);
 set_ghostcells(gsarraySOR);
+
 
 print_array(gsarraySOR);
 
@@ -67,10 +69,12 @@ cout << "done!\n";
 //---------------------GS loop----------------------//
 
 solve_arraySOR(gsarray, E09, 1.0);
+get_l2norm(gsarray, analytic);
 
 //---------------------GS SOR loop----------------------//
 
 solve_arraySOR(gsarraySOR, E09, 1.5);
+get_l2norm(gsarraySOR, analytic);
 
 //----------------------Draw Data---------------------//
 

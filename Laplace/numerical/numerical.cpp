@@ -232,7 +232,7 @@ diff = gs_iter_SOR(myarray, w);
 	else
 	div = 0;
 
-	if(div > 10 && w > 1.1)//reduces over-relaxation for high w when unstable
+	if(div > 3 && w > 1.1)//reduces over-relaxation for high w when unstable
 	{
 	w = 1.0;
 	cout << "Relaxation Reduced to "<<w<<" @ " << myarray.iterations << " \n";

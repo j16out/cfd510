@@ -38,49 +38,61 @@ int main(int argc, char **argv)
 
 float diff = 1;
 carray gsarraySOR1;//my main arrays
-carray gsarraySOR13;
-carray gsarraySOR15;
+carray gsarraySOR2;
+carray gsarraySOR3;
+carray analytic1;
+carray analytic2;
+carray analytic3;
 
 //set size
 set_array_size(gsarraySOR1, 20, 20, 1.0);//array, xsize, ysize, dimension
-set_array_size(gsarraySOR13, 20, 20, 1.0);
-set_array_size(gsarraySOR15, 20, 20, 1.0);
+set_array_size(gsarraySOR2, 40, 40, 1.0);
+set_array_size(gsarraySOR3, 80, 80, 1.0);
+
+set_array_size(analytic1, 20, 20, 1.0);
+set_array_size(analytic2, 40, 40, 1.0);
+set_array_size(analytic3, 80, 80, 1.0);
+
+//set analytic solution
+set_analytic(analytic1);
+set_analytic(analytic2);
+set_analytic(analytic3);
 
 
 //set ghost cells as boundary conditions
 set_zero(gsarraySOR1);
 set_ghostcells(gsarraySOR1);
 
-set_zero(gsarraySOR13);
-set_ghostcells(gsarraySOR13);
+set_zero(gsarraySOR2);
+set_ghostcells(gsarraySOR2);
 
-set_zero(gsarraySOR15);
-set_ghostcells(gsarraySOR15);
+set_zero(gsarraySOR3);
+set_ghostcells(gsarraySOR3);
 
 
 
 //---------------------GS SOR w=1 loop----------------------//
 
-solve_arraySOR(gsarraySOR1, E07, 1.0);
-
+solve_arraySOR(gsarraySOR1, E09, 1.0);
+get_l2norm(gsarraySOR1, analytic1);
 
 //---------------------GS SOR w=1.3 loop----------------------//
 
 
-solve_arraySOR(gsarraySOR13, E07, 1.3);
-
+solve_arraySOR(gsarraySOR2, E09, 1.0);
+get_l2norm(gsarraySOR2, analytic2);
 //---------------------GS SOR w=1.5 loop----------------------//
 
 
-solve_arraySOR(gsarraySOR15, E07, 1.5);
-
+solve_arraySOR(gsarraySOR3, E09, 1.0);
+get_l2norm(gsarraySOR3, analytic3);
 
 //----------------------Draw Data---------------------//
 
 if(1)//start root app
 {
 	TApplication theApp("App", &argc, argv);
-	draw_graph_diff3(gsarraySOR1, gsarraySOR13, gsarraySOR15);//Draw data using root
+	draw_graph_diff3(gsarraySOR1, gsarraySOR2, gsarraySOR3);//Draw data using root
 	theApp.Run();
 }
 
