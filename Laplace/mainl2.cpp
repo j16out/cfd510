@@ -46,12 +46,12 @@ carray analytic3;
 
 //set size
 set_array_size(gsarraySOR1, 20, 20, 1.0);//array, xsize, ysize, dimension
-set_array_size(gsarraySOR2, 40, 40, 1.0);
-set_array_size(gsarraySOR3, 80, 80, 1.0);
+set_array_size(gsarraySOR2, 20, 20, 1.0);
+set_array_size(gsarraySOR3, 20, 20, 1.0);
 
 set_array_size(analytic1, 20, 20, 1.0);
-set_array_size(analytic2, 40, 40, 1.0);
-set_array_size(analytic3, 80, 80, 1.0);
+set_array_size(analytic2, 20, 20, 1.0);
+set_array_size(analytic3, 20, 20, 1.0);
 
 //set analytic solution
 set_analytic(analytic1);
@@ -74,18 +74,18 @@ set_ghostcells(gsarraySOR3);
 //---------------------GS SOR w=1 loop----------------------//
 
 solve_arraySOR(gsarraySOR1, E09, 1.0);
-get_l2norm(gsarraySOR1, analytic1);
+float n = get_l2norm(gsarraySOR1, analytic1);
 
 //---------------------GS SOR w=1.3 loop----------------------//
 
 
-solve_arraySOR(gsarraySOR2, E09, 1.0);
-get_l2norm(gsarraySOR2, analytic2);
+solve_arraySOR(gsarraySOR2, E09, 1.3);
+n = get_l2norm(gsarraySOR2, analytic2);
 //---------------------GS SOR w=1.5 loop----------------------//
 
 
-solve_arraySOR(gsarraySOR3, E09, 1.0);
-get_l2norm(gsarraySOR3, analytic3);
+solve_arraySOR(gsarraySOR3, E09, 1.5);
+n = get_l2norm(gsarraySOR3, analytic3);
 
 //----------------------Draw Data---------------------//
 

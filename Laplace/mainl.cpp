@@ -69,12 +69,12 @@ cout << "done!\n";
 //---------------------GS loop----------------------//
 
 solve_arraySOR(gsarray, E09, 1.0);
-get_l2norm(gsarray, analytic);
+float n = get_l2norm(gsarray, analytic);
 
 //---------------------GS SOR loop----------------------//
 
 solve_arraySOR(gsarraySOR, E09, 1.5);
-get_l2norm(gsarraySOR, analytic);
+n = get_l2norm(gsarraySOR, analytic);
 
 //----------------------Draw Data---------------------//
 

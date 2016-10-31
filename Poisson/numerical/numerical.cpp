@@ -150,8 +150,15 @@ for(int i = 2; i < myarray.sizey-2; ++i)
 	}	
 
 }
-	
 
+//for obtaining l2norm convergence
+
+/*carray analytic;
+set_array_size(analytic, 10, 10, 1.0);
+set_analytic(analytic);
+//float norm = get_l2norm(myarray, analytic);
+
+myarray.l2norm.push_back(norm);	*/
 myarray.diff.push_back(maxdiff);
 ++myarray.iterations; 
 
@@ -159,7 +166,7 @@ return maxdiff;
 }
 //-------------------------Get L2 nrom for unknown analytical----------------------//
 
-void get_l2norm(carray & myarray, carray myarray2)
+float get_l2norm(carray & myarray, carray myarray2)
 {
 float l2sum =0;
 float sx = myarray.sizex-2;
@@ -180,6 +187,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 
 float l2 = sqrt(l2sum/(sx*sy));
 cout << "L2 norm: " << l2 << "\n";
+return l2;
 }
 
 //--------------------------Solve array using GS-iterations----------------------------//
@@ -194,7 +202,7 @@ int div = 0;
 int update = 0;
 int update2 = 100;
 
-while(diff > E0)
+while(diff >= E0)
 {
 diff = gs_iter_SOR(myarray, w);
 
@@ -213,7 +221,7 @@ diff = gs_iter_SOR(myarray, w);
 	else
 	div = 0;
 
-	if(div > 10 && w > 1.1)//reduces over-relaxation for high w when unstable
+	if(div > 3 && w > 1.1)//reduces over-relaxation for high w when unstable
 	{
 	w = 1.0;
 	cout << "Relaxation Reduced to "<<w<<" @ " << myarray.iterations << " \n";
@@ -277,10 +285,12 @@ return source;
 
 float get_solution(carray & myarray)
 {
+float DIM1 = myarray.DIM1;
 int sx = (myarray.sizex)/2.0;
 int sy = (myarray.sizey)/2.0;
-float sol = (myarray.mcell[sx-1][sy]+myarray.mcell[sx][sy]+myarray.mcell[sx][sy-1]+myarray.mcell[sx-1][sy-1])/4;
+float sol = (myarray.mcell[sx-1][sy]+myarray.mcell[sx][sy]+myarray.mcell[sx][sy-1]+myarray.mcell[sx-1][sy-1])/4.0;
 
+printf("cell 1: %f cell 2: %f cell 3: %f cell 4: %f\n",myarray.mcell[sx-1][sy],myarray.mcell[sx][sy],myarray.mcell[sx][sy-1],myarray.mcell[sx-1][sy-1]);
 //for Poisson problem only, finds value based on average of four surrounding cells
 
 return sol;
@@ -309,21 +319,23 @@ void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM)
 
 printf("\nCalculating Error...\n");
 
-float h3 = sqrt((1.0/ray1.sizex)*(DIM));
-float h2 = sqrt((1.0/ray2.sizex)*(DIM));
-float h1 = sqrt((1.0/ray3.sizex)*(DIM));
+float h1 = DIM/ray1.sizex;
+float h2 = DIM/ray2.sizex;
+float h3 = DIM/ray3.sizex;
 
-float sol3 = get_solution(ray1);
+
+float sol1 = get_solution(ray1);
 float sol2 = get_solution(ray2);
-float sol1 = get_solution(ray3);
+float sol3 = get_solution(ray3);
 
 
-printf("h1: %f h2: %f h3: %f, sol1: %f sol2: %f sol3: %f\n",h1, h2, h3, sol1, sol2, sol3);
+
+printf("h1: %f \nh2: %f \nh3: %f, \nsol1: %f \nsol2: %f \nsol3: %f\n",h1, h2, h3, sol1, sol2, sol3);
 
 float r21 = h2/h1;
 float r32 = h3/h2;
 
-printf("r32: %f r21: %f\n",r32, r21);
+printf("\nr32: %f \nr21: %f\n",r32, r21);
 
 float e32 = sol3-sol2;
 float e21 = sol2-sol1;
@@ -346,27 +358,37 @@ float diff = 1;
 
 	float p_n = (1/log(r21))*(abs(log(abs(e32/e21))+log((pow(r21,p)-s)/(pow(r32,p)-s)) ));
 	diff = abs(p_n -p);
-	printf("p_n: %f p: %f diff: %f\n",p_n, p, diff);
+	//printf("p_n: %f p: %f diff: %f\n",p_n, p, diff);
 
 	p = p_n;
 	}
-
+ 
 //
 float sol_ext21 = (pow(r21, p)*sol1-sol2)/(pow(r21,p)-1.0);
 float sol_ext32 = (pow(r32, p)*sol2-sol3)/(pow(r32,p)-1.0);
 
-printf("phi_ext21: %f phi_ext32 %f\n", sol_ext21, sol_ext32);
+printf("order: %f \nphi_ext21: %f \nphi_ext32 %f\n",p, sol_ext21, sol_ext32);
 
 float ea21 = abs((sol1-sol2)/sol1);
-float ea32 = abs((sol2-sol3)/sol2);
 
 float e_ext21 = abs((sol_ext21-sol1)/sol_ext21);
-float e_ext32 = abs((sol_ext32-sol2)/sol_ext32);
 
 float GCI_21 = (1.25*ea21)/(pow(r21,p)-1.0);
-float GCI_32 = (1.25*ea32)/(pow(r32,p)-1.0);
 
-printf("ea21/32: %f %f e_ext21/32: %f %f GC121/32 %f %f\n", ea21, ea32, e_ext21, e_ext32, GCI_21, GCI_32);
+
+printf("ea21: %f  \ne_ext21: %f  \nGC121 %f \n", ea21, e_ext21, GCI_21);
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -28,6 +28,8 @@ using namespace std;
 #define E07 0.0000001
 #define E08 0.00000001
 #define E09 0.000000001
+#define E10 0.0000000001
+#define E11 0.00000000001
 
 
 
@@ -51,41 +53,39 @@ set_array_size(poisson3, 80, 80, 1.0);
 
 set_zero(poisson1);
 set_ghostcells(poisson1);//set ghost cells/boundaries
-print_array(poisson1);//print array in terminal
+//print_array(poisson1);//print array in terminal
 
-/*
+
 set_zero(poisson2);
 set_ghostcells(poisson2);
-print_array(poisson2);
+//print_array(poisson2);
 
 set_zero(poisson3);
 set_ghostcells(poisson3);
-print_array(poisson3);*/
-
+//print_array(poisson3);
 
 
 
 //---------------------GS SOR w=1.3 loop 1----------------------//
 
-solve_arraySOR(poisson1, E09, 1.5);
+solve_arraySOR(poisson1, E11, 1.3);
 cout << "Solution: " << get_solution(poisson1) << "\n";
 
 
 //---------------------GS SOR w=1.3 loop 2----------------------//
 
-solve_arraySOR(poisson2, E09, 1.5);
+solve_arraySOR(poisson2, E11, 1.3);
 cout << "Solution: " << get_solution(poisson2) << "\n";
 
 //---------------------GS SOR w=1 loop 3----------------------//
 
-solve_arraySOR(poisson3, E09, 1.5);
+solve_arraySOR(poisson3, E11, 1.3);
 cout << "Solution: " << get_solution(poisson3) << "\n";
 
 //---------------------calc error based on ASME---------------//
 
-get_discrete_Error(poisson1, poisson2, poisson3, 1.0);
-get_l2norm(poisson1, poisson2);
-get_l2norm(poisson2, poisson3);
+get_discrete_Error(poisson3, poisson2, poisson1, 1.0);
+
 
 //----------------------Draw Data---------------------//
 

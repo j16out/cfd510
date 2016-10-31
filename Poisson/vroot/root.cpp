@@ -48,7 +48,8 @@ N = 0;
 c1->cd();
 
    gStyle->SetPalette(1);
-   gr->Draw("colz");
+   //gr->Draw("colz");
+   gr->Draw("surf1z"); 
 
    
 

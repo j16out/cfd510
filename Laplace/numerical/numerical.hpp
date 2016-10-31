@@ -58,7 +58,7 @@ void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM);//get 
 
 float get_solution(carray & myarray);//find solution at p(1/2,1/2) for Poisson
 
-void get_l2norm(carray & myarray, carray myarray2);//get estimated vale for l2 norm between arrays
+float get_l2norm(carray & myarray, carray myarray2);//get estimated vale for l2 norm between arrays
 
 void set_analytic(carray & myarray);
 //-----------------------testing--------------------------//

@@ -53,8 +53,6 @@ for(int i = 1; i < myarray.sizex-1; ++i)
 	myarray.mcell[0][i] = myarray.mcell[1][i];//left ghost cells
 	myarray.mcell[myarray.sizey-1][i] = myarray.mcell[myarray.sizey-2][i];//right	
 	
-	
-	
         }
 }
 
@@ -151,8 +149,15 @@ for(int i = 2; i < myarray.sizey-2; ++i)
 	}	
 
 }
-	
 
+//for obtaining l2norm convergence
+
+/*carray analytic;
+set_array_size(analytic, 10, 10, 1.0);
+set_analytic(analytic);
+//float norm = get_l2norm(myarray, analytic);
+
+myarray.l2norm.push_back(norm);	*/
 myarray.diff.push_back(maxdiff);
 ++myarray.iterations; 
 
@@ -160,7 +165,7 @@ return maxdiff;
 }
 //-------------------------Get L2 nrom for unknown analytical----------------------//
 
-void get_l2norm(carray & myarray, carray myarray2)
+float get_l2norm(carray & myarray, carray myarray2)
 {
 float l2sum =0;
 float sx = myarray.sizex-2;
@@ -181,25 +186,25 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 
 float l2 = sqrt(l2sum/(sx*sy));
 cout << "L2 norm: " << l2 << "\n";
+return l2;
 }
 
 //----------------------------Set a Analytical Solution------------------------------//
 void set_analytic(carray & myarray)
-{float DIM1 = myarray.DIM1;
-	for(int j = 1; j < myarray.sizey-1; ++j)
+{
+float DIM1 = myarray.DIM1;
+for(int j = 1; j < myarray.sizey-1; ++j)
+{
+
+	for(int i = 1; i < myarray.sizex-1; ++i)
 	{
-
-
-		for(int i = 1; i < myarray.sizex-1; ++i)
-		{
-		float dx = (i-0.5)*DIM1;
-		float dy = (j-0.5)*DIM1;
-		float T = (cos(PI*dx)*sinh(PI*dy))/sinh(PI);
-		myarray.mcell[i][j] = T;
-		}
-
-
+	float dx = (i-0.5)*DIM1;
+	float dy = (j-0.5)*DIM1;
+	float T = (cos(PI*dx)*sinh(PI*dy))/sinh(PI);
+	myarray.mcell[i][j] = T;
 	}
+
+}
 }
 //--------------------------Solve array using GS-iterations----------------------------//
 
@@ -213,7 +218,7 @@ int div = 0;
 int update = 0;
 int update2 = 100;
 
-while(diff > E0)
+while(diff >= E0)
 {
 diff = gs_iter_SOR(myarray, w);
 
@@ -389,83 +394,6 @@ printf("ea21/32: %f %f e_ext21/32: %f %f GC121/32 %f %f\n", ea21, ea32, e_ext21,
 
 }
 
-
-
-
-
-
-
-
-
-//-----------------------------BC checking-------------------------------------//
-
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-
-double BCfunc(const double coord) 
-{
-  return cos(M_PI*coord);
-}
-
-int approxEqual(const double a, const double b)// checks if equal within a relative tolerance, truncating only works if certain your values fall within a range, this avoids that
-{
-  double ave = (a + b) * 0.5;
-  double tol = MAX(ave*1.e-10, 1.e-10);
-  return (fabs(a-b) < tol ? 1 : 0);
-}
-
-int BCtest(const double coord, const double interiorValue,
-	    const double ghostValue)
-{
-  double wallValue = BCfunc(coord);
-  double aveValue = (interiorValue + ghostValue) * 0.5;
-  return approxEqual(wallValue, aveValue);
-}
-
-#define IMAX 20
-#define JMAX 20
-
-int testAllBCs(double soln[IMAX+2][JMAX+2]) 
-{
-  double dx = 1./IMAX;
-  int i;
-  int OK = 1;
-  for (i = 1; i <= IMAX && OK; i++) {
-    double x = (i-0.5) * dx;
-    OK = BCtest(x, soln[i][JMAX], soln[i][JMAX+1]);
-  }
-
-  if (i == IMAX+1 && OK == 1) {
-    printf("BC test passed\n");
-    return 1;
-  }
-  else {
-    printf("BC test failed\n");
-    return 0;
-  }
-}
-
-void testmyBC(carray & myarray)
-{
-
-  double soln[IMAX+2][JMAX+2];
-  double dx = 1./IMAX;
-  double dy = 1./JMAX;
-  int i, j;
-  
-  for (i = 1; i <= IMAX; i++) {
-    for (j = 1; j <= JMAX; j++) {
-      soln[i][j] = 0;
-    }
-  }
-
-  for (i = 1; i <= IMAX; i++) {
-    double x = (i-0.5) * dx;
-    soln[i][JMAX+1] = 2*BCfunc(x) - soln[i][JMAX];
-  }
-
-  testAllBCs(soln);
-
-}
 
 
 

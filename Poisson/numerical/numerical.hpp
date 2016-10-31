@@ -16,8 +16,8 @@
 using namespace std;
 
 #define BIG 1000000
-#define maxx 162
-#define maxy 162
+#define maxx 160
+#define maxy 160
 #define PI 3.141592654
 
 
@@ -57,7 +57,7 @@ void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM);//get 
 
 float get_solution(carray & myarray);//find solution at p(1/2,1/2) for Poisson
 
-void get_l2norm(carray & myarray, carray myarray2);//get estimated vale for l2 norm between arrays
+float get_l2norm(carray & myarray, carray myarray2);//get estimated vale for l2 norm between arrays
 
 
 #endif
