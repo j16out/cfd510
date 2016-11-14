@@ -12,7 +12,7 @@ void draw_graph_wave1(carray myarray, carray myarray2)
 {TCanvas *c1 = new TCanvas("c1","The FillRandom example",200,50,900,700);   
 string titlefile;
 const char* c;  
-float DIM2 = myarray.DIM1;
+float DIM2 = myarray2.DIM1;
 
 c1->cd();
 titlefile = "Convergence Behavior for a 20 x 20 mesh; Iterations (N); T(K)-T(K+1)";
@@ -27,6 +27,12 @@ TGraph *gr2 = new TGraph();
 	gr2->SetMarkerStyle(23);
 	gr2->SetLineColor(1);
 	gr2->SetTitle(c);
+TGraph *gr3 = new TGraph();	
+	gr3->SetMarkerColor(2);
+	gr3->SetMarkerStyle(7);
+	gr3->SetLineColor(1);
+	gr3->SetTitle(c); 		
+	
 
 
 for (int i = 1; i < 500; i++) 
@@ -36,13 +42,21 @@ for (int i = 1; i < 500; i++)
       gr1->SetPoint(i,dx,T);
 }     
 
-for (int i = 1; i < myarray.sizex-1; i++) 
-{ float dx = DIM2*(i-0.5);
+for (int i = 2; i < myarray2.sizex; i++) 
+{ float dx = DIM2*(i-1.5);
   float T = myarray2.mcellSOL[i][1];
 //printf("T: %f dx: %f\n", T, dx);
 
-      gr2->SetPoint(i,dx,T);
+      gr2->SetPoint(i-2,dx,T);
 }  
+
+for (int i = 2; i < myarray.sizex; i++) 
+{ float dx = DIM2*(i-1.5);
+  float T = myarray.mcellSOL[i][1];
+//printf("T: %f dx: %f\n", T, dx);
+
+      gr3->SetPoint(i-2,dx,T);
+} 
 
 
  
@@ -50,17 +64,21 @@ for (int i = 1; i < myarray.sizex-1; i++)
 
 gr1->Draw("AP");
 gr2->Draw("sameP");
-
+gr3->Draw("sameP");
 	 
 
 TLegend *leg1 = new TLegend(0.75,0.9,0.9,0.8);
 
-leg1->AddEntry(gr1,"analytical","AP");
+leg1->AddEntry(gr1,"analytical Cont","AP");
 leg1->AddEntry(gr2,"Numerical","AP");
+leg1->AddEntry(gr3,"Analytic calc","AP");
 
 
 //leg->AddEntry(fitb,"this one","l");
 leg1->Draw();
+
+
+
 
 
 

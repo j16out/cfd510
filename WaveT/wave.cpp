@@ -39,7 +39,6 @@ int main(int argc, char **argv)
 
 
 carray wave1;//my main array
-
 carray analytic;
 
 
@@ -47,8 +46,8 @@ carray analytic;
 
 
 //set array size or default used 162x162
-set_array_size(wave1, 20, 1, 1.0);//array, xsize, ysize, dimension
-set_array_size(analytic, 20, 1, 1.0);
+set_array_size(wave1, 1200, 1, 1.0);//array, xsize, ysize, dimension
+set_array_size(analytic, 1200, 1, 1.0);
 
 //set analytic solution
 set_analytic(analytic);
@@ -69,8 +68,9 @@ print_array(wave1);//print array in terminal
 
 //---------------------GS SOR w=1.3 loop 1----------------------//
 
-solve_arrayRK2(wave1, 1.0, 0.00001);
-
+solve_arrayRK2(wave1, 1.0, 0.0001);
+print_array(wave1);
+get_l2norm(wave1, analytic);
 //cout << "Solution: " << get_solution(poisson1) << "\n";
 
 

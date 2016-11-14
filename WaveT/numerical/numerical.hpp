@@ -16,8 +16,8 @@
 using namespace std;
 
 #define BIG 1000000
-#define maxx 160
-#define maxy 160
+#define maxx 8000
+#define maxy 3
 #define PI 3.141592654
 
 
@@ -47,8 +47,7 @@ vector<float> diff;
 //temporary cells to store
 float Tim1_j=0.0;
 float Tim2_j=0.0;
-float Ti_jm1=0.0;
-float Ti_jm2=0.0;
+
 float Ti_j=0.0;
 
 
