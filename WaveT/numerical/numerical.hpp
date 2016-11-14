@@ -38,7 +38,7 @@ float DIM1 = 0;
 //current time 
 float tstep = 0;
 float ctime = 0;
-float tmax = 0; 
+
 
 //data specific to array
 vector<float> l2norm;
@@ -69,19 +69,21 @@ void set_zero(carray & myarray);//zero entire array
 void print_array(carray & myarray);//print array in terminal
 
 
-void solve_arrayRK2(carray & myarray, float E0);//solve the array
+void solve_arrayRK2(carray & myarray, float tmax, float tstep);//solve the array
 
 
 
 //fI related functions
 
-int get_FIarray(carray & myarray, int stage);//get all FI for array for specific stage
+void get_FIarray(carray & myarray, int stage);//get all FI for array for specific stage
 
-float calc_FI(carray & myarray);//calculate new cell value based on 2nd order scheme
+float calc_2nd_UW(carray & myarray);//calculate new cell value based on 2nd order scheme
 
 void get_surcells(carray & myarray, int i, int j, int stage);//obtain values of surrounding cells stage defines were result stored
 
-int get_RK2(carray & myarray, int stage);
+void get_RK2(carray & myarray, int stage);
+
+void mv_SOL2_to_SOL1(carray & myarray);
 
 
 //Error calc related functions

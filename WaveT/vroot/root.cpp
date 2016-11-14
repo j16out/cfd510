@@ -38,7 +38,7 @@ for (int i = 1; i < 500; i++)
 
 for (int i = 1; i < myarray.sizex-1; i++) 
 { float dx = DIM2*(i-0.5);
-  float T = myarray.mcellSOL[i][1];
+  float T = myarray2.mcellSOL[i][1];
 //printf("T: %f dx: %f\n", T, dx);
 
       gr2->SetPoint(i,dx,T);

@@ -53,7 +53,7 @@ set_array_size(analytic, 20, 1, 1.0);
 //set analytic solution
 set_analytic(analytic);
 
-print_array(analytic);
+//print_array(analytic);
 
 
 
@@ -69,7 +69,8 @@ print_array(wave1);//print array in terminal
 
 //---------------------GS SOR w=1.3 loop 1----------------------//
 
-//solve_arraySOR(poisson1, E11, 1.3);
+solve_arrayRK2(wave1, 1.0, 0.00001);
+
 //cout << "Solution: " << get_solution(poisson1) << "\n";
 
 

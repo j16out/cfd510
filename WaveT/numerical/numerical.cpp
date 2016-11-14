@@ -69,19 +69,12 @@ void set_ghostcells(carray & myarray)
 float DIM1 = myarray.DIM1;
 
 //set boundary conditions in ghost cells
-for(int i = 1; i < myarray.sizex-1; ++i)
-	{float d = (i-0.5)*DIM1;
+myarray.mcellSOL[0][1] = 2.0*(sin(4.0*PI*myarray.ctime)) - myarray.mcellSOL[1][1];
+
 	
-	//neumann boundaries	
-	myarray.mcellSOL[i][0] = myarray.mcellSOL[i][1];//top ghost cells 
-	myarray.mcellSOL[0][i] = myarray.mcellSOL[1][i];//left ghost cells
-		
-	//dirichlet boundaries	
-	myarray.mcellSOL[i][myarray.sizex-1] = 2.0*(5.0-((1.0/2.0)*pow((1.0+pow(d, 2)),3))) - myarray.mcellSOL[i][myarray.sizex-2];
-	myarray.mcellSOL[myarray.sizey-1][i] = 2.0*(5.0-((1.0/2.0)*pow((1.0+pow(d, 2)),3))) - myarray.mcellSOL[myarray.sizex-2][i];
-	
-        }
 }
+
+//--------------------------set intial condition---------------------------------//
 
 void set_intial_cond(carray & myarray)
 {
@@ -97,7 +90,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
     dx = (i-0.5)*DIM1;
     f = -sin(2.0*PI*dx);
     myarray.mcellSOL[i][j] = f;
-    printf("f: %f  dx: %f\n", f, dx);
+    //printf("f: %f  dx: %f\n", f, dx);
     }
 
 }
@@ -108,10 +101,9 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 //---------------------------Array Solving----------------------------------//
 //**************************************************************************//
 
+//--------------------------Set FI values for array mcellFI Face----------------------------//
 
-//--------------------------Set FI values for array mcellFI Interior----------------------------//
-
-int get_FIarray(carray & myarray, int stage)
+void get_FIarray_Face(carray & myarray, int stage)
 {
 float DIM1 = myarray.DIM1;//get dimensions of array (not grid size)
 float l2sum = 0.0;
@@ -126,14 +118,14 @@ carray oldarray=myarray;
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
 
-    for(int i = 2; i < myarray.sizex-2; ++i)
+    for(int i = 1; i < 2; ++i)
     {
     dx = (i-0.5)*DIM1;
     dy = (j-0.5)*DIM1;
 
     //----get surrounding cells and compute new cell-------//
     get_surcells(myarray, i, j, stage);
-    float newcell = calc_FI(myarray); 
+    float newcell = calc_2nd_UW(myarray); 
 
     //-----update current cell----//
     if(stage == 1)
@@ -146,20 +138,58 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 }
 	
 
-return 1;
+}
+
+//--------------------------Set FI values for array mcellFI Interior----------------------------//
+
+void get_FIarray(carray & myarray, int stage)
+{
+float DIM1 = myarray.DIM1;//get dimensions of array (not grid size)
+float l2sum = 0.0;
+float sx = myarray.sizex-2;
+float sy = myarray.sizey-2;
+
+float dx = 0.0;//change in x
+float dy = 0.0;//change in y
+
+carray oldarray=myarray;
+
+for(int j = 1; j < myarray.sizey-1; ++j)
+{
+
+    for(int i = 2; i < myarray.sizex-1; ++i)
+    {
+    dx = (i-0.5)*DIM1;
+    dy = (j-0.5)*DIM1;
+
+    //----get surrounding cells and compute new cell-------//
+    get_surcells(myarray, i, j, stage);
+    float newcell = calc_2nd_UW(myarray); 
+
+    //-----update current cell----//
+    if(stage == 1)
+    myarray.mcellFI[i][j] = newcell;
+
+    if(stage == 2)
+    myarray.mcellFI2[i][j] = newcell;
+    }
+
+}
+	
+
 }
 
 
 //--------------------Calculate new cell value from neighbors ---------------------//
 
 
-float calc_FI(carray & myarray)
+float calc_2nd_UW(carray & myarray)
 {
 float DIM1 = myarray.DIM1;
 float chx = DIM1;
 //float chy = DIM1;
 float temp = 1.0;
-float newcell = (2.0)*(3.0*myarray.Ti_j+4.0*myarray.Tim1_j+myarray.Tim2_j)/(2.0*chx);
+float newcell = (2.0)*(3.0*myarray.Ti_j-4.0*myarray.Tim1_j+myarray.Tim2_j)/(2.0*chx);
 
 return newcell;
 }
@@ -179,8 +209,6 @@ if(stage == 1)
 {
 myarray.Tim1_j = myarray.mcellSOL[i-1][j];
 myarray.Tim2_j = myarray.mcellSOL[i-2][j];
-myarray.Ti_jm1 = myarray.mcellSOL[i][j-1];
-myarray.Ti_jm2 = myarray.mcellSOL[i][j-2];
 myarray.Ti_j = myarray.mcellSOL[i][j]; 
 } 
 
@@ -188,35 +216,77 @@ if(stage == 2)
 {
 myarray.Tim1_j = myarray.mcellSOL2[i-1][j];
 myarray.Tim2_j = myarray.mcellSOL2[i-2][j];
-myarray.Ti_jm1 = myarray.mcellSOL2[i][j-1];
-myarray.Ti_jm2 = myarray.mcellSOL2[i][j-2];
 myarray.Ti_j = myarray.mcellSOL2[i][j]; 
 } 
         
 
 }
 
+//-----------------------------cp array2 to 1---------------------------//
 
+void mv_SOL2_to_SOL1(carray & myarray)
+{
 
+for(int j = 0; j < myarray.sizey; ++j)
+{
+
+    for(int i = 0; i < myarray.sizex; ++i)
+    {
+    myarray.mcellSOL[i][j] = myarray.mcellSOL2[i][j]; 
+    }
+}
+
+}
 
 //--------------------------Solve array using RK2 and 2ndUW----------------------------//
 
-void solve_arrayRK2(carray & myarray)
+void solve_arrayRK2(carray & myarray, float tmax, float tstep)
 {
 int tomp;
-float tmax = myarray.tmax;
+myarray.tstep = tstep;
 float ctime = myarray.ctime;
-while(ctime < tmax)
+set_intial_cond(myarray);
+set_ghostcells(myarray);
+
+
+
+
+int n = 0;
+int nt = 1000;
+while(ctime <= tmax)
 {
+if(n >= nt)
+{
+printf("Run: %d time: %f\n",n,myarray.ctime);
+nt = 1000+n;
+}
+//stage 1
+//printf("before 1st stage:\n");
+//print_array(myarray);
+get_FIarray_Face(myarray, 1);
+get_FIarray(myarray, 1);
+get_RK2(myarray, 1);
+//printf("after 1st stage:\n");
+//print_array(myarray);
 
-tomp = get_FIarray(myarray, 1);
-tomp = get_RK2(myarray, 1);
-
-tomp = get_FIarray(myarray, 2);
-tomp = get_RK2(myarray, 2);
 
 
+//stage 2
+get_FIarray_Face(myarray, 2);
+get_FIarray(myarray, 2);
+get_RK2(myarray, 2);
+
+//flux at face
+
+
+mv_SOL2_to_SOL1(myarray);
+set_ghostcells(myarray);
+//printf("after 2nd stage:\n");
+//print_array(myarray);
+
+myarray.ctime = myarray.ctime+myarray.tstep;
 ctime = myarray.ctime;
+++n;
 }
 
 }
@@ -224,7 +294,7 @@ ctime = myarray.ctime;
 //--------------------------Solve RK2 interation----------------------------//
 
 
-int get_RK2(carray & myarray, int stage)
+void get_RK2(carray & myarray, int stage)
 {
 
 if(stage == 1)
@@ -232,7 +302,7 @@ if(stage == 1)
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
 
-    for(int i = 2; i < myarray.sizex-2; ++i)
+    for(int i = 1; i < myarray.sizex-1; ++i)
     {
       myarray.mcellSOL2[i][j] = myarray.mcellSOL[i][j]-myarray.tstep*(myarray.mcellFI[i][j]);
     }
@@ -245,7 +315,7 @@ if(stage == 2)
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
 
-    for(int i = 2; i < myarray.sizex-2; ++i)
+    for(int i = 1; i < myarray.sizex-1; ++i)
     {
      myarray.mcellSOL2[i][j] = myarray.mcellSOL[i][j]-myarray.tstep*((myarray.mcellFI2[i][j]+myarray.mcellFI[i][j])/2.0);
     }
