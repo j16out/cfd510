@@ -68,7 +68,7 @@ void set_zero(carray & myarray);//zero entire array
 void print_array(carray & myarray);//print array in terminal
 
 
-void solve_arrayRK2(carray & myarray, float tmax, float tstep);//solve the array
+void solve_arrayRK2(carray & myarray, float tmax, float cfl);//solve the array
 
 
 
@@ -91,7 +91,7 @@ void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM);//get 
 
 float get_l2norm(carray & myarray, carray myarray2);//get estimated vale for l2 norm between arrays
 
-void set_analytic(carray & myarray);
+void set_analytic(carray & myarray, carray & numarray);
 
 float get_solution(carray & myarray);
 

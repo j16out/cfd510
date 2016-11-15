@@ -39,49 +39,72 @@ int main(int argc, char **argv)
 
 
 carray wave1;//my main array
-carray analytic;
+carray analytic1;
+carray wave2;//my main array
+carray analytic2;
+carray wave3;//my main array
+carray analytic3;
 
 
 //set size
 
 
 //set array size or default used 162x162
-set_array_size(wave1, 1200, 1, 1.0);//array, xsize, ysize, dimension
-set_array_size(analytic, 1200, 1, 1.0);
+set_array_size(wave1, 20, 1, 1.0);//array, xsize, ysize, dimension
+set_array_size(wave2, 40, 1, 1.0);
+set_array_size(wave3, 80, 1, 1.0);
+set_array_size(analytic1, 20, 1, 1.0);
+set_array_size(analytic2, 40, 1, 1.0);
+set_array_size(analytic3, 80, 1, 1.0);
 
-//set analytic solution
-set_analytic(analytic);
+
 
 //print_array(analytic);
 
 
 
-//set ghost cells as boundary conditions
+//set intial conditions
 
 
 set_zero(wave1);
-set_intial_cond(wave1);//set ghost cells/boundaries
-print_array(wave1);//print array in terminal
+set_intial_cond(wave1);
+//print_array(wave1);//print array in terminal
+set_zero(wave2);
+set_intial_cond(wave2);
+
+set_zero(wave3);
+set_intial_cond(wave3);
 
 
 
 
-//---------------------GS SOR w=1.3 loop 1----------------------//
-
-solve_arrayRK2(wave1, 1.0, 0.0001);
-print_array(wave1);
-get_l2norm(wave1, analytic);
+//---------------------solve array1----------------------//
+solve_arrayRK2(wave1, 1.0, 0.4);
+set_analytic(analytic1, wave1);
+get_l2norm(wave1, analytic1);
 //cout << "Solution: " << get_solution(poisson1) << "\n";
+
+
+
+//---------------------solve array2----------------------//
+solve_arrayRK2(wave2, 1.0, 0.4);
+set_analytic(analytic2, wave2);
+get_l2norm(wave2, analytic2);
+
+
+//---------------------solve array2----------------------//
+solve_arrayRK2(wave3, 1.0, 0.4);
+set_analytic(analytic3, wave3);
+get_l2norm(wave3, analytic3);
+
 
 
 //----------------------Draw Data---------------------//
 
-
-
 if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);
-	draw_graph_wave1(analytic, wave1);//draw 3d graph
+	draw_graph_wave1(analytic1, wave1);//draw 3d graph
 	theApp.Run();
 }
 

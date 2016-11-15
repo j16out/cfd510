@@ -216,21 +216,22 @@ for(int j = 0; j < myarray.sizey; ++j)
 
 //--------------------------Solve array using RK2 and 2ndUW----------------------------//
 
-void solve_arrayRK2(carray & myarray, float tmax, float tstep)
+void solve_arrayRK2(carray & myarray, float tmax, float cfl)
 {
 int tomp;
+float tstep = (cfl*(myarray.DIM1))/2.0;
 myarray.tstep = tstep;
 float ctime = myarray.ctime;
 set_intial_cond(myarray);
 set_ghostcells(myarray);
 
-
-
+printf("Running size: %d time step: %f\n",myarray.sizex,myarray.tstep);
 
 int n = 0;
 int nt = 1000;
-while(ctime < tmax)
+while(ctime < tmax-tstep)
 {
+
 if(n >= nt)
 {
 printf("Run: %d time: %f\n",n,myarray.ctime);
@@ -248,10 +249,13 @@ get_FIarray_Face(myarray, 2);
 get_FIarray(myarray, 2);
 get_RK2(myarray, 2);
 
-//flux at face
+
+//mv sol2 back to array sol1
+mv_SOL2_to_SOL1(myarray);
+
+//flux at boundary
 
 set_ghostcells(myarray);
-mv_SOL2_to_SOL1(myarray);
 
 
 myarray.ctime = myarray.ctime+myarray.tstep;
@@ -259,6 +263,7 @@ ctime = myarray.ctime;
 ++n;
 }
 
+printf("Solved numeric at %f time\n",ctime);
 }
 
 //--------------------------Solve RK2 interation----------------------------//
@@ -292,6 +297,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 
 }
 }
+
 
 
 }
@@ -404,9 +410,10 @@ return l2;
 
 
 //----------------------------Set a Analytical Solution------------------------------//
-void set_analytic(carray & myarray)
+void set_analytic(carray & myarray, carray & numarray)
 {
 float DIM1 = myarray.DIM1;
+float ctime = numarray.ctime;
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
 
@@ -414,11 +421,13 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 	{
 	float dx = (i-1.5)*DIM1;
 	float dy = (j-1.5)*DIM1;
-	float T = sin(2*PI*(2*(1)-dx));
+	float T = sin(2*PI*(2*(ctime)-dx));
 	myarray.mcellSOL[i][j] = T;
 	}
 
 }
+
+printf("setting analytic at %f time\n",ctime);
 }
 
 
