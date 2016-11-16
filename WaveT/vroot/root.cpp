@@ -16,21 +16,21 @@ const char* c;
 
 
 c14->cd();
-titlefile = "Convergence Behavior for a 20 x 20 mesh; Iterations (N); T(K)-T(K+1)";
+titlefile = "Solutions; x; T";
 c = titlefile.c_str();
 TGraph *gr1 = new TGraph();	
 	gr1->SetMarkerColor(4);
-	gr1->SetMarkerStyle(7);
+	gr1->SetMarkerStyle(24);
 	gr1->SetLineColor(1);
 	gr1->SetTitle(c);  
 TGraph *gr2 = new TGraph();	
 	gr2->SetMarkerColor(3);
-	gr2->SetMarkerStyle(23);
+	gr2->SetMarkerStyle(25);
 	gr2->SetLineColor(1);
 	gr2->SetTitle(c);
 TGraph *gr3 = new TGraph();	
 	gr3->SetMarkerColor(2);
-	gr3->SetMarkerStyle(7);
+	gr3->SetMarkerStyle(26);
 	gr3->SetLineColor(1);
 	gr3->SetTitle(c); 
 TGraph *gr4 = new TGraph();	
@@ -82,17 +82,18 @@ float T = myarray3.mcellSOL[i][1];
  
  //c1->SetLogy();	
 
-gr1->Draw("AP");
+gr4->Draw("Ac");
 gr2->Draw("sameP");
 gr3->Draw("sameP");
-gr4->Draw("samec");
+gr1->Draw("sameP");
 	 
 
 TLegend *leg1 = new TLegend(0.75,0.9,0.9,0.8);
 
-leg1->AddEntry(gr1,"analytical Cont","AP");
-leg1->AddEntry(gr2,"Numerical","AP");
-leg1->AddEntry(gr3,"Analytic calc","AP");
+leg1->AddEntry(gr1,"20x1 mesh","AP");
+leg1->AddEntry(gr2,"40x1 mesh","AP");
+leg1->AddEntry(gr3,"80x1 mesh","AP");
+leg1->AddEntry(gr4,"Analytic Solution","l");
 
 
 //leg->AddEntry(fitb,"this one","l");
@@ -102,7 +103,7 @@ leg1->Draw();
 
 TCanvas *c5 = new TCanvas("c5","The FillRandom example",200,50,900,700); 
 c5->cd();
-titlefile = "Order Evaluation; Iterations (N); T(K)-T(K+1)";
+titlefile = "Order Evaluation; Log(dx); Log(L2)";
 c = titlefile.c_str();
 
 
@@ -132,16 +133,16 @@ printf("temp: %f change x: %d\n", temp, n);
 
 
 TF1 *tfit2 = new TF1("tfit2", "pol1");
-tfit2->SetLineColor(4);
+tfit2->SetLineColor(2);
 tfit2->SetLineWidth(1);
 gr5->Fit(tfit2, "", "", -10, 10);
-
+gStyle->SetOptFit();
 gr5->Draw("AP");
 TLegend *leg2 = new TLegend(0.75,0.9,0.9,0.8);
 
 leg2->AddEntry(gr5,"Data","AP");
-leg2->AddEntry(tfit2,"fit","AP");
-
+leg2->AddEntry(tfit2,"Linear Fit","l");
+leg2->Draw();
 
 }
 
@@ -149,28 +150,28 @@ leg2->AddEntry(tfit2,"fit","AP");
 
 
 
-void draw_graph_q1(carray myarray1, carray myarray2, carray myarray3, carray analytic1, carray analytic2, carray analytic3)
+void draw_graph_q1(carray & myarray1, carray & myarray2, carray & myarray3, carray analytic1, carray analytic2, carray analytic3)
 {TCanvas *c11 = new TCanvas("c11","The FillRandom example",200,50,900,700);   
 string titlefile;
 const char* c;  
 float DIM2 = myarray2.DIM1;
 
 c11->cd();
-titlefile = "Convergence Behavior for a 20 x 20 mesh; Iterations (N); T(K)-T(K+1)";
+titlefile = "Convergence Behavior for a 20 x 20 mesh; X; Error       ";
 c = titlefile.c_str();
 TGraph *gr1 = new TGraph();	
 	gr1->SetMarkerColor(4);
-	gr1->SetMarkerStyle(7);
+	gr1->SetMarkerStyle(20);
 	gr1->SetLineColor(1);
 	gr1->SetTitle(c);  
 TGraph *gr2 = new TGraph();	
 	gr2->SetMarkerColor(3);
-	gr2->SetMarkerStyle(23);
+	gr2->SetMarkerStyle(21);
 	gr2->SetLineColor(1);
 	gr2->SetTitle(c);
 TGraph *gr3 = new TGraph();	
 	gr3->SetMarkerColor(2);
-	gr3->SetMarkerStyle(7);
+	gr3->SetMarkerStyle(22);
 	gr3->SetLineColor(1);
 	gr3->SetTitle(c); 	
 	
@@ -211,55 +212,41 @@ float T = myarray3.mcellSOL[i][1]-analytic3.mcellSOL[i][1];
  
  //c1->SetLogy();	
 
-gr1->Draw("AP");
-gr2->Draw("sameP");
-gr3->Draw("sameP");
+gr1->Draw("APl");
+gr2->Draw("samePl");
+gr3->Draw("samePl");
 	 
 
 TLegend *leg1 = new TLegend(0.75,0.9,0.9,0.8);
 
-leg1->AddEntry(gr1,"20 Cont","AP");
-leg1->AddEntry(gr2,"40","AP");
-leg1->AddEntry(gr3,"80","AP");
+leg1->AddEntry(gr1,"20x1 mesh","AP");
+leg1->AddEntry(gr2,"40x1 mesh","AP");
+leg1->AddEntry(gr3,"80x1 mesh","AP");
 
 
 //leg->AddEntry(fitb,"this one","l");
 leg1->Draw();
 
+TCanvas *c14 = new TCanvas("c14","The FillRandom example",200,50,900,700); 	
+c14->cd();	
 
-
-
-
-
-}
-
-
-
-void draw_graph_q1a(carray myarray1, carray myarray2, carray myarray3, carray analytic1, carray analytic2, carray analytic3)
-{TCanvas *c11a = new TCanvas("c11a","The FillRandom example",200,50,900,700);   
-string titlefile;
-const char* c;  
-float DIM2 = myarray2.DIM1;
-
-c11a->cd();
 titlefile = "Convergence Behavior for a 20 x 20 mesh; Iterations (N); T(K)-T(K+1)";
 c = titlefile.c_str();
-TGraph *gr1 = new TGraph();	
-	gr1->SetMarkerColor(4);
-	gr1->SetMarkerStyle(7);
-	gr1->SetLineColor(1);
-	gr1->SetTitle(c);  
-TGraph *gr2 = new TGraph();	
-	gr2->SetMarkerColor(3);
-	gr2->SetMarkerStyle(23);
-	gr2->SetLineColor(1);
-	gr2->SetTitle(c);
-TGraph *gr3 = new TGraph();	
-	gr3->SetMarkerColor(2);
-	gr3->SetMarkerStyle(7);
-	gr3->SetLineColor(1);
-	gr3->SetTitle(c); 		
-	
+TGraph *gr11 = new TGraph();	
+	gr11->SetMarkerColor(4);
+	gr11->SetMarkerStyle(20);
+	gr11->SetLineColor(1);
+	gr11->SetTitle(c);  
+TGraph *gr21 = new TGraph();	
+	gr21->SetMarkerColor(3);
+	gr21->SetMarkerStyle(21);
+	gr21->SetLineColor(1);
+	gr21->SetTitle(c);
+TGraph *gr31 = new TGraph();	
+	gr31->SetMarkerColor(2);
+	gr31->SetMarkerStyle(22);
+	gr31->SetLineColor(1);
+	gr31->SetTitle(c); 
   
 
 for (int i = 2; i < myarray1.sizex; i++) 
@@ -269,7 +256,7 @@ float dx = DIM2*(i-1.5);
 float T = abs(myarray1.mcellSOL[i][1]-analytic1.mcellSOL[i][1]);
 //printf("T: %f dx: %f\n", T, dx);
 
-      gr1->SetPoint(i-2,dx,T);
+      gr11->SetPoint(i-2,dx,T);
 }  
 
 for (int i = 2; i < myarray2.sizex; i++) 
@@ -279,7 +266,7 @@ float dx = DIM2*(i-1.5);
 float T = abs(myarray2.mcellSOL[i][1]-analytic2.mcellSOL[i][1]);
 //printf("T: %f dx: %f\n", T, dx);
 
-      gr2->SetPoint(i-2,dx,T);
+      gr21->SetPoint(i-2,dx,T);
 }  
 
 for (int i = 2; i < myarray3.sizex; i++) 
@@ -289,27 +276,27 @@ float dx = DIM2*(i-1.5);
 float T = abs(myarray3.mcellSOL[i][1]-analytic3.mcellSOL[i][1]);
 //printf("T: %f dx: %f\n", T, dx);
 
-      gr3->SetPoint(i-2,dx,T);
+      gr31->SetPoint(i-2,dx,T);
 }  
 
 
  
  //c1->SetLogy();	
 
-gr1->Draw("AP");
-gr2->Draw("sameP");
-gr3->Draw("sameP");
+gr11->Draw("APl");
+gr21->Draw("samePl");
+gr31->Draw("samePl");
 	 
 
-TLegend *leg1 = new TLegend(0.75,0.9,0.9,0.8);
+TLegend *leg2 = new TLegend(0.75,0.9,0.9,0.8);
 
-leg1->AddEntry(gr1,"20 Cont","AP");
-leg1->AddEntry(gr2,"40","AP");
-leg1->AddEntry(gr3,"80","AP");
+leg2->AddEntry(gr11,"20x1 mesh","AP");
+leg2->AddEntry(gr21,"40x1 mesh","AP");
+leg2->AddEntry(gr31,"80x1 mesh","AP");
 
 
 //leg->AddEntry(fitb,"this one","l");
-leg1->Draw();
+leg2->Draw();
 
 
 

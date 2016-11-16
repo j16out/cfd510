@@ -59,8 +59,8 @@ void draw_graph_l2norm3(carray myarray, carray myarray2, carray myarray3);
 
 void draw_graph_wave1(carray & myarray1, carray myarray2, carray myarray3);
 
-void draw_graph_q1(carray myarray1, carray myarray2, carray myarray3, carray analytic1, carray analytic2, carray analytic3);
-void draw_graph_q1a(carray myarray1, carray myarray2, carray myarray3, carray analytic1, carray analytic2, carray analytic3);
+void draw_graph_q1(carray & myarray1, carray & myarray2, carray & myarray3, carray analytic1, carray analytic2, carray analytic3);
+
 
 
 
