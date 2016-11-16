@@ -54,14 +54,14 @@ set_array_size(wave2, 40, 1, 1.0);
 set_array_size(wave3, 80, 1, 1.0);
 set_array_size(wave4, 160, 1, 1.0);//array, xsize, ysize, dimension
 set_array_size(wave5, 320, 1, 1.0);
-set_array_size(wave6, 640, 1, 1.0);
+set_array_size(wave6, 686, 1, 1.0);
 
 set_array_size(analytic1, 20, 1, 1.0);
 set_array_size(analytic2, 40, 1, 1.0);
 set_array_size(analytic3, 80, 1, 1.0);
 set_array_size(analytic4, 160, 1, 1.0);
 set_array_size(analytic5, 320, 1, 1.0);
-set_array_size(analytic6, 640, 1, 1.0);
+set_array_size(analytic6, 686, 1, 1.0);
 
 
 

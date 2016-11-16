@@ -15,7 +15,7 @@
 
 using namespace std;
 
-#define BIG 1000000
+#define BIG 10000
 #define maxx 8000
 #define maxy 3
 #define PI 3.141592654

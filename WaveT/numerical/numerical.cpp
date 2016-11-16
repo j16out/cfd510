@@ -55,7 +55,9 @@ void set_zero(carray & myarray)
 		for(int i = 0; i < myarray.sizex; ++i)
 		{
 		myarray.mcellSOL[i][j] = 0;//set everything to zero
-
+        myarray.mcellSOL2[i][j] = 0;
+        myarray.mcellFI2[i][j] = 0;
+        myarray.mcellFI[i][j] = 0;
 		}
 	}
 }
@@ -77,7 +79,7 @@ myarray.mcellSOL2[1][1] = 2.0*(sin(4.0*PI*myarray.ctime)) - myarray.mcellSOL[2][
 }
 
 //--------------------------set intial condition---------------------------------//
-
+/*
 void set_intial_cond(carray & myarray)
 {
 float DIM1 = myarray.DIM1;
@@ -92,6 +94,34 @@ for(int j = 1; j < myarray.sizey-1; ++j)
     dx = (i-1.5)*DIM1;
     f = -sin(2.0*PI*dx);
     myarray.mcellSOL[i][j] = f;
+    //printf("f: %f  dx: %f\n", f, dx);
+    }
+
+}
+}*/
+
+void set_intial_cond(carray & myarray)
+{
+float DIM1 = myarray.DIM1;
+float dx =0.0;
+float f;
+
+for(int j = 1; j < myarray.sizey-1; ++j)
+{
+
+    for(int i = 2; i < myarray.sizex; ++i)
+    {
+    dx = (i-1.5)*DIM1;
+    if(dx <= 1.0)
+    {
+    f = -dx;
+    myarray.mcellSOL[i][j] = f;
+    }
+    else
+    {
+    f = 0.0;
+    myarray.mcellSOL[i][j] = f;
+    }
     //printf("f: %f  dx: %f\n", f, dx);
     }
 

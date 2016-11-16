@@ -6,6 +6,125 @@ using namespace std;
 
 
 
+
+
+
+
+void draw_graph_wave1_p2(carray & myarray1, carray myarray2, carray myarray3)
+{
+TCanvas *c14 = new TCanvas("c14","The FillRandom example",200,50,900,700);   
+string titlefile;
+const char* c;  
+
+
+c14->cd();
+titlefile = "Solutions; x; T";
+c = titlefile.c_str();
+TGraph *gr1 = new TGraph();	
+	gr1->SetMarkerColor(1);
+	//gr1->SetMarkerStyle(24);
+	gr1->SetLineColor(4);
+	gr1->SetTitle(c);  
+TGraph *gr2 = new TGraph();	
+	gr2->SetMarkerColor(1);
+	//gr2->SetMarkerStyle(25);
+	gr2->SetLineColor(1);
+	gr2->SetTitle(c);
+TGraph *gr3 = new TGraph();	
+	gr3->SetMarkerColor(1);
+	//gr3->SetMarkerStyle(26);
+	gr3->SetLineColor(2);
+	gr3->SetTitle(c); 
+	
+	
+
+
+for (int i = 2; i < myarray1.sizex; i++) 
+{
+float DIM2 = myarray1.DIM1; 
+float dx = DIM2*(i-1.5);
+float T = myarray1.mcellSOL[i][1];
+//printf("T: %f dx: %f\n", T, dx);
+
+      gr1->SetPoint(i-2,dx,T);
+}  
+
+for (int i = 2; i < myarray2.sizex; i++) 
+{
+float DIM2 = myarray2.DIM1; 
+float dx = DIM2*(i-1.5);
+float T = myarray2.mcellSOL[i][1];
+//printf("T: %f dx: %f\n", T, dx);
+
+      gr2->SetPoint(i-2,dx,T);
+}  
+
+for (int i = 2; i < myarray3.sizex; i++) 
+{
+float DIM2 = myarray3.DIM1; 
+float dx = DIM2*(i-1.5);
+float T = myarray3.mcellSOL[i][1];
+//printf("T: %f dx: %f\n", T, dx);
+
+      gr3->SetPoint(i-2,dx,T);
+}  
+
+
+ 
+ //c1->SetLogy();	
+
+gr3->Draw("APc");
+gr2->Draw("samePc");
+gr1->Draw("samePc");
+
+	 
+
+TLegend *leg1 = new TLegend(0.75,0.9,0.9,0.8);
+
+leg1->AddEntry(gr1,"CFL 0.4000 Very Stable ","Pl");
+leg1->AddEntry(gr2,"CFL 0.5000 Borderline Stable","Pl");
+leg1->AddEntry(gr3,"CFL 0.5015 Slightly Unstable ","Pl");
+
+
+//leg->AddEntry(fitb,"this one","l");
+leg1->Draw();
+//-------------------------------------------------------------------------------------l2
+TCanvas *c5 = new TCanvas("c5","The FillRandom example",200,50,900,700); 
+c5->cd();
+titlefile = "Order Evaluation; CFL Number ; L2 Error";
+c = titlefile.c_str();
+
+
+TGraph *gr5 = new TGraph();	
+	gr5->SetMarkerColor(4);
+	gr5->SetMarkerStyle(23);
+	gr5->SetLineColor(1);
+	gr5->SetTitle(c);  
+
+c5->SetLogy();	
+int size = myarray1.l2norm.size();
+int n = 10;
+printf("array size %d\n", size);
+
+for(int i = 0; i < size; ++i)
+{
+float temp = myarray1.l2norm.at(i);
+float cfl = myarray1.diff.at(i);
+gr5->SetPoint(i,cfl,temp);
+
+printf("temp: %f i: %f\n", temp, cfl);
+}
+
+
+gr5->Draw("APl");
+
+
+TLegend *leg2 = new TLegend(0.75,0.9,0.9,0.8);
+leg2->AddEntry(gr5,"L2 Error","AP");
+leg2->Draw();
+}
+
+
 //--------------------------wave1 graphs----------------------------//
 
 void draw_graph_wave1(carray & myarray1, carray myarray2, carray myarray3)

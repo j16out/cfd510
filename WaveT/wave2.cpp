@@ -39,63 +39,51 @@ int main(int argc, char **argv)
 
 
 carray wave1;//my main array
-carray analytic1;
-carray wave2;//my main array
-carray analytic2;
-carray wave3;//my main array
-carray analytic3;
-
-
-//set size
-
-
-//set array size or default used 162x162
-set_array_size(wave1, 20, 1, 1.0);//array, xsize, ysize, dimension
-set_array_size(wave2, 40, 1, 1.0);
-set_array_size(wave3, 80, 1, 1.0);
-set_array_size(analytic1, 20, 1, 1.0);
-set_array_size(analytic2, 40, 1, 1.0);
-set_array_size(analytic3, 80, 1, 1.0);
-
-
-
-//print_array(analytic);
-
-
-
-//set intial conditions
-
-
+set_array_size(wave1, 500, 1, 20.0);//array, xsize, ysize, dimension
 set_zero(wave1);
 set_intial_cond(wave1);
-//print_array(wave1);//print array in terminal
+solve_arrayRK2(wave1, 8.0, 0.1);//def stable
+
+//---------------------plot unstable cfl----------------------//
+float cfl = 0.4;
+float factor = 0.0025;
+
+while(cfl <= 0.7)
+{
+carray wave2;
+set_array_size(wave2, 500, 1, 20.0);
 set_zero(wave2);
 set_intial_cond(wave2);
+solve_arrayRK2(wave2, 8.0, cfl);
+//set_analytic(analytic1, wave1);
+float l2 = get_l2norm(wave1, wave2);
 
+if(l2>BIG)
+break;
+else
+{
+wave1.l2norm.push_back(l2);
+wave1.diff.push_back(cfl);
+}
+if(l2>0.052)
+factor = 0.001;
+
+cfl = cfl + factor;
+}
+
+//-----------------------
+carray wave2;
+set_array_size(wave2, 500, 1, 20.0);
+set_zero(wave2);
+set_intial_cond(wave2);
+solve_arrayRK2(wave2, 8.0, 0.5000);
+
+carray wave3;//my main array
+set_array_size(wave3, 500, 1, 20.0);//array, xsize, ysize, dimension
 set_zero(wave3);
 set_intial_cond(wave3);
+solve_arrayRK2(wave3, 8.0, 0.5015);//def stable
 
-
-
-
-//---------------------solve array1----------------------//
-solve_arrayRK2(wave1, 1.0, 0.4);
-set_analytic(analytic1, wave1);
-get_l2norm(wave1, analytic1);
-//cout << "Solution: " << get_solution(poisson1) << "\n";
-
-
-
-//---------------------solve array2----------------------//
-solve_arrayRK2(wave2, 1.0, 0.4);
-set_analytic(analytic2, wave2);
-get_l2norm(wave2, analytic2);
-
-
-//---------------------solve array2----------------------//
-solve_arrayRK2(wave3, 1.0, 0.4);
-set_analytic(analytic3, wave3);
-get_l2norm(wave3, analytic3);
 
 
 
@@ -104,7 +92,7 @@ get_l2norm(wave3, analytic3);
 if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);//no more than two subs
-    draw_graph_wave1(wave1, wave2, wave3);
+    draw_graph_wave1_p2(wave1, wave2, wave3);
 	//draw_graph_q1(wave1, wave2, wave3, analytic1, analytic2, analytic3);
     //draw_graph_q1a(wave1, wave2, wave3, analytic1, analytic2, analytic3);
 	theApp.Run();
