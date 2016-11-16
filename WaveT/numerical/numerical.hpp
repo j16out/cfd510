@@ -43,14 +43,18 @@ vector<float> l2norm;
 vector<float> diff;
 
 //temporary cells to store
-float Tim1_j=0.0;
 float Tim2_j=0.0;
+float Tim1_j=0.0;
 float Ti_j=0.0;
+float Tip1_j=0.0;
+
+//scheme
+int scheme = 0;
 
 };
 
 
-void set_array_size(carray & myarray, int x, int y, float DIM);//set array size
+void set_array_size(carray & myarray, int x, int y, float DIM, int scheme);//set array size
 
 void set_ghostcells(carray & myarray);//set ghost cells
 
@@ -74,6 +78,8 @@ void get_FIarray(carray & myarray, int stage);//get all FI for array for specifi
 void get_FIarray_1stcell(carray & myarray, int stage);
 
 float calc_2nd_UW(carray & myarray);//calculate new cell value based on 2nd order scheme
+float calc_1st_UW(carray & myarray);
+float calc_2nd_CE(carray & myarray);
 
 void get_surcells(carray & myarray, int i, int j, int stage);//obtain values of surrounding cells stage defines were result stored
 
@@ -87,6 +93,8 @@ void mv_SOL2_to_SOL1(carray & myarray);
 void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM);//get error using 3 arrays based on ASME solution accuarcy handout
 
 float get_l2norm(carray & myarray, carray myarray2);//get estimated vale for l2 norm between arrays
+float get_linf_norm(carray & myarray, carray myarray2);
+float get_l1norm(carray & myarray, carray myarray2);
 
 void set_analytic(carray & myarray, carray & numarray);
 

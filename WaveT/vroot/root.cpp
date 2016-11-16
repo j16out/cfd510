@@ -129,12 +129,12 @@ leg2->Draw();
 
 void draw_graph_wave1(carray & myarray1, carray myarray2, carray myarray3)
 {
-TCanvas *c14 = new TCanvas("c14","The FillRandom example",200,50,900,700);   
+TCanvas *c17 = new TCanvas("c17","The FillRandom example",200,50,900,700);   
 string titlefile;
 const char* c;  
 
 
-c14->cd();
+c17->cd();
 titlefile = "Solutions; x; T";
 c = titlefile.c_str();
 TGraph *gr1 = new TGraph();	
@@ -208,10 +208,14 @@ gr1->Draw("sameP");
 	 
 
 TLegend *leg1 = new TLegend(0.75,0.9,0.9,0.8);
-
+/*
 leg1->AddEntry(gr1,"20x1 mesh","AP");
 leg1->AddEntry(gr2,"40x1 mesh","AP");
 leg1->AddEntry(gr3,"80x1 mesh","AP");
+*/
+leg1->AddEntry(gr1,"2nd Upwind","APl");
+leg1->AddEntry(gr2,"1st Upwind","APl");
+leg1->AddEntry(gr3,"2nd Centered","APl");
 leg1->AddEntry(gr4,"Analytic Solution","l");
 
 
@@ -331,16 +335,16 @@ float T = myarray3.mcellSOL[i][1]-analytic3.mcellSOL[i][1];
  
  //c1->SetLogy();	
 
-gr1->Draw("APl");
-gr2->Draw("samePl");
+gr2->Draw("APl");
+gr1->Draw("samePl");
 gr3->Draw("samePl");
 	 
 
 TLegend *leg1 = new TLegend(0.75,0.9,0.9,0.8);
 
-leg1->AddEntry(gr1,"20x1 mesh","AP");
-leg1->AddEntry(gr2,"40x1 mesh","AP");
-leg1->AddEntry(gr3,"80x1 mesh","AP");
+leg1->AddEntry(gr1,"2nd Upwind","APl");
+leg1->AddEntry(gr2,"1st Upwind","APl");
+leg1->AddEntry(gr3,"2nd Centered","APl");
 
 
 //leg->AddEntry(fitb,"this one","l");
@@ -409,9 +413,9 @@ gr31->Draw("samePl");
 
 TLegend *leg2 = new TLegend(0.75,0.9,0.9,0.8);
 
-leg2->AddEntry(gr11,"20x1 mesh","AP");
-leg2->AddEntry(gr21,"40x1 mesh","AP");
-leg2->AddEntry(gr31,"80x1 mesh","AP");
+leg2->AddEntry(gr11,"2nd Upwind","AP");
+leg2->AddEntry(gr21,"1st Upwind","AP");
+leg2->AddEntry(gr31,"2nd Centered","AP");
 
 
 //leg->AddEntry(fitb,"this one","l");
@@ -423,47 +427,6 @@ leg2->Draw();
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

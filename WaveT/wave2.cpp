@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 
 
 carray wave1;//my main array
-set_array_size(wave1, 500, 1, 20.0);//array, xsize, ysize, dimension
+set_array_size(wave1, 500, 1, 20.0, 0);//array, xsize, ysize, dimension
 set_zero(wave1);
 set_intial_cond(wave1);
 solve_arrayRK2(wave1, 8.0, 0.1);//def stable
@@ -51,7 +51,7 @@ float factor = 0.0025;
 while(cfl <= 0.7)
 {
 carray wave2;
-set_array_size(wave2, 500, 1, 20.0);
+set_array_size(wave2, 500, 1, 20.0, 0);
 set_zero(wave2);
 set_intial_cond(wave2);
 solve_arrayRK2(wave2, 8.0, cfl);
@@ -73,13 +73,13 @@ cfl = cfl + factor;
 
 //-----------------------
 carray wave2;
-set_array_size(wave2, 500, 1, 20.0);
+set_array_size(wave2, 500, 1, 20.0, 0);
 set_zero(wave2);
 set_intial_cond(wave2);
 solve_arrayRK2(wave2, 8.0, 0.5000);
 
 carray wave3;//my main array
-set_array_size(wave3, 500, 1, 20.0);//array, xsize, ysize, dimension
+set_array_size(wave3, 500, 1, 20.0, 0);//array, xsize, ysize, dimension
 set_zero(wave3);
 set_intial_cond(wave3);
 solve_arrayRK2(wave3, 8.0, 0.5015);//def stable

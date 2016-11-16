@@ -11,13 +11,14 @@
 
 //----------set array size (working area excluding ghost)---------------//
 
-void set_array_size(carray & myarray, int x, int y, float DIM)
+void set_array_size(carray & myarray, int x, int y, float DIM, int scheme)
 {
 	if(x <= 8000 && y <= 3)
 	{
 	myarray.sizex = x+2;
 	myarray.sizey = y+2;
 	myarray.DIM1 = DIM/(x);
+	myarray.scheme = scheme;
 	}
 	else
 	cout << "Array size to big, setting to default 160" << "\n";
@@ -71,15 +72,28 @@ void set_ghostcells(carray & myarray)
 float DIM1 = myarray.DIM1;
 
 //set boundary conditions in ghost cells
+if(myarray.scheme == 0)//2nd order upwind
+{
 myarray.mcellSOL2[0][1] = -2.0*(sin(4.0*PI*myarray.ctime)) + 3.0*myarray.mcellSOL[1][1];
 myarray.mcellSOL2[1][1] = 2.0*(sin(4.0*PI*myarray.ctime)) - myarray.mcellSOL[2][1];
+}
+
+if(myarray.scheme == 1)//1st order upwind
+{
+myarray.mcellSOL2[1][1] = 2.0*(sin(4.0*PI*myarray.ctime)) - myarray.mcellSOL[2][1];
+}
+
+if(myarray.scheme == 2)//2nd order centered
+{
+myarray.mcellSOL2[1][1] = 2.0*(sin(4.0*PI*myarray.ctime)) - myarray.mcellSOL[2][1];
+}
 
 
 	
 }
 
 //--------------------------set intial condition---------------------------------//
-/*
+
 void set_intial_cond(carray & myarray)
 {
 float DIM1 = myarray.DIM1;
@@ -98,8 +112,8 @@ for(int j = 1; j < myarray.sizey-1; ++j)
     }
 
 }
-}*/
-
+}
+/*
 void set_intial_cond(carray & myarray)
 {
 float DIM1 = myarray.DIM1;
@@ -127,7 +141,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 
 }
 }
-
+*/
 
 //**************************************************************************//
 //---------------------------Array Solving----------------------------------//
@@ -140,10 +154,18 @@ void get_FIarray_1stcell(carray & myarray, int stage)
 
 int j = 1;
 int i = 2;
+float newcell;
 
 //----get surrounding cells and compute new cell-------//
 get_surcells(myarray, i, j, stage);
-float newcell = calc_2nd_UW(myarray); 
+if(myarray.scheme == 0)
+newcell = calc_2nd_UW(myarray); 
+
+if(myarray.scheme == 1)
+newcell = calc_1st_UW(myarray); 
+
+if(myarray.scheme == 2)
+newcell = calc_2nd_CE(myarray); 
 
 //-----update current cell----//
 if(stage == 1)
@@ -201,6 +223,30 @@ return newcell;
 }
 
 
+float calc_1st_UW(carray & myarray)
+{
+float DIM1 = myarray.DIM1;
+float chx = DIM1;
+//float chy = DIM1;
+float temp = 1.0;
+float newcell = (2.0)*(myarray.Ti_j-myarray.Tim1_j)/(2.0*chx);
+
+return newcell;
+}
+
+
+float calc_2nd_CE(carray & myarray)
+{
+float DIM1 = myarray.DIM1;
+float chx = DIM1;
+//float chy = DIM1;
+float temp = 1.0;
+float newcell = (2.0)*(myarray.Tip1_j-myarray.Tim1_j)/(2.0*chx);
+
+return newcell;
+}
+
+
 
 
 //--------------------------Get current cell values----------------------------//
@@ -216,13 +262,17 @@ if(stage == 1)
 myarray.Tim1_j = myarray.mcellSOL[i-1][j];
 myarray.Tim2_j = myarray.mcellSOL[i-2][j];
 myarray.Ti_j = myarray.mcellSOL[i][j]; 
+myarray.Tip1_j = myarray.mcellSOL[i+1][j];
+
 } 
 
 if(stage == 2)
 {
 myarray.Tim1_j = myarray.mcellSOL2[i-1][j];
 myarray.Tim2_j = myarray.mcellSOL2[i-2][j];
-myarray.Ti_j = myarray.mcellSOL2[i][j]; 
+myarray.Ti_j = myarray.mcellSOL2[i][j];
+myarray.Tip1_j = myarray.mcellSOL[i+1][j];
+ 
 } 
         
 
@@ -255,7 +305,7 @@ float ctime = myarray.ctime;
 set_intial_cond(myarray);
 set_ghostcells(myarray);
 
-printf("Running size: %d time step: %f\n",myarray.sizex,myarray.tstep);
+printf("\n\nRunning size: %d time step: %f\n",myarray.sizex,myarray.tstep);
 
 int n = 0;
 int nt = 1000;
@@ -403,6 +453,64 @@ float GCI_21 = (1.25*ea21)/(pow(r21,p)-1.0);
 
 printf("ea21: %f  \ne_ext21: %f  \nGC121 %f \n", ea21, e_ext21, GCI_21);
 
+}
+
+
+
+//-------------------------Get L1 nrom for unknown analytical----------------------//
+
+float get_l1norm(carray & myarray, carray myarray2)
+{
+float l1sum =0;
+float sx = myarray.sizex-2;
+float sy = myarray.sizey-2;
+
+for(int j = 1; j < myarray.sizey-1; ++j)
+{	
+	for(int i = 2; i < myarray.sizex; ++i)
+	{
+
+	float P = myarray.mcellSOL[i][j];
+	float T = myarray2.mcellSOL[i][j];
+	l1sum =  l1sum + abs(P-T);
+
+	}
+
+}
+
+float l1 = l1sum/(sx);
+cout << setprecision(8) << fixed << "L1 norm: " << l1 << "\n";
+return l1;
+}
+
+
+//-------------------------Get L2 nrom for unknown analytical----------------------//
+
+float get_linf_norm(carray & myarray, carray myarray2)
+{
+float error =0;
+float maxerror = -1;
+float sx = myarray.sizex-2;
+float sy = myarray.sizey-2;
+
+for(int j = 1; j < myarray.sizey-1; ++j)
+{	
+	for(int i = 2; i < myarray.sizex; ++i)
+	{
+
+	float P = myarray.mcellSOL[i][j];
+	float T = myarray2.mcellSOL[i][j];
+	error =  abs(P-T);
+    if(error > maxerror)
+    maxerror = error;
+
+	}
+
+}
+
+
+cout << setprecision(8) << fixed << "L infinity norm: " << maxerror << "\n";
+return maxerror;
 }
 
 
