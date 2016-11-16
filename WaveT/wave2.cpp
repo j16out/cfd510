@@ -25,6 +25,13 @@ via the link provided: url{https://github.com/j16out/
 using namespace std;
 
 
+#define E07 0.0000001
+#define E08 0.00000001
+#define E09 0.000000001
+#define E10 0.0000000001
+#define E11 0.00000000001
+
+
 
 
 int main(int argc, char **argv)
@@ -37,32 +44,18 @@ carray wave2;//my main array
 carray analytic2;
 carray wave3;//my main array
 carray analytic3;
-carray wave4;//my main array
-carray analytic4;
-carray wave5;//my main array
-carray analytic5;
-carray wave6;//my main array
-carray analytic6;
 
 
 //set size
 
 
 //set array size or default used 162x162
-set_array_size(wave1, 10, 1, 1.0);//array, xsize, ysize, dimension
+set_array_size(wave1, 20, 1, 1.0);//array, xsize, ysize, dimension
 set_array_size(wave2, 40, 1, 1.0);
 set_array_size(wave3, 80, 1, 1.0);
-set_array_size(wave4, 160, 1, 1.0);//array, xsize, ysize, dimension
-set_array_size(wave5, 320, 1, 1.0);
-set_array_size(wave6, 640, 1, 1.0);
-
-set_array_size(analytic1, 10, 1, 1.0);
+set_array_size(analytic1, 20, 1, 1.0);
 set_array_size(analytic2, 40, 1, 1.0);
 set_array_size(analytic3, 80, 1, 1.0);
-set_array_size(analytic4, 160, 1, 1.0);
-set_array_size(analytic5, 320, 1, 1.0);
-set_array_size(analytic6, 640, 1, 1.0);
-
 
 
 
@@ -82,62 +75,27 @@ set_intial_cond(wave2);
 set_zero(wave3);
 set_intial_cond(wave3);
 
-set_zero(wave4);
-set_intial_cond(wave4);
-//print_array(wave1);//print array in terminal
-set_zero(wave5);
-set_intial_cond(wave5);
-
-set_zero(wave6);
-set_intial_cond(wave6);
 
 
-
-float l2 = 0;
 
 //---------------------solve array1----------------------//
-solve_arrayRK2(wave1, 0.8, 0.4);//array,time,cfl
+solve_arrayRK2(wave1, 1.0, 0.4);
 set_analytic(analytic1, wave1);
-l2 = get_l2norm(wave1, analytic1);
-wave1.l2norm.push_back(l2);
+get_l2norm(wave1, analytic1);
 //cout << "Solution: " << get_solution(poisson1) << "\n";
 
 
 
 //---------------------solve array2----------------------//
-solve_arrayRK2(wave2, 0.8, 0.4);
+solve_arrayRK2(wave2, 1.0, 0.4);
 set_analytic(analytic2, wave2);
-l2 = get_l2norm(wave2, analytic2);
-wave1.l2norm.push_back(l2);
+get_l2norm(wave2, analytic2);
 
 
 //---------------------solve array2----------------------//
-solve_arrayRK2(wave3, 0.8, 0.4);
+solve_arrayRK2(wave3, 1.0, 0.4);
 set_analytic(analytic3, wave3);
-l2 = get_l2norm(wave3, analytic3);
-wave1.l2norm.push_back(l2);
-
-//---------------------solve array1----------------------//
-solve_arrayRK2(wave4, 0.8, 0.4);//array,time,cfl
-set_analytic(analytic4, wave4);
-l2 = get_l2norm(wave4, analytic4);
-wave1.l2norm.push_back(l2);
-//cout << "Solution: " << get_solution(poisson1) << "\n";
-
-
-
-//---------------------solve array2----------------------//
-solve_arrayRK2(wave5, 0.8, 0.4);
-set_analytic(analytic5, wave5);
-l2 = get_l2norm(wave5, analytic5);
-wave1.l2norm.push_back(l2);
-
-
-//---------------------solve array2----------------------//
-solve_arrayRK2(wave6, 0.8, 0.4);
-set_analytic(analytic6, wave6);
-l2 = get_l2norm(wave6, analytic6);
-wave1.l2norm.push_back(l2);
+get_l2norm(wave3, analytic3);
 
 
 

@@ -24,21 +24,19 @@ using namespace std;
 
 struct carray{
 //arrays
-float mcellSOL [maxx][maxy];
-float mcellSOL2 [maxx][maxy];
-float mcellFI [maxx][maxy];
-float mcellFI2 [maxx][maxy];
+float mcellSOL [maxx][maxy];//first stage and solution mesh
+float mcellSOL2 [maxx][maxy];//second stage solution mesh
+float mcellFI [maxx][maxy];//first stage flux
+float mcellFI2 [maxx][maxy];//second stage flux
 
 //array attributes
 int sizex = maxx;
 int sizey = maxy;
-int iterations = 0;
 float DIM1 = 0;
 
 //current time 
 float tstep = 0;
 float ctime = 0;
-
 
 //data specific to array
 vector<float> l2norm;
@@ -47,10 +45,7 @@ vector<float> diff;
 //temporary cells to store
 float Tim1_j=0.0;
 float Tim2_j=0.0;
-
 float Ti_j=0.0;
-
-
 
 };
 
@@ -75,6 +70,8 @@ void solve_arrayRK2(carray & myarray, float tmax, float cfl);//solve the array
 //fI related functions
 
 void get_FIarray(carray & myarray, int stage);//get all FI for array for specific stage
+
+void get_FIarray_1stcell(carray & myarray, int stage);
 
 float calc_2nd_UW(carray & myarray);//calculate new cell value based on 2nd order scheme
 

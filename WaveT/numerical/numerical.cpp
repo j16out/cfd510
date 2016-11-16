@@ -69,9 +69,9 @@ void set_ghostcells(carray & myarray)
 float DIM1 = myarray.DIM1;
 
 //set boundary conditions in ghost cells
-
 myarray.mcellSOL2[0][1] = -2.0*(sin(4.0*PI*myarray.ctime)) + 3.0*myarray.mcellSOL[1][1];
 myarray.mcellSOL2[1][1] = 2.0*(sin(4.0*PI*myarray.ctime)) - myarray.mcellSOL[2][1];
+
 
 	
 }
@@ -105,7 +105,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 
 //--------------------------Set FI values for array mcellFI Face----------------------------//
 
-void get_FIarray_Face(carray & myarray, int stage)
+void get_FIarray_1stcell(carray & myarray, int stage)
 {
 
 int j = 1;
@@ -238,26 +238,22 @@ printf("Run: %d time: %f\n",n,myarray.ctime);
 nt = 1000+n;
 }
 
-//stage 1
-get_FIarray_Face(myarray, 1);
-get_FIarray(myarray, 1);
-get_RK2(myarray, 1);
-
-
-//stage 2
-get_FIarray_Face(myarray, 2);
-get_FIarray(myarray, 2);
-get_RK2(myarray, 2);
-
-
+//stage 1 and 2
+    for(int h = 1; h <= 2; ++h)
+    { 
+    get_FIarray_1stcell(myarray, h);//(array, stage)
+    get_FIarray(myarray, h);//(array, stage)
+    get_RK2(myarray, h);//(array, stage)
+    }
+//flux at boundary
+set_ghostcells(myarray);
 //mv sol2 back to array sol1
 mv_SOL2_to_SOL1(myarray);
 
-//flux at boundary
-
-set_ghostcells(myarray);
 
 
+
+//advance and record time steps
 myarray.ctime = myarray.ctime+myarray.tstep;
 ctime = myarray.ctime;
 ++n;
@@ -391,7 +387,7 @@ float sy = myarray.sizey-2;
 
 for(int j = 1; j < myarray.sizey-1; ++j)
 {	
-	for(int i = 1; i < myarray.sizex-1; ++i)
+	for(int i = 2; i < myarray.sizex; ++i)
 	{
 
 	float P = myarray.mcellSOL[i][j];
