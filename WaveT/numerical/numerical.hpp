@@ -38,8 +38,10 @@ float DIM1 = 0;
 float tstep = 0;
 float ctime = 0;
 
-//data specific to array
+//data storage specific to array
 vector<float> l2norm;
+vector<float> l1norm;
+vector<float> linfnorm;
 vector<float> diff;
 
 //temporary cells to store
@@ -53,33 +55,29 @@ int scheme = 0;
 
 };
 
+//--------------------Init Arrays-----------------------------------------//
 
 void set_array_size(carray & myarray, int x, int y, float DIM, int scheme);//set array size
+
+void set_zero(carray & myarray);//zero entire array
+
+void print_array(carray & myarray);//print array in terminal
+
+
+
+//-------------------Boundary and Intial Conditions------------------------//
 
 void set_ghostcells(carray & myarray);//set ghost cells
 
 void set_intial_cond(carray & myarray);
 
+void set_intial_cond2(carray & myarray);
 
-void set_zero(carray & myarray);//zero entire array
-
-
-void print_array(carray & myarray);//print array in terminal
-
-
-void solve_arrayRK2(carray & myarray, float tmax, float cfl);//solve the array
-
-
-
-//fI related functions
+//--------------------RK2 solver functions----------------------------------//
 
 void get_FIarray(carray & myarray, int stage);//get all FI for array for specific stage
 
 void get_FIarray_1stcell(carray & myarray, int stage);
-
-float calc_2nd_UW(carray & myarray);//calculate new cell value based on 2nd order scheme
-float calc_1st_UW(carray & myarray);
-float calc_2nd_CE(carray & myarray);
 
 void get_surcells(carray & myarray, int i, int j, int stage);//obtain values of surrounding cells stage defines were result stored
 
@@ -87,18 +85,25 @@ void get_RK2(carray & myarray, int stage);
 
 void mv_SOL2_to_SOL1(carray & myarray);
 
+void solve_arrayRK2(carray & myarray, float tmax, float cfl);//solve the array
 
-//Error calc related functions
+//flux schemes
+float calc_2nd_UW(carray & myarray);//calculate new cell value based on 2nd order scheme
+float calc_1st_UW(carray & myarray);
+float calc_2nd_CE(carray & myarray);
 
-void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM);//get error using 3 arrays based on ASME solution accuarcy handout
+
+//-----------------------Error calc related functions---------------------------//
+
+void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM);//get error using 3 arrays 
 
 float get_l2norm(carray & myarray, carray myarray2);//get estimated vale for l2 norm between arrays
 float get_linf_norm(carray & myarray, carray myarray2);
 float get_l1norm(carray & myarray, carray myarray2);
 
-void set_analytic(carray & myarray, carray & numarray);
+void set_analytic(carray & myarray, carray & numarray);//set analytic solution to a mesh
 
-float get_solution(carray & myarray);
+float get_solution(carray & myarray);//returns solution at P=1/2,1/2
 
 
 #endif

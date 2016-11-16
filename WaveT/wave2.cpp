@@ -25,13 +25,6 @@ via the link provided: url{https://github.com/j16out/
 using namespace std;
 
 
-#define E07 0.0000001
-#define E08 0.00000001
-#define E09 0.000000001
-#define E10 0.0000000001
-#define E11 0.00000000001
-
-
 
 
 int main(int argc, char **argv)

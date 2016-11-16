@@ -4,6 +4,182 @@ using namespace std;
 
 
 
+void draw_graph_wave1_p3(carray & myarray1, carray myarray2, carray myarray3)
+{
+TCanvas *c16 = new TCanvas("c16","The FillRandom example",200,50,900,700);   
+string titlefile;
+const char* c;  
+
+
+c16->cd();
+titlefile = "Solutions; Mesh Size; T Error";
+c = titlefile.c_str();
+TGraph *gr1 = new TGraph();	
+	gr1->SetMarkerColor(4);
+	gr1->SetMarkerStyle(24);
+	gr1->SetLineColor(1);
+	gr1->SetTitle(c);  
+TGraph *gr2 = new TGraph();	
+	gr2->SetMarkerColor(3);
+	gr2->SetMarkerStyle(25);
+	gr2->SetLineColor(1);
+	gr2->SetTitle(c);
+TGraph *gr3 = new TGraph();	
+	gr3->SetMarkerColor(2);
+	gr3->SetMarkerStyle(26);
+	gr3->SetLineColor(1);
+	gr3->SetTitle(c); 
+	
+	TGraph *gr11 = new TGraph();	
+	gr11->SetMarkerColor(4);
+	gr11->SetMarkerStyle(20);
+	gr11->SetLineColor(1);
+	gr11->SetTitle(c);  
+TGraph *gr21 = new TGraph();	
+	gr21->SetMarkerColor(3);
+	gr21->SetMarkerStyle(21);
+	gr21->SetLineColor(1);
+	gr21->SetTitle(c);
+TGraph *gr31 = new TGraph();	
+	gr31->SetMarkerColor(2);
+	gr31->SetMarkerStyle(22);
+	gr31->SetLineColor(1);
+	gr31->SetTitle(c); 
+	
+	TGraph *gr = new TGraph();
+	gr->SetTitle(c); 
+	
+int p = 50;
+int size = myarray1.l1norm.size();
+int n = 20;
+printf("array size %d\n", size);
+
+for(int i = 0; i < size; ++i)
+{
+float temp = myarray1.l1norm.at(i);
+gr1->SetPoint(i,n,temp);
+n = n+p;
+//printf("temp: %f i: %d\n", temp, n);
+}
+
+
+
+
+
+size = myarray2.l1norm.size();
+n = 20;
+//printf("array size %d\n", size);
+
+for(int i = 0; i < size; ++i)
+{
+float temp = myarray2.l1norm.at(i);
+gr2->SetPoint(i,n,temp);
+n = n+p;
+//printf("temp: %f i: %d\n", temp, n);
+}
+
+
+
+
+
+
+size = myarray3.l1norm.size();
+n = 20;
+//printf("array size %d\n", size);
+
+for(int i = 0; i < size; ++i)
+{
+float temp = myarray3.l1norm.at(i);
+gr3->SetPoint(i,n,temp);
+n = n+p;
+//printf("temp: %f i: %d\n", temp, n);
+}
+
+
+
+
+size = myarray1.linfnorm.size();
+n = 20;
+//printf("array size %d\n", size);
+
+for(int i = 0; i < size; ++i)
+{
+float temp = myarray1.linfnorm.at(i);
+gr11->SetPoint(i,n,temp);
+n = n+p;
+//printf("temp: %f i: %d\n", temp, n);
+}
+
+
+
+
+
+
+size = myarray2.linfnorm.size();
+n = 20;
+//printf("array size %d\n", size);
+
+for(int i = 0; i < size; ++i)
+{
+float temp = myarray2.linfnorm.at(i);
+gr21->SetPoint(i,n,temp);
+n = n+p;
+//printf("temp: %f i: %d\n", temp, n);
+}
+
+
+
+size = myarray3.linfnorm.size();
+n = 20;
+//printf("array size %d\n", size);
+
+for(int i = 0; i < size; ++i)
+{
+float temp = myarray3.linfnorm.at(i);
+gr31->SetPoint(i,n,temp);
+n = n+p;
+//printf("temp: %f i: %d\n", temp, n);
+}
+
+ c16->SetLogy();
+gr->SetPoint(0,0,10.0);
+
+gr->SetPoint(1,3000,0.00001);
+ 
+	
+
+gr->Draw("AP");
+gr21->Draw("samePl");
+gr1->Draw("samePl");
+gr3->Draw("samePl");
+
+gr11->Draw("samePl");
+gr2->Draw("samePl");
+gr31->Draw("samePl");
+
+	 
+
+TLegend *leg1 = new TLegend(0.75,0.9,0.9,0.8);
+
+leg1->AddEntry(gr1,"L1 2nd Upwind","APl");
+leg1->AddEntry(gr2,"L1 1st Upwind","APl");
+leg1->AddEntry(gr3,"L1 2nd Centered","APl");
+leg1->AddEntry(gr11,"L Infinity 2nd Upwind","APl");
+leg1->AddEntry(gr21,"L Infinity 1st Upwind","APl");
+leg1->AddEntry(gr31,"L Infinity 2nd Centered","APl");
+
+
+//leg->AddEntry(fitb,"this one","l");
+leg1->Draw();
+}
+//-------------------------------------------------------------------------------------l2
+
+
+
+
+//---------------------------------------------------------------------------------------------//
+
+
 
 
 
