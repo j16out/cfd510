@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------//
-Main Program for finding pressure for imcompressible flows using Poisson equations.
-Finds solution at P(1/2,1/2) for Land descretization error for w values of 1 for 
-20x20,40x40 and 60x60 array
+Main Program for finding solution for wave equation. Employs a RK2 time advance 
+with 2nd order upwind flux scheme.
+
 
 Jerin Roberts 2016
 compiled using g++/gcc version 5.4.0 on Ubuntu 16.04.02 and are available for clone 
@@ -30,6 +30,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
 
+//used as storage for this example
 carray wave11;//my main array1
 carray wave21;//my main array2
 carray wave31;//my main array3
@@ -41,7 +42,7 @@ int smesh = 20;
 
 while(smesh <= 2000)
 {
-//arrays
+//arrays being solved
 carray wave1;
 carray analytic1;
 carray wave2;

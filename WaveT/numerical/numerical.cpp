@@ -257,7 +257,7 @@ float fcon = false;
 float sizex = myarray.sizex;
 float sizey = myarray.sizey;
 
-if(stage == 1)
+if(stage == 1)//get surrounding cell values
 {
 myarray.Tim1_j = myarray.mcellSOL[i-1][j];
 myarray.Tim2_j = myarray.mcellSOL[i-2][j];
@@ -288,7 +288,7 @@ for(int j = 0; j < myarray.sizey; ++j)
 
     for(int i = 0; i < myarray.sizex; ++i)
     {
-    myarray.mcellSOL[i][j] = myarray.mcellSOL2[i][j]; 
+    myarray.mcellSOL[i][j] = myarray.mcellSOL2[i][j];//move update solution to array 1 
     }
 }
 
@@ -312,26 +312,24 @@ int nt = 1000;
 while(ctime < tmax-tstep)
 {
 
-if(n >= nt)
+if(n >= nt)//status
 {
 printf("Run: %d time: %f\n",n,myarray.ctime);
 nt = 1000+n;
 }
 
-//stage 1 and 2
+//FI and RK2 for stage 1 and 2
     for(int h = 1; h <= 2; ++h)
     { 
     get_FIarray_1stcell(myarray, h);//(array, stage)
-    get_FIarray(myarray, h);//(array, stage)
-    get_RK2(myarray, h);//(array, stage)
+    get_FIarray(myarray, h);
+    get_RK2(myarray, h);
     }
 //flux at boundary
 set_ghostcells(myarray);
+
 //mv sol2 back to array sol1
 mv_SOL2_to_SOL1(myarray);
-
-
-
 
 //advance and record time steps
 myarray.ctime = myarray.ctime+myarray.tstep;
@@ -348,7 +346,7 @@ printf("Solved numeric at %f time\n",ctime);
 void get_RK2(carray & myarray, int stage)
 {
 
-if(stage == 1)
+if(stage == 1)//first stage RK2
 {
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
@@ -361,7 +359,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 }
 }
 
-if(stage == 2)
+if(stage == 2)//second stage RK2
 {
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
@@ -388,7 +386,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 
 
 
-//-------------------------Get L1 nrom for unknown analytical----------------------//
+//-------------------------Get L1 norm for unknown analytical----------------------//
 
 float get_l1norm(carray & myarray, carray myarray2)
 {
@@ -415,7 +413,7 @@ return l1;
 }
 
 
-//-------------------------Get L2 nrom for unknown analytical----------------------//
+//-------------------------Get L infinty norm for unknown analytical----------------------//
 
 float get_linf_norm(carray & myarray, carray myarray2)
 {
@@ -496,89 +494,7 @@ printf("setting analytic at %f time\n",ctime);
 }
 
 
-//-----------------------Get average solution at point (1/2)(1/2)--------------------//
-
-float get_solution(carray & myarray)
-{
-float DIM1 = myarray.DIM1;
-int sx = (myarray.sizex)/2.0;
-int sy = (myarray.sizey)/2.0;
-float sol = (myarray.mcellSOL[sx-1][sy]+myarray.mcellSOL[sx][sy]+myarray.mcellSOL[sx][sy-1]+myarray.mcellSOL[sx-1][sy-1])/4.0;
-
-printf("cell 1: %f cell 2: %f cell 3: %f cell 4: %f\n",myarray.mcellSOL[sx-1][sy],myarray.mcellSOL[sx][sy],myarray.mcellSOL[sx][sy-1],myarray.mcellSOL[sx-1][sy-1]);
-//for Poisson problem only, finds value based on average of four surrounding cells
-
-return sol;
-}
 
 
-//--------------------------Get descrete error----------------------------//
-
-void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM)
-{
-//Calculating error as described in paper "procedure for estimation and reporting of uncertainty due to discretization in CFD applications"//
-
-printf("\nCalculating Error...\n");
-
-float h1 = DIM/ray1.sizex;
-float h2 = DIM/ray2.sizex;
-float h3 = DIM/ray3.sizex;
-
-
-float sol1 = get_solution(ray1);
-float sol2 = get_solution(ray2);
-float sol3 = get_solution(ray3);
-
-
-
-printf("h1: %f \nh2: %f \nh3: %f, \nsol1: %f \nsol2: %f \nsol3: %f\n",h1, h2, h3, sol1, sol2, sol3);
-
-float r21 = h2/h1;
-float r32 = h3/h2;
-
-printf("\nr32: %f \nr21: %f\n",r32, r21);
-
-float e32 = sol3-sol2;
-float e21 = sol2-sol1;
-
-float s = (e32/e21);
-if(s >= 0)
-s = 1;
-else
-s = -1;
-
-float p_n = 0;
-float p = (1/log(r21))*(abs(log(abs(e32/e21))+0));
-
-printf("intial guess: %f \n", p);
-
-float diff = 1;
-
-	while(diff > 0.0000001)
-	{
-
-	float p_n = (1/log(r21))*(abs(log(abs(e32/e21))+log((pow(r21,p)-s)/(pow(r32,p)-s)) ));
-	diff = abs(p_n -p);
-	//printf("p_n: %f p: %f diff: %f\n",p_n, p, diff);
-
-	p = p_n;
-	}
- 
-//
-float sol_ext21 = (pow(r21, p)*sol1-sol2)/(pow(r21,p)-1.0);
-float sol_ext32 = (pow(r32, p)*sol2-sol3)/(pow(r32,p)-1.0);
-
-printf("order: %f \nphi_ext21: %f \nphi_ext32 %f\n",p, sol_ext21, sol_ext32);
-
-float ea21 = abs((sol1-sol2)/sol1);
-
-float e_ext21 = abs((sol_ext21-sol1)/sol_ext21);
-
-float GCI_21 = (1.25*ea21)/(pow(r21,p)-1.0);
-
-
-printf("ea21: %f  \ne_ext21: %f  \nGC121 %f \n", ea21, e_ext21, GCI_21);
-
-}
 
 

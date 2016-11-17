@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------//
-Main Program for finding pressure for imcompressible flows using Poisson equations.
-Finds solution at P(1/2,1/2) for Land descretization error for w values of 1 for 
-20x20,40x40 and 60x60 array
+Main Program for finding solutions for wave equation. Employs a RK2 time advance 
+with 2nd order upwind flux scheme.
+
 
 Jerin Roberts 2016
 compiled using g++/gcc version 5.4.0 on Ubuntu 16.04.02 and are available for clone 

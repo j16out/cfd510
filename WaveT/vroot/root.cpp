@@ -4,6 +4,8 @@ using namespace std;
 
 
 
+//-----------------------------------part 3---------------------------------------//
+
 void draw_graph_wave1_p3(carray & myarray1, carray myarray2, carray myarray3)
 {
 TCanvas *c16 = new TCanvas("c16","The FillRandom example",200,50,900,700);   
@@ -64,8 +66,6 @@ n = n+p;
 
 
 
-
-
 size = myarray2.l1norm.size();
 n = 20;
 //printf("array size %d\n", size);
@@ -77,9 +77,6 @@ gr2->SetPoint(i,n,temp);
 n = n+p;
 //printf("temp: %f i: %d\n", temp, n);
 }
-
-
-
 
 
 
@@ -97,7 +94,6 @@ n = n+p;
 
 
 
-
 size = myarray1.linfnorm.size();
 n = 20;
 //printf("array size %d\n", size);
@@ -112,9 +108,6 @@ n = n+p;
 
 
 
-
-
-
 size = myarray2.linfnorm.size();
 n = 20;
 //printf("array size %d\n", size);
@@ -126,7 +119,6 @@ gr21->SetPoint(i,n,temp);
 n = n+p;
 //printf("temp: %f i: %d\n", temp, n);
 }
-
 
 
 size = myarray3.linfnorm.size();
@@ -172,18 +164,12 @@ leg1->AddEntry(gr31,"L Infinity 2nd Centered","APl");
 //leg->AddEntry(fitb,"this one","l");
 leg1->Draw();
 }
-//-------------------------------------------------------------------------------------l2
-
-
-
-
-//---------------------------------------------------------------------------------------------//
 
 
 
 
 
-
+//-----------------------------------------prt 2----------------------------------------------------//
 
 
 void draw_graph_wave1_p2(carray & myarray1, carray myarray2, carray myarray3)
@@ -264,7 +250,7 @@ leg1->AddEntry(gr3,"CFL 0.5015 Slightly Unstable ","Pl");
 
 //leg->AddEntry(fitb,"this one","l");
 leg1->Draw();
-//-------------------------------------------------------------------------------------l2
+//---------------sub section for order----------//
 TCanvas *c5 = new TCanvas("c5","The FillRandom example",200,50,900,700); 
 c5->cd();
 titlefile = "Order Evaluation; CFL Number ; L2 Error";
@@ -444,8 +430,6 @@ leg2->AddEntry(tfit2,"Linear Fit","l");
 leg2->Draw();
 
 }
-
-
 
 
 

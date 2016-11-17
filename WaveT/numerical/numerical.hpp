@@ -95,15 +95,12 @@ float calc_2nd_CE(carray & myarray);
 
 //-----------------------Error calc related functions---------------------------//
 
-void get_discrete_Error(carray ray1, carray ray2, carray ray3, float DIM);//get error using 3 arrays 
-
 float get_l2norm(carray & myarray, carray myarray2);//get estimated vale for l2 norm between arrays
 float get_linf_norm(carray & myarray, carray myarray2);
 float get_l1norm(carray & myarray, carray myarray2);
 
 void set_analytic(carray & myarray, carray & numarray);//set analytic solution to a mesh
 
-float get_solution(carray & myarray);//returns solution at P=1/2,1/2
 
 
 #endif

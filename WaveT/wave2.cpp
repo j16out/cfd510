@@ -1,12 +1,15 @@
 /*-------------------------------------------------------------------------------//
-Main Program for finding pressure for imcompressible flows using Poisson equations.
-Finds solution at P(1/2,1/2) for Land descretization error for w values of 1 for 
-20x20,40x40 and 60x60 array
+Main Program for finding solution for wave equation. Employs a RK2 time advance 
+with 2nd order upwind flux scheme.
+
 
 Jerin Roberts 2016
 compiled using g++/gcc version 5.4.0 on Ubuntu 16.04.02 and are available for clone 
 via the link provided: url{https://github.com/j16out/
 //-------------------------------------------------------------------------------*/
+
+//***NOTE need to change intial condition in numerical.cpp***//
+
 
 
 #include <vector>
@@ -35,21 +38,20 @@ carray wave1;//my main array
 set_array_size(wave1, 500, 1, 20.0, 0);//array, xsize, ysize, dimension
 set_zero(wave1);
 set_intial_cond(wave1);
-solve_arrayRK2(wave1, 8.0, 0.1);//def stable
+solve_arrayRK2(wave1, 8.0, 0.1);//def stable solution
 
-//---------------------plot unstable cfl----------------------//
-float cfl = 0.4;
+//---------------------plot l2 vs cfl----------------------//
+float cfl = 0.1;
 float factor = 0.0025;
 
-while(cfl <= 0.7)
+while(cfl <= 1.0)
 {
-carray wave2;
+carray wave2;//solve array for different cfl
 set_array_size(wave2, 500, 1, 20.0, 0);
 set_zero(wave2);
 set_intial_cond(wave2);
 solve_arrayRK2(wave2, 8.0, cfl);
-//set_analytic(analytic1, wave1);
-float l2 = get_l2norm(wave1, wave2);
+float l2 = get_l2norm(wave1, wave2);//compare to stable solution
 
 if(l2>BIG)
 break;
@@ -64,7 +66,7 @@ factor = 0.001;
 cfl = cfl + factor;
 }
 
-//-----------------------
+//-----------------------look at particular cfl------------------//
 carray wave2;
 set_array_size(wave2, 500, 1, 20.0, 0);
 set_zero(wave2);
@@ -75,7 +77,7 @@ carray wave3;//my main array
 set_array_size(wave3, 500, 1, 20.0, 0);//array, xsize, ysize, dimension
 set_zero(wave3);
 set_intial_cond(wave3);
-solve_arrayRK2(wave3, 8.0, 0.5015);//def stable
+solve_arrayRK2(wave3, 8.0, 0.5015);
 
 
 
@@ -86,8 +88,7 @@ if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);//no more than two subs
     draw_graph_wave1_p2(wave1, wave2, wave3);
-	//draw_graph_q1(wave1, wave2, wave3, analytic1, analytic2, analytic3);
-    //draw_graph_q1a(wave1, wave2, wave3, analytic1, analytic2, analytic3);
+	draw_graph_q1(wave1, wave2, wave3, analytic1, analytic2, analytic3);
 	theApp.Run();
 }
 
