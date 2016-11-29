@@ -16,7 +16,7 @@ TCanvas *c2 = new TCanvas("c2","The FillRandom example",200,50,900,700);
 TCanvas *c4 = new TCanvas("c4","The FillRandom example",200,50,900,700);
 
 
-string titlefile = "Laplace Numerical; x; y; z";
+string titlefile = "Energy Numerical; x; y; z";
 const char* c; 
 c = titlefile.c_str();	
 
@@ -25,7 +25,7 @@ TGraph2D *gr1 = new TGraph2D();
 TGraph2D *gr5 = new TGraph2D();
 gr1->SetTitle(c);
 
-titlefile = "Laplace Analytical; x; y; z";
+titlefile = "Energy Analytical; x; y; z";
 c = titlefile.c_str();
 gr5->SetTitle(c);	
 

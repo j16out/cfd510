@@ -13,7 +13,7 @@
 
 void set_array_size(carray & myarray, int x, int y, double DIMx, double DIMy, int scheme)
 {
-	if(x <= 100 && y <= 100)
+	if(x <= maxx && y <= maxy)
 	{
 	myarray.sizex = x+2;
 	myarray.sizey = y+2;
@@ -71,27 +71,9 @@ void set_zero(carray & myarray)
 
 void set_ghostcells(carray & myarray)
 {
-double DIMx = myarray.DIMx;
-
 //set boundary conditions in ghost cells
-if(myarray.scheme == 0)//2nd order upwind
-{
-myarray.T1[0][1] = -2.0*(sin(4.0*PI*myarray.ctime)) + 3.0*myarray.T1[1][1];
-myarray.T1[1][1] = 2.0*(sin(4.0*PI*myarray.ctime)) - myarray.T1[2][1];
-}
-
-if(myarray.scheme == 1)//1st order upwind
-{
-myarray.T1[1][1] = 2.0*(sin(4.0*PI*myarray.ctime)) - myarray.T1[2][1];
-}
-
-if(myarray.scheme == 2)//2nd order centered
-{
-myarray.T1[1][1] = 2.0*(sin(4.0*PI*myarray.ctime)) - myarray.T1[2][1];
-}
 
 
-	
 }
 
 //--------------------------set intial condition---------------------------------//
@@ -103,13 +85,13 @@ double DIMy = myarray.DIMy;
 double dx = 0.0;
 double dy = 0.0;
 
-for(int j = 0; j < myarray.sizey-0; ++j)
+for(int j = 0; j < myarray.sizey; ++j)
 {
 
-    for(int i = 0; i < myarray.sizex-0; ++i)
+    for(int i = 0; i < myarray.sizex; ++i)
     {
     dx = (i-0.5)*DIMx;
-    dy = (i-0.5)*DIMy;
+    dy = (j-0.5)*DIMy;
     
 
     myarray.T1[i][j] = T0*cos(PI*dx)*sin(PI*dy);
@@ -195,13 +177,13 @@ double chx = myarray.DIMx;
 double chy = myarray.DIMy;
 //float chy = DIM1;
 double source = 0.0;
-double a = (s1.uip1_j * s1.Tip1_j  -  s1.uim1_j * s1.Tim1_j)/(2.0*chx);
-double b = (s1.Tip1_j  - 2.0*s1.Ti_j + s1.Tim1_j)/(chx*chx*(RE*PR));
-double c = (s1.vi_jp1 * s1.Ti_jp1  -  s1.vi_jm1 * s1.Ti_jm1)/(2.0*chy);
-double d = (s1.Ti_jp1  - 2.0*s1.Ti_j + s1.Ti_jm1)/(chy*chy*(RE*PR));
+double a = (s1.uip1_j * s1.Tip1_j  -  s1.uim1_j * s1.Tim1_j)/(2.0);
+double b = (s1.Tip1_j  - 2.0*s1.Ti_j + s1.Tim1_j)/(chx*(RE*PR));
+double c = (s1.vi_jp1 * s1.Ti_jp1  -  s1.vi_jm1 * s1.Ti_jm1)/(2.0);
+double d = (s1.Ti_jp1  - 2.0*s1.Ti_j + s1.Ti_jm1)/(chy*(RE*PR));
 
-double newcell = (-a+b)   +   (-c+d)   +   source;
-return newcell*-1.0;
+double newcell = (-1.0/chx)*(a-b)   +   (-1.0/chy)*(c-d)   +   source;
+return -newcell;
 }
 
 
@@ -211,92 +193,6 @@ return newcell*-1.0;
 //**************************************************************************//
 
 
-
-
-
-//-------------------------Get L1 norm for unknown analytical----------------------//
-
-double get_l1norm(carray & myarray, carray myarray2)
-{
-double l1sum =0;
-double sx = myarray.sizex-2;
-double sy = myarray.sizey-2;
-
-for(int j = 1; j < myarray.sizey-1; ++j)
-{	
-	for(int i = 2; i < myarray.sizex; ++i)
-	{
-
-	double P = myarray.T1[i][j];
-	double T = myarray2.T1[i][j];
-	l1sum =  l1sum + abs(P-T);
-
-	}
-
-}
-
-double l1 = l1sum/(sx);
-cout << setprecision(8) << fixed << "L1 norm: " << l1 << "\n";
-return l1;
-}
-
-
-//-------------------------Get L infinty norm for unknown analytical----------------------//
-
-double get_linf_norm(carray & myarray, carray myarray2)
-{
-double error =0;
-double maxerror = -1;
-double sx = myarray.sizex-2;
-double sy = myarray.sizey-2;
-
-for(int j = 1; j < myarray.sizey-1; ++j)
-{	
-	for(int i = 2; i < myarray.sizex; ++i)
-	{
-
-	double P = myarray.T1[i][j];
-	double T = myarray2.T1[i][j];
-	error =  abs(P-T);
-    if(error > maxerror)
-    maxerror = error;
-
-	}
-
-}
-
-
-cout << setprecision(8) << fixed << "L infinity norm: " << maxerror << "\n";
-return maxerror;
-}
-
-
-
-//-------------------------Get L2 nrom for unknown analytical----------------------//
-
-double get_l2norm(carray & myarray, carray myarray2)
-{
-double l2sum =0;
-double sx = myarray.sizex-2;
-double sy = myarray.sizey-2;
-
-for(int j = 1; j < myarray.sizey-1; ++j)
-{	
-	for(int i = 2; i < myarray.sizex; ++i)
-	{
-
-	double P = myarray.T1[i][j];
-	double T = myarray2.T1[i][j];
-	l2sum =  l2sum + pow((P-T),2);
-
-	}
-
-}
-
-double l2 = sqrt(l2sum/(sx));
-cout << setprecision(8) << fixed << "L2 norm: " << l2 << "\n";
-return l2;
-}
 
 
 
@@ -313,6 +209,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 	{
 	double dx = (i-0.5)*DIMx;
 	double dy = (j-0.5)*DIMy;
+	
 	double a = U0*T0*PI*cos(2.0*PI*dx)*dy*sin(PI*dy);
 	double b = V0*T0*PI*dx*cos(PI*dx)*cos(2.0*PI*dy);
 	double c = (2.0*T0*pow(PI,2)*cos(PI*dx)*sin(PI*dy))/(RE*PR);

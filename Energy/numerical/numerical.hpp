@@ -16,12 +16,14 @@
 using namespace std;
 
 #define BIG 10000
-#define maxx 8000
-#define maxy 3
+#define maxx 120
+#define maxy 120
 #define PI 3.141592654
-#define U0 0
-#define T0 1
-#define V0 0
+
+#define U0 1
+#define T0 10
+#define V0 1
+
 #define RE 50
 #define PR 0.7
 #define EC 0.1
