@@ -71,25 +71,9 @@ void set_zero(carray & myarray)
 
 void set_ghostcells(carray & myarray)
 {
-double DIMx = myarray.DIMx;
-double DIMy = myarray.DIMy;
-double dx = 0.0;
-double dy = 0.0;
-    //set ghost cells top/bottom
-	for(int i = 0; i < myarray.sizex; ++i)
-	{
-	myarray.T1[i][0] = 2.0*(1.0) - myarray.T1[i][1];
-	myarray.T1[i][myarray.sizey] =2.0*(0.0)-myarray.T1[i][myarray.sizey-1];
-	}	
-	
-    //set ghost cells inflow/outflow	
-	for(int j = 0; j < myarray.sizey; ++j)
-	{ 
-    dy = (j-0.5)*DIMy;
-	myarray.T1[0][j] = 2.0*( dy+((0.75)*PR*EC*(1/pow(myarray.u1[1][j],2))*(1.0-pow((1.0-2.0*dy),4))) )- myarray.T1[1][j];
-	myarray.T1[myarray.sizex][j] = myarray.T1[myarray.sizex-1][j];//set everything to zero
+//set boundary conditions in ghost cells
 
-	}
+
 }
 
 //--------------------------set intial condition---------------------------------//
@@ -110,9 +94,9 @@ for(int j = 0; j < myarray.sizey; ++j)
     dy = (j-0.5)*DIMy;
     
 
-    myarray.T1[i][j] = dy;
-    myarray.u1[i][j] = 6.0*U0*dy*(1.0-dy);
-    myarray.v1[i][j] = 0;
+    myarray.T1[i][j] = T0*cos(PI*dx)*sin(PI*dy);
+    myarray.u1[i][j] = U0*dy*sin(PI*dx);
+    myarray.v1[i][j] = V0*dx*cos(PI*dy);
     //printf("f: %f  dx: %f\n", f, dx);
     }
 
@@ -124,52 +108,24 @@ for(int j = 0; j < myarray.sizey; ++j)
 //----------------------------- Array Solving-------------------------------//
 //**************************************************************************//
 
-void solve_array_EE(carray & myarray, double tmax, double cfl)
+void solve_array(carray & myarray, double tmax, double cfl)
 {
-double tstep = (cfl*(myarray.DIMx))/2.0;
-double ctime = 0.0;
+
+
+double ctime = myarray.ctime;
 
 set_intial_cond(myarray);
 
 
-printf("\n\nRunning size: %d time step: %f\n",myarray.sizex,tstep);
 
-int n = 0;
-int nt = 1000;
-
-while(ctime < tmax-tstep)
-{
-
-if(n >= nt)//status
-{
-printf("Run: %d time: %f\n",n,ctime);
-nt = 1000+n;
-}   
-
-ctime = ctime+tstep;
 compute_Flux(myarray);
-time_advance_EE(myarray, tstep);
-set_ghostcells(myarray);
 
-++n;
-}
 
-myarray.ctime = ctime;
+
 printf("Solved numeric at %f time\n",ctime);
 }
 
-//------------------------------EE time advance----------------------------//
 
-void time_advance_EE(carray & myarray, double tstep)
-{
-for(int j = 1; j < myarray.sizey-1; ++j)
-{
-    for(int i = 1; i < myarray.sizex-1; ++i)
-    {
-      myarray.T1[i][j] = myarray.T1[i][j]-tstep*(myarray.f1[i][j]);
-    }
-}
-}
 
 
 //**************************************************************************//

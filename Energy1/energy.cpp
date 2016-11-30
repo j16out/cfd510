@@ -29,35 +29,54 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-cdata mydata;
 
-carray flow1;//my main array
-carray analytic;
+
+carray wave1;//my main array
+carray analytic1;
+
+//set size
 
 //set array size or default used 162x162
-set_array_size(flow1, 25, 10, 5.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(analytic, 20, 20, 5.0, 1.0, 0);
-
-set_zero(flow1);
-set_zero(analytic);
-
-//---------------------solve EE----------------------//
-
-solve_array_EE(flow1, 1.101, 1.0);
-set_analytic(analytic, flow1);
+set_array_size(wave1, 20, 1, 1.0, 1.0, 0);//array, xsize, ysize, dimension
+set_array_size(analytic1, 20, 1, 1.0, 1.0, 0);
 
 
+
+
+
+//print_array(analytic);
+
+
+
+//set intial conditions
+
+
+set_zero(wave1);
+set_intial_cond(wave1);
+//print_array(wave1);//print array in terminal
+
+
+double l2 = 0;
+
+//---------------------solve array1----------------------//
+
+set_analytic(analytic1, wave1);
+
+
+//cout << "Solution: " << get_solution(poisson1) << "\n";
 
 
 
 //----------------------Draw Data---------------------//
+
 if(1)//start root application
 {
-	TApplication theApp("App", &argc, argv);//no more than two subs  
-	draw_3Dgraph(flow1, analytic);
+	TApplication theApp("App", &argc, argv);//no more than two subs 
+	//draw_graph_q1(wave1, wave2, wave3, analytic1, analytic2, analytic3);   
 	theApp.Run();
 }
 
+ //draw_graph_wave1(wave1, wave2, wave3);
 
 
 //end

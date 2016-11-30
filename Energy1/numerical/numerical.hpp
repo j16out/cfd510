@@ -20,7 +20,7 @@ using namespace std;
 #define maxy 120
 #define PI 3.141592654
 
-#define U0 3
+#define U0 1
 #define T0 1
 #define V0 1
 
@@ -40,10 +40,11 @@ double u1 [maxx][maxy];
 //array attributes
 int sizex = maxx;
 int sizey = maxy;
-double DIMx = 0.0;
-double DIMy = 0.0;
+double DIMx = 0;
+double DIMy = 0;
 //scheme
 int scheme = 0;
+double tstep = 0;
 double ctime = 0;
 };
 
@@ -95,13 +96,9 @@ void set_ghostcells(carray & myarray);//set ghost cells
 
 void set_intial_cond(carray & myarray);
 
-//--------------------Solve Explicit Euler------------------------------------//
-
-void solve_array_EE(carray & myarray, double tmax, double cfl);
-
-void time_advance_EE(carray & myarray, double tstep);
 
 //--------------------Flux calculation------------------------------------//
+void solve_array(carray & myarray, double tmax, double cfl);
 
 void compute_Flux(carray & myarray);
 

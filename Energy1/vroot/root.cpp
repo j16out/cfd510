@@ -13,7 +13,7 @@ float DIMy = myarray.DIMy;
 
 
 TCanvas *c2 = new TCanvas("c2","The FillRandom example",200,50,900,700);
-//TCanvas *c4 = new TCanvas("c4","The FillRandom example",200,50,900,700);
+TCanvas *c4 = new TCanvas("c4","The FillRandom example",200,50,900,700);
 
 
 string titlefile = "Energy Numerical; x; y; z";
@@ -71,9 +71,9 @@ c4->cd();
    gStyle->SetPalette(1);
    gr1->Draw("surf1z");
    
-//c4->cd();   
+c4->cd();   
    gStyle->SetPalette(1);
-   //gr5->Draw("surf1z");   
+   gr5->Draw("surf1z");   
    
 }
 
