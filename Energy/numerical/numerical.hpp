@@ -57,14 +57,12 @@ vector<double> linfnorm;
 };
 
 struct crow{
-//data storage specific to array
-double LHS [maxx][3];//second stage solution mesh
+double LHS [maxx][3];
 double RHS [maxx];
 };
 
 struct ccol{
-//data storage specific to array
-double LHS [maxy][3];//second stage solution mesh
+double LHS [maxy][3];
 double RHS [maxy];
 };
 
@@ -112,11 +110,15 @@ void set_intial_cond(carray & myarray);
 
 void solve_array_IE(carray & myarray, double tmax, double cfl);
 
-void solve_LinSys1(carray & myarray, double tstep);
+void solve_LinSys(carray & myarray, double tstep);
 
 void load_row(carray & myarray, crow & myrow, int j, double tstep);
 
+void load_col(carray & myarray, ccol & mycol, int i, double tstep);
+
 static void solve_thomas(crow & r, const int iSize);
+
+static void solve_thomas(ccol & r, const int iSize);
 
 //--------------------Solve Explicit Euler------------------------------------//
 
