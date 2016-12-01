@@ -43,7 +43,7 @@ set_zero(analytic);
 
 //---------------------solve EE----------------------//
 
-solve_array_EE(flow1, 1.101, 1.0);
+solve_array_EE(flow1, 1.501, 1.0);
 set_analytic(analytic, flow1);
 
 

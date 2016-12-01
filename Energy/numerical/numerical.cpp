@@ -125,7 +125,7 @@ for(int j = 0; j < myarray.sizey; ++j)
 
 void solve_array_IE(carray & myarray, double tmax, double cfl)
 {
-cimp myimp;
+
 double tstep = (cfl*(myarray.DIMx))/2.0;
 double ctime = 0.0;
 
@@ -146,11 +146,14 @@ printf("Run: %d time: %f\n",n,ctime);
 nt = 1000+n;
 }   
 
+//implicit time advance
 ctime = ctime+tstep;
 compute_Flux(myarray);
-solve_LinSys1(myarray, myimp, tstep)
+solve_LinSys1(myarray, tstep);
 
-time_implicit_E(myarray, tstep);
+
+
+
 set_ghostcells(myarray);
 
 ++n;
@@ -162,35 +165,82 @@ printf("Solved numeric at %f time\n",ctime);
 
 //-------------------------------LHS approx factor----------------------//
 
-void solve_LinSys1(carray & myarray, crow & myrow, double tstep)
+void solve_LinSys1(carray & myarray, double tstep)
 {
 crow myrow;
 for(int j = 0; j < myarray.sizey; ++j)
 {
-load_row(myarray, myimp, j, tstep)
+load_row(myarray, myrow, j, tstep);
+solve_thomas(myrow, myarray.sizex);
+}
 
 }
 
+//--------------------------Load row for Thomson---------------------------//
 
-
-}
-
-
-
-void load_row(carray & myarray, cimp & myrow, int j, double tstep)
+void load_row(carray & myarray, crow & myrow, int j, double tstep)
 {
 double chx = myarray.DIMx;
 for(int i = 1; i < myarray.sizex-1; ++i)
 {
 double alpha = tstep/(RE*PR*pow(chx,2));
-double beta = (myarray.u1[i][j]*tstep)*(;
+double beta = (myarray.u1[i][j]*tstep)*(2.0*chx);
 
-myrow.LHS[i][1] =  
-myrow.LHS[i][2]
-myrow.LHS[i][3]
+myrow.LHS[i][1] = (-alpha - beta);
+myrow.LHS[i][2] = (1.0 + 2.0*alpha);
+myrow.LHS[i][3] = (-alpha + beta);
+//load the flux
+myrow.RHS[i] = tstep * myarray.f1[i][j];
+}
 
 }
 
+
+
+
+//--------------------------Load column for Thomson---------------------------//
+
+void load_col(carray & myarray, ccol & mycol, int i, double tstep)
+{
+double chy = myarray.DIMy;
+for(int j = 1; j < myarray.sizey-1; ++j)
+{
+double alpha = tstep/(RE*PR*pow(chy,2));
+double beta = (myarray.v1[i][j]*tstep)*(2.0*chy);
+
+myrow.LHS[j][1] = (-alpha - beta);
+myrow.LHS[j][2] = (1.0 + 2.0*alpha);
+myrow.LHS[j][3] = (-alpha + beta);
+//load the flux
+myrow.RHS[i] = tstep * myarray.f1[i][j];
+}
+
+}
+
+
+//------------------------------Thomas solving----------------------------------//
+
+
+static void solve_thomas(crow & r, const int iSize)
+{
+  int i;
+  /* This next line actually has no effect, but it -does- make clear that
+     the values in those locations have no impact. */
+  r.LHS[0][0] = r.LHS[iSize-1][2] = 0;
+  /* Forward elimination */
+  for (i = 0; i < iSize-1; i++) {
+    r.LHS[i][2] /= r.LHS[i][1];
+    r.RHS[i] /= r.LHS[i][1];
+    r.LHS[i+1][1] -= r.LHS[i][2]*r.LHS[i+1][0];
+    r.RHS[i+1] -= r.LHS[i+1][0]*r.RHS[i];
+  }
+  /* Last line of elimination */
+  r.RHS[iSize-1] /= r.LHS[iSize-1][1];
+
+  /* Back-substitution */
+  for (i = iSize-2; i >= 0; i--) {
+    r.RHS[i] -= r.RHS[i+1]*r.LHS[i][2];
+  }
 }
 
 //**************************************************************************//

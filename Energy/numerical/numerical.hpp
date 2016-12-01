@@ -107,6 +107,17 @@ void set_ghostcells(carray & myarray);//set ghost cells
 
 void set_intial_cond(carray & myarray);
 
+
+//--------------------Solve Implicit Euler------------------------------------//
+
+void solve_array_IE(carray & myarray, double tmax, double cfl);
+
+void solve_LinSys1(carray & myarray, double tstep);
+
+void load_row(carray & myarray, crow & myrow, int j, double tstep);
+
+static void solve_thomas(crow & r, const int iSize);
+
 //--------------------Solve Explicit Euler------------------------------------//
 
 void solve_array_EE(carray & myarray, double tmax, double cfl);
