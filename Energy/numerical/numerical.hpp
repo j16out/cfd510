@@ -56,6 +56,18 @@ vector<double> l1norm;
 vector<double> linfnorm;
 };
 
+struct crow{
+//data storage specific to array
+double LHS [maxx][3];//second stage solution mesh
+double RHS [maxx];
+};
+
+struct ccol{
+//data storage specific to array
+double LHS [maxy][3];//second stage solution mesh
+double RHS [maxy];
+};
+
 struct surr{
 //surrounding cells
 double Tim1_j = 0;

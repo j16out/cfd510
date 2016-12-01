@@ -125,21 +125,73 @@ for(int j = 0; j < myarray.sizey; ++j)
 
 void solve_array_IE(carray & myarray, double tmax, double cfl)
 {
+cimp myimp;
 double tstep = (cfl*(myarray.DIMx))/2.0;
 double ctime = 0.0;
 
 set_intial_cond(myarray);
 
 
+printf("\n\nRunning size: %d time step: %f\n",myarray.sizex,tstep);
+
+int n = 0;
+int nt = 1000;
+
+while(ctime < tmax-tstep)
+{
+
+if(n >= nt)//status
+{
+printf("Run: %d time: %f\n",n,ctime);
+nt = 1000+n;
+}   
+
+ctime = ctime+tstep;
+compute_Flux(myarray);
+solve_LinSys1(myarray, myimp, tstep)
+
+time_implicit_E(myarray, tstep);
+set_ghostcells(myarray);
+
+++n;
+}
+
+myarray.ctime = ctime;
+printf("Solved numeric at %f time\n",ctime);
+}
+
+//-------------------------------LHS approx factor----------------------//
+
+void solve_LinSys1(carray & myarray, crow & myrow, double tstep)
+{
+crow myrow;
+for(int j = 0; j < myarray.sizey; ++j)
+{
+load_row(myarray, myimp, j, tstep)
+
+}
 
 
 
+}
 
 
 
+void load_row(carray & myarray, cimp & myrow, int j, double tstep)
+{
+double chx = myarray.DIMx;
+for(int i = 1; i < myarray.sizex-1; ++i)
+{
+double alpha = tstep/(RE*PR*pow(chx,2));
+double beta = (myarray.u1[i][j]*tstep)*(;
 
+myrow.LHS[i][1] =  
+myrow.LHS[i][2]
+myrow.LHS[i][3]
 
+}
 
+}
 
 //**************************************************************************//
 //-----------------------------EE Array Solving-----------------------------//
