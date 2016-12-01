@@ -97,6 +97,10 @@ void set_zero(carray & myarray);//zero entire array
 
 void print_array(carray & myarray);//print array in terminal
 
+void print_arrayu(carray & myarray);
+
+void print_row(crow & myrow, carray & myarray);
+
 void set_array_size(carray & myarray, int x, int y, double DIMx, double DIMy, int scheme);
 
 //-------------------Boundary and Intial Conditions------------------------//
@@ -116,9 +120,9 @@ void load_row(carray & myarray, crow & myrow, int j, double tstep);
 
 void load_col(carray & myarray, ccol & mycol, int i, double tstep);
 
-static void solve_thomas(crow & r, const int iSize);
+void solve_thomas(crow & r, int iSize);
 
-static void solve_thomas(ccol & r, const int iSize);
+void solve_thomas(ccol & r, int iSize);
 
 //--------------------Solve Explicit Euler------------------------------------//
 

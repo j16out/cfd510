@@ -26,26 +26,7 @@ void set_array_size(carray & myarray, int x, int y, double DIMx, double DIMy, in
 
 }
 
-//--------------------------Print array in terminal----------------------------//
 
-void print_array(carray & myarray)
-{
-cout << "\n";
-
-	for(int j = 0; j < myarray.sizey; ++j)
-	{
-	cout << "\n|";	
-		for(int i = 0; i < myarray.sizex; ++i)
-		{
-		if(myarray.T1[i][j] >= 0)
-		cout << setprecision(3) << fixed << myarray.T1[i][j] <<"|";
-		if(myarray.T1[i][j] < 0)
-		cout << setprecision(2) << fixed << myarray.T1[i][j] <<"|";
-		}
-	
-	}
-cout << "\n";
-}
 
 
 //--------------------------zero array----------------------------//
@@ -66,7 +47,7 @@ void set_zero(carray & myarray)
 }
 
 
-//--------------------------set ghost cells for Wave----------------------------//
+//--------------------------set ghost cells for Energy----------------------------//
 
 
 void set_ghostcells(carray & myarray)
@@ -78,15 +59,18 @@ double dy = 0.0;
     //set ghost cells top/bottom
 	for(int i = 0; i < myarray.sizex; ++i)
 	{
-	myarray.T1[i][0] = 2.0*(1.0) - myarray.T1[i][1];
-	myarray.T1[i][myarray.sizey] =2.0*(0.0)-myarray.T1[i][myarray.sizey-1];
+	myarray.T1[i][0] = 2.0*(0.0) - myarray.T1[i][1];
+	myarray.T1[i][myarray.sizey] =2.0*(1.0)-myarray.T1[i][myarray.sizey-1];
 	}	
 	
     //set ghost cells inflow/outflow	
-	for(int j = 0; j < myarray.sizey; ++j)
+	for(int j = 1; j < myarray.sizey-1; ++j)
 	{ 
     dy = (j-0.5)*DIMy;
-	myarray.T1[0][j] = 2.0*( dy+((0.75)*PR*EC*(1/pow(myarray.u1[1][j],2))*(1.0-pow((1.0-2.0*dy),4))) )- myarray.T1[1][j];
+    
+	myarray.T1[0][j] = 2.0*( dy+((3.0/4.0)*PR*EC*(pow(U0,2))*(1.0-pow((1.0-2.0*dy),4))) ) - myarray.T1[1][j];
+	
+	
 	myarray.T1[myarray.sizex][j] = myarray.T1[myarray.sizex-1][j];//set everything to zero
 
 	}
@@ -106,10 +90,8 @@ for(int j = 0; j < myarray.sizey; ++j)
 
     for(int i = 0; i < myarray.sizex; ++i)
     {
-    dx = (i-0.5)*DIMx;
     dy = (j-0.5)*DIMy;
     
-
     myarray.T1[i][j] = dy;
     myarray.u1[i][j] = 6.0*U0*dy*(1.0-dy);
     myarray.v1[i][j] = 0;
@@ -130,6 +112,7 @@ double tstep = (cfl*(myarray.DIMx))/2.0;
 double ctime = 0.0;
 
 set_intial_cond(myarray);
+set_ghostcells(myarray);
 
 
 printf("\n\nRunning size: %d time step: %f\n",myarray.sizex,tstep);
@@ -166,17 +149,25 @@ printf("Solved numeric at %f time\n",ctime);
 
 void solve_LinSys(carray & myarray, double tstep)
 {
+
 //--linear system num 1---//
 crow myrow;
+
+print_array(myarray);
+print_arrayu(myarray);
 for(int j = 0; j < myarray.sizey; ++j)
 {
+
 load_row(myarray, myrow, j, tstep);
 solve_thomas(myrow, myarray.sizex);
+
     for(int i = 0; i < myarray.sizex; ++i)
     {
     myarray.f1[i][j] = myrow.RHS[i];
     }
 }
+print_array(myarray);
+print_arrayu(myarray);
 
 //--linear system num 2---//
 ccol mycol;
@@ -184,32 +175,40 @@ for(int i = 0; i < myarray.sizex; ++i)
 {
 load_col(myarray, mycol, i, tstep);
 solve_thomas(mycol, myarray.sizey);
+
     for(int j = 0; j < myarray.sizey; ++j)
     {
-    myarray.T1[i][j] = myrow.RHS[j];
+    myarray.T1[i][j] = mycol.RHS[j] ;
     }
 }
 
+print_array(myarray);
+print_arrayu(myarray);
+
 }
+
+
 
 //--------------------------Load row for Thomson---------------------------//
 
 void load_row(carray & myarray, crow & myrow, int j, double tstep)
 {
 double chx = myarray.DIMx;
-for(int i = 1; i < myarray.sizex-1; ++i)
+for(int i = 0; i < myarray.sizex; ++i)
 {
 double alpha = tstep/(RE*PR*pow(chx,2));
 double beta = (myarray.u1[i][j]*tstep)*(2.0*chx);
 
-myrow.LHS[i][1] = (-alpha - beta);
-myrow.LHS[i][2] = (1.0 + 2.0*alpha);
-myrow.LHS[i][3] = (-alpha + beta);
+myrow.LHS[i][0] = (-alpha - beta);
+myrow.LHS[i][1] = (1.0 + 2.0*alpha);
+myrow.LHS[i][2] = (-alpha + beta);
 //load the flux
+
 myrow.RHS[i] = tstep * myarray.f1[i][j];
 }
 
 }
+
 
 
 //--------------------------Load column for Thomson---------------------------//
@@ -217,14 +216,14 @@ myrow.RHS[i] = tstep * myarray.f1[i][j];
 void load_col(carray & myarray, ccol & mycol, int i, double tstep)
 {
 double chy = myarray.DIMy;
-for(int j = 1; j < myarray.sizey-1; ++j)
+for(int j = 0; j < myarray.sizey; ++j)
 {
 double alpha = tstep/(RE*PR*pow(chy,2));
 double beta = (myarray.v1[i][j]*tstep)*(2.0*chy);
 
-mycol.LHS[j][1] = (-alpha - beta);
-mycol.LHS[j][2] = (1.0 + 2.0*alpha);
-mycol.LHS[j][3] = (-alpha + beta);
+mycol.LHS[j][0] = (-alpha - beta);
+mycol.LHS[j][1] = (1.0 + 2.0*alpha);
+mycol.LHS[j][2] = (-alpha + beta);
 //load the solution from first linsys solve
 mycol.RHS[i] = myarray.f1[i][j]; 
 }
@@ -235,7 +234,7 @@ mycol.RHS[i] = myarray.f1[i][j];
 //------------------------------Thomas solving----------------------------------//
 
 
-static void solve_thomas(crow & r, const int iSize)
+void solve_thomas(crow & r, int iSize)
 {
   int i;
   /* This next line actually has no effect, but it -does- make clear that
@@ -258,7 +257,7 @@ static void solve_thomas(crow & r, const int iSize)
   
 }
 
-static void solve_thomas(ccol & r, const int iSize)
+void solve_thomas(ccol & r, int iSize)
 {
   int i;
   /* This next line actually has no effect, but it -does- make clear that
@@ -462,8 +461,99 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 printf("setting analytic at %f time\n",ctime);
 }
 
+//**************************************************************************//
+//---------------------------Print Functions--------------------------------//
+//**************************************************************************//
+
+
+//--------------------------Print array in terminal----------------------------//
+
+void print_array(carray & myarray)
+{
+cout << "Solution:\n       |";
+for(int i = 0; i < myarray.sizex; ++i)
+		{
+		if(i < 10)
+		cout << " i: " << i <<"|";
+		if(i > 9)
+		cout << " i:" << i <<"|";
+        }
+cout << "\n";
+	for(int j = 0; j < myarray.sizey; ++j)
+	{
+	if(j > 9)
+	cout << "\nj:" << j << "|  |";
+	if(j < 10)	
+	cout << "\nj: " << j << "|  |";
+		for(int i = 0; i < myarray.sizex; ++i)
+		{
+		if(myarray.T1[i][j] >= 0)
+		cout << setprecision(3) << fixed << myarray.T1[i][j] <<"|";
+		if(myarray.T1[i][j] < 0)
+		cout << setprecision(2) << fixed << myarray.T1[i][j] <<"|";
+		}
+	
+	}
+cout << "\n\n";
+}
+
+//--------------------------Print u array in terminal----------------------------//
+
+void print_arrayu(carray & myarray)
+{
+
+cout << "Flux:\n       |";
+for(int i = 0; i < myarray.sizex; ++i)
+		{
+		if(i < 10)
+		cout << " i: " << i <<"|";
+		if(i > 9)
+		cout << " i:" << i <<"|";
+        }
+cout << "\n";
+	for(int j = 0; j < myarray.sizey; ++j)
+	{
+	if(j > 9)
+	cout << "\nj:" << j << "|  |";
+	if(j < 10)	
+	cout << "\nj: " << j << "|  |";
+		for(int i = 0; i < myarray.sizex; ++i)
+		{
+		if(myarray.f1[i][j] >= 0)
+		cout << setprecision(3) << fixed << myarray.f1[i][j] <<"|";
+		if(myarray.f1[i][j] < 0)
+		cout << setprecision(2) << fixed << myarray.f1[i][j] <<"|";
+		}
+	
+	}
+cout << "\n\n";
+}
+
+
+//-------------------------------print row------------------------------------//
+
+void print_row(crow & myrow, carray & myarray)
+{
+cout << "\nprint rows\n";
+for(int i = 0; i < myarray.sizex; ++i)
+{
+cout << "|" << myrow.LHS[i][1] << "|" << myrow.LHS[i][2] << "|" << myrow.LHS[i][3] << "|   |" << myrow.RHS[i] << "|\n";
+
+}
+
+}
 
 
 
+void print_col(ccol & mycol, carray & myarray)
+{
+cout << "\nprint rows\n";
+for(int i = 0; i < myarray.sizex; ++i)
+{
+cout << "|" << mycol.LHS[i][1] << "|" << mycol.LHS[i][2] << "|" << mycol.LHS[i][3] << "|   |" << mycol.RHS[i] << "|\n";
+
+}
+
+}
 
 
