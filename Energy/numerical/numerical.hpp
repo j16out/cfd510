@@ -57,11 +57,13 @@ vector<double> linfnorm;
 };
 
 struct crow{
+//data for loaded row
 double LHS [maxx][3];
 double RHS [maxx];
 };
 
 struct ccol{
+//data for loaded col
 double LHS [maxy][3];
 double RHS [maxy];
 };
@@ -91,19 +93,10 @@ double vi_jp1 = 0;
 
 //--------------------Init Arrays-----------------------------------------//
 
-//set array size
-
 void set_zero(carray & myarray);//zero entire array
 
-void print_array(carray & myarray);//print array in terminal
+void set_array_size(carray & myarray, int x, int y, double DIMx, double DIMy, int scheme);//set array size
 
-void print_arrayu(carray & myarray);
-
-void print_row(crow & myrow, carray & myarray);
-
-void print_col(ccol & mycol, carray & myarray);
-
-void set_array_size(carray & myarray, int x, int y, double DIMx, double DIMy, int scheme);
 
 //-------------------Boundary and Intial Conditions------------------------//
 
@@ -116,7 +109,7 @@ void set_intial_cond(carray & myarray);
 
 void solve_array_IE(carray & myarray, double tmax, double cfl);
 
-void solve_LinSys(carray & myarray, double tstep);
+void solve_LinSys(carray & myarray, double tstep, double & mdiff);
 
 void load_row(carray & myarray, crow & myrow, int j, double tstep);
 
@@ -126,11 +119,13 @@ void solve_thomas(crow & r, int iSize);
 
 void solve_thomas(ccol & r, int iSize);
 
+
 //--------------------Solve Explicit Euler------------------------------------//
 
 void solve_array_EE(carray & myarray, double tmax, double cfl);
 
-void time_advance_EE(carray & myarray, double tstep);
+void time_advance_EE(carray & myarray, double tstep, double & mdiff);
+
 
 //--------------------Flux calculation------------------------------------//
 
@@ -148,7 +143,17 @@ double get_l2norm(carray & myarray, carray myarray2);//get estimated vale for l2
 
 void set_analytic(carray & myarray, carray & numarray);//set analytic solution to a mesh
 
+void get_discrete_Error(carray ray1, carray ray2, carray ray3);
 
+//-----------------------Print related functions-------------------------------//
+
+void print_array(carray & myarray);//print array in terminal
+
+void print_arrayu(carray & myarray);
+
+void print_row(crow & myrow, carray & myarray);
+
+void print_col(ccol & mycol, carray & myarray);
 
 #endif
 

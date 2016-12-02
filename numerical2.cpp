@@ -118,11 +118,17 @@ set_ghostcells(myarray);
 printf("\n\nRunning size: %d time step: %f\n",myarray.sizex,tstep);
 
 int n = 0;
-int nt = 10;
+int nt = 1000;
 double mdiff = 0;
 
 while(ctime < tmax-tstep)
 {
+
+if(n >= nt)//status
+{
+printf("Run: %d time: %f\n",n,ctime);
+nt = 1000+n;
+}   
 
 //implicit time advance
 ctime = ctime+tstep;
@@ -130,11 +136,7 @@ compute_Flux(myarray);
 solve_LinSys(myarray, tstep, mdiff);
 set_ghostcells(myarray);
 
-if(n >= nt)//status
-{
-printf("Run: %d time: %f diff %f\n",n,ctime, mdiff);
-nt = 10+n;
-} 
+
 
 ++n;
 }
@@ -145,13 +147,13 @@ printf("Solved numeric at %f time\n",ctime);
 
 //-------------------------------LHS approx factor----------------------//
 
-void solve_LinSys(carray & myarray, double tstep, double & mdiff)
+void solve_LinSys(carray & myarray, double tstep, double mdiff)
 {
-mdiff = -1.0;
+
 //--linear system num 1---//
 crow myrow;
-//print_array(myarray);
-//print_arrayu(myarray);
+print_array(myarray);
+print_arrayu(myarray);
 
 for(int j = 0; j < myarray.sizey; ++j)
 {
@@ -164,9 +166,9 @@ solve_thomas(myrow, myarray.sizex);
     myarray.f1[i][j] = myrow.RHS[i];
     }
 }
-
-//print_array(myarray);
-//print_arrayu(myarray);
+//
+print_array(myarray);
+print_arrayu(myarray);
 
 //--linear system num 2---//
 ccol mycol;
@@ -177,13 +179,11 @@ solve_thomas(mycol, myarray.sizey);
 
     for(int j = 0; j < myarray.sizey; ++j)
     {
-    double temp = mycol.RHS[j];
-    if(abs(temp) > mdiff)
-    mdiff = abs(temp);
-    myarray.f1[i][j] = temp;
-    myarray.T1[i][j] = temp + myarray.T1[i][j];
+    myarray.f1[i][j] = mycol.RHS[j];
+    myarray.T1[i][j] = mycol.RHS[j] + myarray.T1[i][j];
     }
 }
+
 
 }
 
@@ -321,30 +321,29 @@ void solve_array_EE(carray & myarray, double tmax, double cfl)
 {
 double tstep = (cfl*(myarray.DIMx))/2.0;
 double ctime = 0.0;
-double mdiff = 0.0;
+
 set_intial_cond(myarray);
 set_ghostcells(myarray);
 
 printf("\n\nRunning size: %d time step: %f\n",myarray.sizex,tstep);
 
 int n = 0;
-int nt = 10;
+int nt = 1000;
 
 while(ctime < tmax-tstep)
 {
-  
-ctime = ctime+tstep;
-compute_Flux(myarray);
-time_advance_EE(myarray, tstep, mdiff);
-
-set_ghostcells(myarray);
-
 
 if(n >= nt)//status
 {
-printf("Run: %d time: %f diff %f\n",n,ctime, mdiff);
-nt = 10+n;
-} 
+printf("Run: %d time: %f\n",n,ctime);
+nt = 1000+n;
+}   
+
+ctime = ctime+tstep;
+compute_Flux(myarray);
+time_advance_EE(myarray, tstep);
+
+set_ghostcells(myarray);
 
 ++n;
 }
@@ -355,18 +354,13 @@ printf("Solved numeric at %f time\n",ctime);
 
 //------------------------------EE time advance----------------------------//
 
-void time_advance_EE(carray & myarray, double tstep, double & mdiff)
+void time_advance_EE(carray & myarray, double tstep)
 {
-mdiff = -1.0;
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
     for(int i = 1; i < myarray.sizex-1; ++i)
-    {  
-    double temp = tstep*(myarray.f1[i][j]); 
-    if(abs(temp)> mdiff)
-    mdiff = abs(temp);
-       
-    myarray.T1[i][j] = myarray.T1[i][j] + temp;
+    {
+      myarray.T1[i][j] = myarray.T1[i][j] + tstep*(myarray.f1[i][j]);
     }
 }
 }
@@ -445,75 +439,7 @@ return newcell;
 //**************************************************************************//
 //---------------------------Error Checking---------------------------------//
 //**************************************************************************//
-//--------------------------Get descrete error----------------------------//
 
-void get_discrete_Error(carray ray1, carray ray2, carray ray3)
-{
-//Calculating error as described in paper "procedure for estimation and reporting of uncertainty due to discretization in CFD applications"//
-
-printf("\nCalculating Error...\n");
-
-float h1 = ray1.DIMx;
-float h2 = ray2.DIMx;
-float h3 = ray3.DIMx;
-
-
-float sol1 = ray1.T1[10][5];
-float sol2 = ray2.T1[20][10];
-float sol3 = ray3.T1[40][20];
-
-
-
-printf("h1: %f \nh2: %f \nh3: %f, \nsol1: %f \nsol2: %f \nsol3: %f\n",h1, h2, h3, sol1, sol2, sol3);
-
-float r21 = h2/h1;
-float r32 = h3/h2;
-
-printf("\nr32: %f \nr21: %f\n",r32, r21);
-
-float e32 = sol3-sol2;
-float e21 = sol2-sol1;
-
-float s = (e32/e21);
-if(s >= 0)
-s = 1;
-else
-s = -1;
-
-float p_n = 0;
-float p = (1/log(r21))*(abs(log(abs(e32/e21))+0));
-
-printf("intial guess: %f \n", p);
-
-float diff = 1;
-
-	while(diff > 0.0000001)
-	{
-
-	float p_n = (1/log(r21))*(abs(log(abs(e32/e21))+log((pow(r21,p)-s)/(pow(r32,p)-s)) ));
-	diff = abs(p_n -p);
-	//printf("p_n: %f p: %f diff: %f\n",p_n, p, diff);
-
-	p = p_n;
-	}
- 
-//
-float sol_ext21 = (pow(r21, p)*sol1-sol2)/(pow(r21,p)-1.0);
-float sol_ext32 = (pow(r32, p)*sol2-sol3)/(pow(r32,p)-1.0);
-
-printf("order: %f \nphi_ext21: %f \nphi_ext32 %f\n",p, sol_ext21, sol_ext32);
-
-float ea21 = abs((sol1-sol2)/sol1);
-
-float e_ext21 = abs((sol_ext21-sol1)/sol_ext21);
-
-float GCI_21 = (1.25*ea21)/(pow(r21,p)-1.0);
-
-
-printf("ea21: %f  \ne_ext21: %f  \nGC121 %f \n", ea21, e_ext21, GCI_21);
-
-}
-//-------------------------------------l2norm--------------------------//
 
 double get_l2norm(carray & myarray, carray myarray2)
 {
