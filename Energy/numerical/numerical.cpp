@@ -133,10 +133,10 @@ nt = 1000+n;
 ctime = ctime+tstep;
 compute_Flux(myarray);
 solve_LinSys(myarray, tstep);
-
-
-
 set_ghostcells(myarray);
+
+print_array(myarray);
+print_arrayu(myarray);
 
 ++n;
 }
@@ -178,12 +178,12 @@ solve_thomas(mycol, myarray.sizey);
 
     for(int j = 0; j < myarray.sizey; ++j)
     {
-    myarray.T1[i][j] = mycol.RHS[j] ;
+    myarray.f1[i][j] = mycol.RHS[i];
+    myarray.T1[i][j] = mycol.RHS[j] + myarray.T1[i][j];
     }
 }
 
-print_array(myarray);
-print_arrayu(myarray);
+
 
 }
 
@@ -197,7 +197,7 @@ double chx = myarray.DIMx;
 for(int i = 0; i < myarray.sizex; ++i)
 {
 double alpha = tstep/(RE*PR*pow(chx,2));
-double beta = (myarray.u1[i][j]*tstep)*(2.0*chx);
+double beta = (myarray.u1[i][j]*tstep)/(2.0*chx);
 
 myrow.LHS[i][0] = (-alpha - beta);
 myrow.LHS[i][1] = (1.0 + 2.0*alpha);
@@ -219,13 +219,13 @@ double chy = myarray.DIMy;
 for(int j = 0; j < myarray.sizey; ++j)
 {
 double alpha = tstep/(RE*PR*pow(chy,2));
-double beta = (myarray.v1[i][j]*tstep)*(2.0*chy);
+double beta = (myarray.v1[i][j]*tstep)/(2.0*chy);
 
 mycol.LHS[j][0] = (-alpha - beta);
 mycol.LHS[j][1] = (1.0 + 2.0*alpha);
 mycol.LHS[j][2] = (-alpha + beta);
 //load the solution from first linsys solve
-mycol.RHS[i] = myarray.f1[i][j]; 
+mycol.RHS[j] = myarray.f1[i][j]; 
 }
 
 }
@@ -290,7 +290,7 @@ double tstep = (cfl*(myarray.DIMx))/2.0;
 double ctime = 0.0;
 
 set_intial_cond(myarray);
-
+set_ghostcells(myarray);
 
 printf("\n\nRunning size: %d time step: %f\n",myarray.sizex,tstep);
 
@@ -326,7 +326,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 {
     for(int i = 1; i < myarray.sizex-1; ++i)
     {
-      myarray.T1[i][j] = myarray.T1[i][j]-tstep*(myarray.f1[i][j]);
+      myarray.T1[i][j] = myarray.T1[i][j]+tstep*(myarray.f1[i][j]);
     }
 }
 }
@@ -396,7 +396,7 @@ double e = (2.0*pow((s1.uip1_j-s1.uim1_j)/(2.0*chx),2)+2.0*pow((s1.vi_jp1-s1.vi_
 double f = pow(((s1.vip1_j-s1.vim1_j)/(2.0*chx))+((s1.ui_jp1-s1.ui_jm1)/(2.0*chy)), 2);
 double source = (EC/RE)*(e+f);
 
-double newcell = -1.0*((-1.0/chx)*(a-b)   +   (-1.0/chy)*(c-d))   +   source;
+double newcell = 1.0*((-1.0/chx)*(a-b)   +   (-1.0/chy)*(c-d))   +   source;
 return newcell;
 }
 
@@ -537,7 +537,7 @@ void print_row(crow & myrow, carray & myarray)
 cout << "\nprint rows\n";
 for(int i = 0; i < myarray.sizex; ++i)
 {
-cout << "|" << myrow.LHS[i][1] << "|" << myrow.LHS[i][2] << "|" << myrow.LHS[i][3] << "|   |" << myrow.RHS[i] << "|\n";
+cout << "|" << myrow.LHS[i][0] << "|" << myrow.LHS[i][1] << "|" << myrow.LHS[i][2] << "|   |" << myrow.RHS[i] << "|\n";
 
 }
 
@@ -548,9 +548,9 @@ cout << "|" << myrow.LHS[i][1] << "|" << myrow.LHS[i][2] << "|" << myrow.LHS[i][
 void print_col(ccol & mycol, carray & myarray)
 {
 cout << "\nprint rows\n";
-for(int i = 0; i < myarray.sizex; ++i)
+for(int i = 0; i < myarray.sizey; ++i)
 {
-cout << "|" << mycol.LHS[i][1] << "|" << mycol.LHS[i][2] << "|" << mycol.LHS[i][3] << "|   |" << mycol.RHS[i] << "|\n";
+cout << "|" << mycol.LHS[i][0] << "|" << mycol.LHS[i][1] << "|" << mycol.LHS[i][2] << "|   |" << mycol.RHS[i] << "|\n";
 
 }
 

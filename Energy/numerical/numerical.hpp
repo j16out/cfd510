@@ -101,6 +101,8 @@ void print_arrayu(carray & myarray);
 
 void print_row(crow & myrow, carray & myarray);
 
+void print_col(ccol & mycol, carray & myarray);
+
 void set_array_size(carray & myarray, int x, int y, double DIMx, double DIMy, int scheme);
 
 //-------------------Boundary and Intial Conditions------------------------//

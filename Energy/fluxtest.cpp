@@ -58,7 +58,7 @@ solve_array_IE(flow2, 0.101, 1.0);
 if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);//no more than two subs  
-	//draw_3Dgraph(flow1, flow2);
+	draw_3Dgraph(flow1, flow2);
 	theApp.Run();
 }
 
