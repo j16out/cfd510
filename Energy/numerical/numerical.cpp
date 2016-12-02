@@ -60,7 +60,7 @@ double dy = 0.0;
 	for(int i = 0; i < myarray.sizex; ++i)
 	{
 	myarray.T1[i][0] = 2.0*(0.0) - myarray.T1[i][1];
-	myarray.T1[i][myarray.sizey] =2.0*(1.0)-myarray.T1[i][myarray.sizey-1];
+	myarray.T1[i][myarray.sizey-1] =2.0*(1.0)-myarray.T1[i][myarray.sizey-2];
 	}	
 	
     //set ghost cells inflow/outflow	
@@ -71,7 +71,7 @@ double dy = 0.0;
 	myarray.T1[0][j] = 2.0*( dy+((3.0/4.0)*PR*EC*(pow(U0,2))*(1.0-pow((1.0-2.0*dy),4))) ) - myarray.T1[1][j];
 	
 	
-	myarray.T1[myarray.sizex][j] = myarray.T1[myarray.sizex-1][j];//set everything to zero
+	myarray.T1[myarray.sizex-1][j] = myarray.T1[myarray.sizex-2][j];
 
 	}
 }
