@@ -18,6 +18,7 @@ via the link provided: url{https://github.com/j16out/
 #include <algorithm>
 #include <sstream>
 #include <math.h> 
+#include <chrono>
 #include "TApplication.h"
 #include "vroot/root.hpp"
 #include "numerical/numerical.hpp"
@@ -25,7 +26,7 @@ via the link provided: url{https://github.com/j16out/
 using namespace std;
 
 
-
+typedef chrono::high_resolution_clock Clock;
 
 int main(int argc, char **argv)
 {
@@ -35,7 +36,7 @@ double l2;
 int n = 5;
 int p = 1;
 
-int nt = 60;
+int nt = 200;
 
 while(n < nt)
 {
@@ -46,7 +47,7 @@ carray analytic;
 
 //set array size or default used 162x162
 set_array_size(flow1, n, p, 5.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(flow2, n*2, p*2, 5.0, 1.0, 0);
+set_array_size(flow2, n, p, 5.0, 1.0, 0);
 
 
 set_zero(flow1);
@@ -54,12 +55,28 @@ set_zero(flow2);
 
 
 //---------------------solve IE----------------------//
-solve_array_IE(flow1, 2.5, 0.1);
-solve_array_IE(flow2, 2.5, 0.1);
 
 
-l2 = get_l1normD(flow1, flow2);
-mydata.l2norm.push_back(l2);
+auto t1 = Clock::now();    
+solve_array_IE(flow1, 28.5, 0.1);
+auto t2 = Clock::now();
+
+double time = chrono::duration_cast<chrono::microseconds>(t2 - t1).count();
+cout << "time: " << time/1000.0 << " microseconds" << endl;
+mydata.time1.push_back(time/1000.0);  
+ 
+ 
+ //---------------------solve EE----------------------//
+ 
+            
+t1 = Clock::now();               
+solve_array_EE(flow2, 8.5, 0.1);
+t2 = Clock::now();
+
+time = chrono::duration_cast<chrono::microseconds>(t2 - t1).count();
+cout << "time: " << time/1000.0 << " microseconds" << endl;
+mydata.time2.push_back(time/1000.0);
+
 
 n +=5;
 p +=1;
@@ -71,7 +88,7 @@ if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);//no more than two subs  
 	//draw_3Dgraph(flow1, flow2);
-	draw_order_l2(mydata); 
+	draw_order_eff(mydata); 
 	theApp.Run();
 }
 

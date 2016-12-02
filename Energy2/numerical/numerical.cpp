@@ -59,17 +59,8 @@ double dy = 0.0;
     //set ghost cells top/bottom
 	for(int i = 0; i < myarray.sizex; ++i)
 	{
-	dx = (i-0.5)*DIMx;
 	myarray.T1[i][0] = 3.0*(0.0) - (5.0/2.0)*myarray.T1[i][1] + (1.0/2.0)*myarray.T1[i][2];
-	
-	    if( dx <= 3.0 && dx >= 1.0) 
-	    {
-	    myarray.T1[i][myarray.sizey-1] =3.0*(2-cos(PI*(dx-1)))- (5.0/2.0)*myarray.T1[i][myarray.sizey-2] + (1.0/2.0)*myarray.T1[i][myarray.sizey-3];
-	    }
-	    else
-	    {
-	    myarray.T1[i][myarray.sizey-1] =3.0*(1.0)- (5.0/2.0)*myarray.T1[i][myarray.sizey-2] + (1.0/2.0)*myarray.T1[i][myarray.sizey-3];
-	    }
+	myarray.T1[i][myarray.sizey-1] =3.0*(1.0)- (5.0/2.0)*myarray.T1[i][myarray.sizey-2] + (1.0/2.0)*myarray.T1[i][myarray.sizey-3];
 	}	
 	
     //set ghost cells inflow/outflow	
@@ -624,32 +615,6 @@ printf("setting analytic at %f time\n",ctime);
 //**************************************************************************//
 
 
-
-
-
-//--------------------------zero array----------------------------//
-
-void find_max(carray & myarray, double & dx)
-{double temp;
- double mdif = -1000.0;
- double DIMx = myarray.DIMx;
-	for(int j = 1; j < 10; ++j)
-	{
-		for(int i = 0; i < myarray.sizex; ++i)
-		{
-		temp = myarray.T1[i][j];//set everything to zero
-            if(temp > mdif)
-            {
-            mdif = temp;
-            dx = (i-0.5)*DIMx;
-            
-            }
-
-		}
-		printf("dx: %f\n", dx);
-	}
-	
-}
 //--------------------------Print array in terminal----------------------------//
 
 void print_array(carray & myarray)

@@ -26,7 +26,7 @@ using namespace std;
 
 #define RE 50
 #define PR 0.7
-#define EC 0.001
+#define EC 0.1
 
 
 
@@ -158,8 +158,6 @@ void print_arrayu(carray & myarray);
 void print_row(crow & myrow, carray & myarray);
 
 void print_col(ccol & mycol, carray & myarray);
-
-void find_max(carray & myarray, double & dx);
 
 #endif
 
