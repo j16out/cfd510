@@ -133,10 +133,9 @@ nt = 1000+n;
 ctime = ctime+tstep;
 compute_Flux(myarray);
 solve_LinSys(myarray, tstep);
-set_ghostcells(myarray);
 
-print_array(myarray);
-print_arrayu(myarray);
+
+
 
 ++n;
 }
@@ -166,6 +165,7 @@ solve_thomas(myrow, myarray.sizex);
     myarray.f1[i][j] = myrow.RHS[i];
     }
 }
+//
 print_array(myarray);
 print_arrayu(myarray);
 
@@ -178,13 +178,14 @@ solve_thomas(mycol, myarray.sizey);
 
     for(int j = 0; j < myarray.sizey; ++j)
     {
-    myarray.f1[i][j] = mycol.RHS[i];
+    myarray.f1[i][j] = mycol.RHS[j];
     myarray.T1[i][j] = mycol.RHS[j] + myarray.T1[i][j];
     }
 }
 
-
-
+print_array(myarray);
+print_arrayu(myarray);
+set_ghostcells(myarray);
 }
 
 
@@ -196,12 +197,27 @@ void load_row(carray & myarray, crow & myrow, int j, double tstep)
 double chx = myarray.DIMx;
 for(int i = 0; i < myarray.sizex; ++i)
 {
-double alpha = tstep/(RE*PR*pow(chx,2));
-double beta = (myarray.u1[i][j]*tstep)/(2.0*chx);
 
+double alpha = tstep/(RE*PR*pow(chx,2.0));
+double beta = (myarray.u1[i][j]*tstep)/(2.0*chx);
+if(i == 0)
+{
+myrow.LHS[i][0] = 0.0;
+myrow.LHS[i][1] = 1.0;
+myrow.LHS[i][2] = 1.0;
+}
+else if(i == myarray.sizex-1)
+{
+myrow.LHS[i][0] =  -1.0;
+myrow.LHS[i][1] =  1.0;
+myrow.LHS[i][2] =  0.0;
+}
+else
+{
 myrow.LHS[i][0] = (-alpha - beta);
 myrow.LHS[i][1] = (1.0 + 2.0*alpha);
 myrow.LHS[i][2] = (-alpha + beta);
+}
 //load the flux
 
 myrow.RHS[i] = tstep * myarray.f1[i][j];
@@ -221,12 +237,30 @@ for(int j = 0; j < myarray.sizey; ++j)
 double alpha = tstep/(RE*PR*pow(chy,2));
 double beta = (myarray.v1[i][j]*tstep)/(2.0*chy);
 
+
+if(j == 0)
+{
+mycol.LHS[j][0] =  0.0;
+mycol.LHS[j][1] =  1.0;
+mycol.LHS[j][2] =  1.0;
+}
+else if(j == myarray.sizey-1)
+{
+mycol.LHS[j][0] =  1.0;
+mycol.LHS[j][1] =  1.0;
+mycol.LHS[j][2] =  0.0;
+}
+else
+{
 mycol.LHS[j][0] = (-alpha - beta);
 mycol.LHS[j][1] = (1.0 + 2.0*alpha);
 mycol.LHS[j][2] = (-alpha + beta);
+}
 //load the solution from first linsys solve
 mycol.RHS[j] = myarray.f1[i][j]; 
 }
+mycol.RHS[0] = 0.0; 
+mycol.RHS[myarray.sizey] = 0.0; 
 
 }
 
@@ -474,9 +508,9 @@ cout << "Solution:\n       |";
 for(int i = 0; i < myarray.sizex; ++i)
 		{
 		if(i < 10)
-		cout << " i: " << i <<"|";
+		cout << "   i: " << i <<"|";
 		if(i > 9)
-		cout << " i:" << i <<"|";
+		cout << "   i:" << i <<"|";
         }
 cout << "\n";
 	for(int j = 0; j < myarray.sizey; ++j)
@@ -488,9 +522,9 @@ cout << "\n";
 		for(int i = 0; i < myarray.sizex; ++i)
 		{
 		if(myarray.T1[i][j] >= 0)
-		cout << setprecision(3) << fixed << myarray.T1[i][j] <<"|";
+		cout << setprecision(5) << fixed << myarray.T1[i][j] <<"|";
 		if(myarray.T1[i][j] < 0)
-		cout << setprecision(2) << fixed << myarray.T1[i][j] <<"|";
+		cout << setprecision(4) << fixed << myarray.T1[i][j] <<"|";
 		}
 	
 	}
@@ -506,9 +540,9 @@ cout << "Flux:\n       |";
 for(int i = 0; i < myarray.sizex; ++i)
 		{
 		if(i < 10)
-		cout << " i: " << i <<"|";
+		cout << "   i: " << i <<"|";
 		if(i > 9)
-		cout << " i:" << i <<"|";
+		cout << "   i:" << i <<"|";
         }
 cout << "\n";
 	for(int j = 0; j < myarray.sizey; ++j)
@@ -520,9 +554,9 @@ cout << "\n";
 		for(int i = 0; i < myarray.sizex; ++i)
 		{
 		if(myarray.f1[i][j] >= 0)
-		cout << setprecision(3) << fixed << myarray.f1[i][j] <<"|";
+		cout << setprecision(5) << fixed << myarray.f1[i][j] <<"|";
 		if(myarray.f1[i][j] < 0)
-		cout << setprecision(2) << fixed << myarray.f1[i][j] <<"|";
+		cout << setprecision(4) << fixed << myarray.f1[i][j] <<"|";
 		}
 	
 	}
