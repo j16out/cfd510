@@ -108,7 +108,8 @@ for(int j = 0; j < myarray.sizey; ++j)
 void solve_array_IE(carray & myarray, double tmax, double cfl)
 {
 
-double tstep = (cfl*(myarray.DIMx))/2.0;
+//double tstep = (cfl*(myarray.DIMx))/2.0;
+double tstep = cfl;
 double ctime = 0.0;
 
 set_intial_cond(myarray);
@@ -457,10 +458,14 @@ float h1 = ray1.DIMx;
 float h2 = ray2.DIMx;
 float h3 = ray3.DIMx;
 
-
-float sol1 = ray1.T1[10][5];
+/*
+float sol1 = ray1.T1[40][20];
 float sol2 = ray2.T1[20][10];
-float sol3 = ray3.T1[40][20];
+float sol3 = ray3.T1[10][5];
+*/
+float sol1 = ray1.T1[44][4];
+float sol2 = ray2.T1[22][2];
+float sol3 = ray3.T1[11][1];
 
 
 

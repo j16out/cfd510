@@ -33,27 +33,32 @@ cdata mydata;
 
 carray flow1;//my main array
 carray flow2;
+carray flow3;
 carray analytic;
 
 //set array size or default used 162x162
 set_array_size(flow1, 25, 10, 5.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(flow2, 25, 10, 5.0, 1.0, 0);
-set_array_size(analytic, 20, 20, 5.0, 1.0, 0);
+set_array_size(flow2, 50, 20, 5.0, 1.0, 0);
+set_array_size(flow3, 100, 40, 5.0, 1.0, 0);
 
 set_zero(flow1);
 set_zero(flow2);
-set_zero(analytic);
+set_zero(flow3);
+
 //print_array(flow2);
 //---------------------solve EE----------------------//
 
-solve_array_EE(flow1, 5.101, 0.01);
-set_analytic(analytic, flow1);
+//solve_array_EE(flow1, 5.101, 0.01);
+
 
 
 //---------------------solve IE----------------------//
-solve_array_IE(flow2, 5.101, 0.1);
+solve_array_IE(flow1, 5.0, 0.01);
+solve_array_IE(flow2, 5.0, 0.01);
+solve_array_IE(flow3, 5.0, 0.01);
 //print_array(flow2);
 
+get_discrete_Error(flow3, flow2, flow1);
 
 //----------------------Draw Data---------------------//
 if(1)//start root application
