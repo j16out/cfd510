@@ -64,7 +64,7 @@ double dy = 0.0;
 	}	
 	
     //set ghost cells inflow/outflow	
-	for(int j = 1; j < myarray.sizey-1; ++j)
+	for(int j = 0; j < myarray.sizey; ++j)
 	{ 
     dy = (j-0.5)*DIMy;
     
@@ -152,8 +152,7 @@ void solve_LinSys(carray & myarray, double tstep)
 //--linear system num 1---//
 crow myrow;
 
-print_array(myarray);
-print_arrayu(myarray);
+
 for(int j = 0; j < myarray.sizey; ++j)
 {
 
@@ -166,8 +165,7 @@ solve_thomas(myrow, myarray.sizex);
     }
 }
 //
-print_array(myarray);
-print_arrayu(myarray);
+
 
 //--linear system num 2---//
 ccol mycol;
@@ -183,8 +181,6 @@ solve_thomas(mycol, myarray.sizey);
     }
 }
 
-print_array(myarray);
-print_arrayu(myarray);
 set_ghostcells(myarray);
 }
 
@@ -343,6 +339,7 @@ nt = 1000+n;
 ctime = ctime+tstep;
 compute_Flux(myarray);
 time_advance_EE(myarray, tstep);
+
 set_ghostcells(myarray);
 
 ++n;
@@ -360,7 +357,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 {
     for(int i = 1; i < myarray.sizex-1; ++i)
     {
-      myarray.T1[i][j] = myarray.T1[i][j]+tstep*(myarray.f1[i][j]);
+      myarray.T1[i][j] = myarray.T1[i][j] + tstep*(myarray.f1[i][j]);
     }
 }
 }
