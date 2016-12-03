@@ -4,6 +4,152 @@ using namespace std;
 
 
 
+
+
+
+void find_maxvalues(carray & myarray, carray & myarray2, carray & myarray3)
+{
+
+TCanvas *c4 = new TCanvas("c4","The FillRandom example",200,50,900,700);
+
+
+string titlefile = "Energy Explicit flow1; Channel Bottom Length; Temperature Gradient";
+const char* c; 
+c = titlefile.c_str();	
+TGraph *gr6 = new TGraph();	
+	gr6->SetMarkerColor(4);
+	gr6->SetMarkerStyle(24);
+	gr6->SetLineColor(1);
+	gr6->SetTitle(c); 
+	TGraph *gr7 = new TGraph();	
+	gr7->SetMarkerColor(3);
+	gr7->SetMarkerStyle(25);
+	gr7->SetLineColor(1);
+	gr7->SetTitle(c); 
+	TGraph *gr8 = new TGraph();	
+	gr8->SetMarkerColor(2);
+	gr8->SetMarkerStyle(26);
+	gr8->SetLineColor(1);
+	gr8->SetTitle(c); 
+
+double temp;
+ double mdif = -1000.0;
+ double q = 0;
+    double DIMx = myarray.DIMx;
+    double DIMy = myarray.DIMy;  
+	for(int j = 1; j < 2; ++j)
+	{
+		for(int i = 0; i < myarray.sizex; ++i)
+		{
+		TGraph *gr5 = new TGraph();	
+		 
+		 
+		 	gr5->SetPoint(0,DIMy*(4*j-0.5),myarray.T1[i][4*j]);
+		 gr5->SetPoint(1,DIMy*(4*(j+1)-0.5),myarray.T1[i][4*(j+1)]);
+		 gr5->SetPoint(2,DIMy*(4*(j+2)-0.5),myarray.T1[i][4*(j+2)]);
+		 //gr5->SetPoint(3,DIMy*(4*(j+3)-0.5),myarray.T1[i][4*(j+3)]);
+
+		
+		TF1 *tfit2 = new TF1("tfit2", "pol1");
+        gr5->Fit(tfit2, "BRQE", "", -10, 10);
+        float x = tfit2->GetParameter(1);
+         if(x > mdif)
+        {
+        mdif = x;
+        q = DIMx*(i-0.5);
+        }
+        //printf("x: %f\n", x);
+        gr6->SetPoint(i,DIMx*(i-0.5),x);   
+
+		}
+		
+	}
+	
+	printf("max slope: %f at %f\n", mdif, q);
+	
+	DIMx = myarray2.DIMx;
+    DIMy = myarray2.DIMy; 
+    temp;
+    mdif = -1000.0;
+	
+		for(int j = 1; j < 2; ++j)
+	{
+		for(int i = 0; i < myarray2.sizex; ++i)
+		{
+		TGraph *gr5 = new TGraph();	
+		 gr5->SetPoint(0,DIMy*(2*j-0.5),myarray2.T1[i][2*j]);
+		 gr5->SetPoint(1,DIMy*(2*(j+1)-0.5),myarray2.T1[i][2*(j+1)]);
+		 gr5->SetPoint(2,DIMy*(2*(j+2)-0.5),myarray2.T1[i][2*(j+2)]);
+		 //gr5->SetPoint(3,DIMy*(2*(j+3)-0.5),myarray2.T1[i][2*(j+3)]);
+
+		
+		TF1 *tfit2 = new TF1("tfit2", "pol1");
+        gr5->Fit(tfit2, "BRQE", "", -10, 10);
+        float x = tfit2->GetParameter(1);
+         if(x > mdif)
+        {
+        mdif = x;
+        q = DIMx*(i-0.5);
+        }
+        //printf("x: %f\n", x);
+        gr7->SetPoint(i,DIMx*(i-0.5),x);   
+
+		}
+		
+	}
+	
+	printf("max slope: %f at %f\n", mdif, q);
+	
+	
+	DIMx = myarray3.DIMx;
+    DIMy = myarray3.DIMy;
+    temp;
+    mdif = -1000.0; 
+	
+		for(int j = 1; j < 2; ++j)
+	{
+		for(int i = 0; i < myarray3.sizex; ++i)
+		{
+		TGraph *gr5 = new TGraph();	
+         gr5->SetPoint(0,DIMy*(j-0.5),myarray3.T1[i][j]);
+		 gr5->SetPoint(1,DIMy*(j-0.5+1),myarray3.T1[i][j+1]);
+		 gr5->SetPoint(2,DIMy*(j-0.5+2),myarray3.T1[i][j+2]);
+		// gr5->SetPoint(3,DIMy*(j-0.5+3),myarray3.T1[i][j+3]);
+
+		
+		TF1 *tfit2 = new TF1("tfit2", "pol1");
+        gr5->Fit(tfit2, "BRQE", "", -10, 10);
+        float x = tfit2->GetParameter(1);
+        if(x > mdif)
+        {
+        mdif = x;
+        q = DIMx*(i-0.5);
+        }
+        
+        gr8->SetPoint(i,DIMx*(i-0.5),x);   
+
+		}
+		
+	}
+	printf("max slope: %f at %f\n", mdif, q);
+	
+
+c4->SetGridx();
+c4->SetGridy();
+c4->SetTickx(1);
+c4->SetTicky(1);
+
+
+gr6->Draw("AP");
+gr7->Draw("sameP");
+gr8->Draw("sameP");
+TLegend *leg2 = new TLegend(0.75,0.9,0.9,0.8);
+
+leg2->AddEntry(gr6,"40x1 channel","AP");
+leg2->AddEntry(gr7,"30x1 channel","AP");
+leg2->AddEntry(gr8,"10x1 channel","AP");
+leg2->Draw();
+}
 //-----------------------------------part 3---------------------------------------//
 
 void draw_3Dgraph(carray myarray, carray myarray2)

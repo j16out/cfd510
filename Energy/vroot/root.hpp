@@ -52,7 +52,7 @@ void draw_order_l2(cdata & mydata);
 
 void draw_order_eff(cdata & mydata);
 
-
+void find_maxvalues(carray & myarray, carray & myarray2, carray & myarray3);
 
 
 

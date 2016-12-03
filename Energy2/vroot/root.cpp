@@ -99,7 +99,7 @@ TGraph *gr5 = new TGraph();
 
 
 int size = mydata.l2norm.size();
-int n = 5;
+int n = 25;
 printf("array size %d\n", size);
 
 for(int i = 0; i < size; ++i)

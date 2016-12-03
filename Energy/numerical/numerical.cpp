@@ -444,7 +444,7 @@ double calc_newcell(carray & myarray, surr & s1)
 {
 double chx = myarray.DIMx;
 double chy = myarray.DIMy;
-//float chy = DIM1;
+//double chy = DIM1;
 
 double a = (s1.uip1_j * s1.Tip1_j  -  s1.uim1_j * s1.Tim1_j)/(2.0);
 double b = (s1.Tip1_j  - 2.0*s1.Ti_j + s1.Tim1_j)/(chx*(RE*PR));
@@ -472,48 +472,49 @@ void get_discrete_Error(carray ray1, carray ray2, carray ray3)
 
 printf("\nCalculating Error...\n");
 
-float h1 = ray1.DIMx;
-float h2 = ray2.DIMx;
-float h3 = ray3.DIMx;
+double h1 = ray1.DIMx;
+double h2 = ray2.DIMx;
+double h3 = ray3.DIMx;
 
 /*
-float sol1 = ray1.T1[40][20];
-float sol2 = ray2.T1[20][10];
-float sol3 = ray3.T1[10][5];
+double sol1 = ray1.T1[40][20];
+double sol2 = ray2.T1[20][10];
+double sol3 = ray3.T1[10][5];
 */
-float sol1 = ray1.T1[44][20];
-float sol2 = ray2.T1[22][10];
-float sol3 = ray3.T1[11][5];
+double sol1 = 1.114209;
+double sol2 = 1.112606;
+double sol3 = 1.111794;
+
 
 
 
 printf("h1: %f \nh2: %f \nh3: %f, \nsol1: %f \nsol2: %f \nsol3: %f\n",h1, h2, h3, sol1, sol2, sol3);
 
-float r21 = h2/h1;
-float r32 = h3/h2;
+double r21 = h2/h1;
+double r32 = h3/h2;
 
 printf("\nr32: %f \nr21: %f\n",r32, r21);
 
-float e32 = sol3-sol2;
-float e21 = sol2-sol1;
+double e32 = sol3-sol2;
+double e21 = sol2-sol1;
 
-float s = (e32/e21);
+double s = (e32/e21);
 if(s >= 0)
 s = 1;
 else
 s = -1;
 
-float p_n = 0;
-float p = (1/log(r21))*(abs(log(abs(e32/e21))+0));
+double p_n = 0;
+double p = (1/log(r21))*(abs(log(abs(e32/e21))+0));
 
 printf("intial guess: %f \n", p);
 
-float diff = 1;
+double diff = 1;
 
 	while(diff > 0.0000001)
 	{
 
-	float p_n = (1/log(r21))*(abs(log(abs(e32/e21))+log((pow(r21,p)-s)/(pow(r32,p)-s)) ));
+	double p_n = (1/log(r21))*(abs(log(abs(e32/e21))+log((pow(r21,p)-s)/(pow(r32,p)-s)) ));
 	diff = abs(p_n -p);
 	//printf("p_n: %f p: %f diff: %f\n",p_n, p, diff);
 
@@ -521,16 +522,16 @@ float diff = 1;
 	}
  
 //
-float sol_ext21 = (pow(r21, p)*sol1-sol2)/(pow(r21,p)-1.0);
-float sol_ext32 = (pow(r32, p)*sol2-sol3)/(pow(r32,p)-1.0);
+double sol_ext21 = (pow(r21, p)*sol1-sol2)/(pow(r21,p)-1.0);
+double sol_ext32 = (pow(r32, p)*sol2-sol3)/(pow(r32,p)-1.0);
 
 printf("order: %f \nphi_ext21: %f \nphi_ext32 %f\n",p, sol_ext21, sol_ext32);
 
-float ea21 = abs((sol1-sol2)/sol1);
+double ea21 = abs((sol1-sol2)/sol1);
 
-float e_ext21 = abs((sol_ext21-sol1)/sol_ext21);
+double e_ext21 = abs((sol_ext21-sol1)/sol_ext21);
 
-float GCI_21 = (1.25*ea21)/(pow(r21,p)-1.0);
+double GCI_21 = (1.25*ea21)/(pow(r21,p)-1.0);
 
 
 printf("ea21: %f  \ne_ext21: %f  \nGC121 %f \n", ea21, e_ext21, GCI_21);

@@ -27,8 +27,6 @@ void set_array_size(carray & myarray, int x, int y, double DIMx, double DIMy, in
 }
 
 
-
-
 //--------------------------zero array----------------------------//
 
 void set_zero(carray & myarray)
@@ -87,17 +85,15 @@ double dy = 0.0;
 
 for(int j = 0; j < myarray.sizey; ++j)
 {
-
     for(int i = 0; i < myarray.sizex; ++i)
     {
     dy = (j-0.5)*DIMy;
-    
+    //set intial conditions for array    
     myarray.T1[i][j] = dy;
     myarray.u1[i][j] = 6.0*U0*dy*(1.0-dy);
     myarray.v1[i][j] = 0;
     //printf("f: %f  dx: %f\n", f, dx);
     }
-
 }
 }
 
@@ -130,9 +126,7 @@ ctime = ctime+tstep;
 compute_Flux(myarray);
 solve_LinSys(myarray, tstep, mdiff);
 set_ghostcells(myarray);
-
 //print_array(myarray);
-
 
 if(n >= nt)//status
 {
@@ -146,7 +140,6 @@ break;
 }
 
 myarray.ctime = ctime;
-
 printf("Solved numeric at %f time with tstep %f\n",ctime, tstep);
 
 }
@@ -156,14 +149,14 @@ printf("Solved numeric at %f time with tstep %f\n",ctime, tstep);
 void solve_LinSys(carray & myarray, double tstep, double & mdiff)
 {
 mdiff = -1.0;
-//--linear system num 1---//
+//--solve linear system num 1---//
 crow myrow;
 //print_array(myarray);
 //print_arrayu(myarray);
 
 for(int j = 0; j < myarray.sizey; ++j)
 {
-
+//load row data via appox fact then tomas to solve
 load_row(myarray, myrow, j, tstep);
 solve_thomas(myrow, myarray.sizex);
 
@@ -180,6 +173,7 @@ solve_thomas(myrow, myarray.sizex);
 ccol mycol;
 for(int i = 0; i < myarray.sizex; ++i)
 {
+//load col data via appox fact then tomas to solve
 load_col(myarray, mycol, i, tstep);
 solve_thomas(mycol, myarray.sizey);
 
@@ -209,13 +203,13 @@ double alpha = tstep/(RE*PR*pow(chx,2.0));
 double beta = (myarray.u1[i][j]*tstep)/(2.0*chx);
 if(i == 0)
 {
-myrow.LHS[i][0] = 0.0;
+myrow.LHS[i][0] = 0.0;//apply dirichlet
 myrow.LHS[i][1] = 1.0;
 myrow.LHS[i][2] = 1.0;
 }
 else if(i == myarray.sizex-1)
 {
-myrow.LHS[i][0] =  -1.0;
+myrow.LHS[i][0] =  -1.0;//apply newmann
 myrow.LHS[i][1] =  1.0;
 myrow.LHS[i][2] =  0.0;
 }
@@ -245,13 +239,13 @@ double alpha = tstep/(RE*PR*pow(chy,2));
 double beta = (myarray.v1[i][j]*tstep)/(2.0*chy);
 
 
-if(j == 0)
+if(j == 0)//apply dirichlet
 {
 mycol.LHS[j][0] =  0.0;
 mycol.LHS[j][1] =  1.0;
 mycol.LHS[j][2] =  1.0;
 }
-else if(j == myarray.sizey-1)
+else if(j == myarray.sizey-1)//apply dirichlet
 {
 mycol.LHS[j][0] =  1.0;
 mycol.LHS[j][1] =  1.0;
@@ -540,8 +534,8 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 {	
 	for(int i = 1; i < myarray.sizex-1; ++i)
 	{
-	double P = myarray.f1[i][j];
-	double T = myarray2.f1[i][j];
+	double P = myarray.T1[i][j];
+	double T = myarray2.T1[i][j];
 	l2sum =  l2sum + pow((P-T),2);
 
 	}
@@ -550,7 +544,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 }
 
 double l2 = sqrt(l2sum/(sx*sy));
-cout << setprecision(8) << fixed << "L2 norm: " << l2 << "\n";
+cout << setprecision(20) << fixed << "L2 norm: " << l2 << "\n";
 return l2;
 }
 
@@ -595,13 +589,8 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 	double dx = (i-0.5)*DIMx;
 	double dy = (j-0.5)*DIMy;
 	
-	double a = U0*T0*PI*cos(2.0*PI*dx)*dy*sin(PI*dy);
-	double b = V0*T0*PI*dx*cos(PI*dx)*cos(2.0*PI*dy);
-	double c = (2.0*T0*pow(PI,2)*cos(PI*dx)*sin(PI*dy))/(RE*PR);
 	
-	double d = pow((U0*sin(PI*dx)+V0*cos(PI*dy)), 2);
-	double source = (EC/RE)*((2.0*pow((U0*PI*cos(PI*dx)*dy),2)+(2.0*pow((V0*PI*sin(PI*dy)*dx),2)))+d);
-	myarray.f1[i][j] =  a + b + c + source;
+	myarray.T1[i][j] =  ( dy+((3.0/4.0)*PR*EC*(pow(U0,2))*(1.0-pow((1.0-2.0*dy),4))) );
 	
 	}
 

@@ -25,18 +25,18 @@ via the link provided: url{https://github.com/j16out/
 using namespace std;
 
 
-
+//--------Gets l2 and order for either IE or EE---------//
 
 int main(int argc, char **argv)
 {
 cdata mydata;
 double l2;
+int n = 25;
+int p = 10;
+int nt = 200;
 
-int n = 5;
-int p = 1;
 
-int nt = 60;
-
+//loop for different array sizes
 while(n < nt)
 {
 carray flow1;//my main array
@@ -46,23 +46,26 @@ carray analytic;
 
 //set array size or default used 162x162
 set_array_size(flow1, n, p, 5.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(flow2, n*2, p*2, 5.0, 1.0, 0);
+set_array_size(flow2, n, p, 5.0, 1.0, 0);
+set_array_size(analytic, n, p, 5.0, 1.0, 0);
 
-
+//set zero
 set_zero(flow1);
 set_zero(flow2);
+set_zero(analytic);
 
 
 //---------------------solve IE----------------------//
-solve_array_IE(flow1, 2.5, 0.1);
-solve_array_IE(flow2, 2.5, 0.1);
+solve_array_IE(flow1, 4.5, 0.1);
+solve_array_IE(flow2, 4.5, 0.1);
+set_analytic(analytic, flow1);
 
-
-l2 = get_l1normD(flow1, flow2);
+//get l2 norm and save
+l2 = get_l2norm(flow1, analytic);
 mydata.l2norm.push_back(l2);
 
 n +=5;
-p +=1;
+p +=2;
 }
 
 
@@ -70,7 +73,7 @@ p +=1;
 if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);//no more than two subs  
-	//draw_3Dgraph(flow1, flow2);
+	//draw_3Dgraph(flow1, analytic);
 	draw_order_l2(mydata); 
 	theApp.Run();
 }

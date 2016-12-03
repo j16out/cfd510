@@ -33,30 +33,36 @@ cdata mydata;
 
 carray flow1;//my main array
 carray flow2;
+carray flow3;
 
 
 //set array size or default used 162x162
-set_array_size(flow1, 200, 40, 40.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(flow2, 25, 10, 5.0, 1.0, 0);
+set_array_size(flow1, 200, 80, 20.0, 1.0, 0);//array, xsize, ysize, dimension
+set_array_size(flow2, 100, 40, 20.0, 1.0, 0);
+set_array_size(flow3, 50, 20, 20.0, 1.0, 0);
 
 
 set_zero(flow1);
 set_zero(flow2);
+set_zero(flow3);
 
 
 //---------------------solve IE----------------------//
 solve_array_IE(flow1, 14.5, 0.1);
 solve_array_IE(flow2, 14.5, 0.1);
+solve_array_IE(flow3, 14.5, 0.1);
 
 //print_array(flow1);
 double dx = 0.0;
 
 find_max(flow1, dx);
+get_discrete_Error(flow1, flow2, flow3);
 //----------------------Draw Data---------------------//
 if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);//no more than two subs  
-	draw_3Dgraph(flow1, flow2);
+	//draw_3Dgraph(flow1, flow2);
+	find_maxvalues(flow1, flow2, flow3);
 	theApp.Run();
 }
 
