@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------------//
-Main Program for finding solutions for wave equation. Employs a RK2 time advance 
-with 2nd order upwind flux scheme.
+Main Program for finding solutions for energy equation. Employs a implicit euler
+time advance with 2nd order centered flux scheme.
 
 
 Jerin Roberts 2016
@@ -37,9 +37,9 @@ carray flow3;
 
 
 //set array size or default used 162x162
-set_array_size(flow1, 200, 80, 20.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(flow2, 100, 40, 20.0, 1.0, 0);
-set_array_size(flow3, 50, 20, 20.0, 1.0, 0);
+set_array_size(flow1, 200, 80, 40.0, 1.0, 0);//array, xsize, ysize, dimension
+set_array_size(flow2, 100, 40, 40.0, 1.0, 0);
+set_array_size(flow3, 50, 20, 40.0, 1.0, 0);
 
 
 set_zero(flow1);
