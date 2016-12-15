@@ -25,7 +25,7 @@ using namespace std;
 #define V0 1.0
 #define BETA 1.0
 
-#define RE 50
+#define RE 10
 #define PR 0.7
 #define EC 0.001
 
@@ -119,11 +119,11 @@ void solve_array_IE(carray & myarray, double tmax, double cfl);
 
 //--------------------Flux calculation------------------------------------//
 
-void compute_Flux(carray & myarray);
+void update_flux(carray & myarray);
 
 void get_nsurcells(carray & myarray, int i, int j, surr & mysurr);
 
-double calc_newcell(carray & myarray, surr & s1);
+void calc_flux(carray & myarray, surr & s1, vec & ftemp);
 
 
 

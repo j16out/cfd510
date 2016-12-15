@@ -46,7 +46,7 @@ set_zero(analytic);
 //---------------------solve IE----------------------//
 set_init_cond(analytic);
 set_analytic(analytic);
-//solve_array_IE(flow1, 5.101, 0.1);
+solve_array_IE(flow1, 5.101, 0.1);
 //print_array(flow2);
 
 
@@ -55,7 +55,7 @@ set_analytic(analytic);
 if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);//no more than two subs  
-	draw_3Dgraph(analytic, analytic);
+	draw_3Dgraph(flow1, analytic);
 	theApp.Run();
 }
 

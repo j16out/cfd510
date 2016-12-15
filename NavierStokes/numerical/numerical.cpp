@@ -91,7 +91,7 @@ double ctime = 0.0;
 set_init_cond(myarray);
 //set_ghostcells(myarray);
 
-compute_Flux(myarray);
+update_flux(myarray);
 
 }
 
@@ -114,19 +114,21 @@ compute_Flux(myarray);
 //==========================================================================//
 
 
-void compute_Flux(carray & myarray)
+void update_flux(carray & myarray)
 {
 surr mysurr;
+vec ftemp;
 
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
     for(int i = 1; i < myarray.sizex-1; ++i)
     {
     //----get surrounding cells and compute new cell----//
-    get_nsurcells(myarray, i, j, mysurr);
-    //-----update current cell----//
-    double newcell = calc_newcell(myarray, mysurr);    
-    //myarray.f1[i][j] = newcell;   
+    get_nsurcells(myarray, i, j, mysurr);    
+    calc_flux(myarray, mysurr, ftemp); 
+    
+    //-----update current cell----//  
+    myarray.f1[i][j] = ftemp;   
     }
 
 }
@@ -160,23 +162,37 @@ mysurr.vip1_j = myarray.s1[i+1][j].v;
 
 //-----------------------calculate flux for new cell--------------------//
 
-double calc_newcell(carray & myarray, surr & s1)
+void calc_flux(carray & myarray, surr & s1, vec & ftemp)
 {
 double chx = myarray.DIMx;
 double chy = myarray.DIMy;
-//double chy = DIM1;
+ftemp.P = 0;
+ftemp.u = 0;
+ftemp.v = 0;
 
-double a = (s1.uip1_j * s1.Pip1_j  -  s1.uim1_j * s1.Pim1_j)/(2.0);
-double b = (s1.Pip1_j  - 2.0*s1.Pi_j + s1.Pim1_j)/(chx*(RE*PR));
-double c = (s1.vi_jp1 * s1.Pi_jp1  -  s1.vi_jm1 * s1.Pi_jm1)/(2.0);
-double d = (s1.Pi_jp1  - 2.0*s1.Pi_j + s1.Pi_jm1)/(chy*(RE*PR));
+//x direction
 
-double e = (2.0*pow((s1.uip1_j-s1.uim1_j)/(2.0*chx),2)+2.0*pow((s1.vi_jp1-s1.vi_jm1)/(2.0*chy),2));
-double f = pow(((s1.vip1_j-s1.vim1_j)/(2.0*chx))+((s1.ui_jp1-s1.ui_jm1)/(2.0*chy)), 2);
-double source = (EC/RE)*(e+f);
+double fp = (((s1.uip1_j + s1.ui_j)/(2.0*BETA)) - ((s1.ui_j + s1.uim1_j)/(2.0*BETA))) /chx;
 
-double newcell = 1.0*((-1.0/chx)*(a-b)   +   (-1.0/chy)*(c-d))   +   source;
-return newcell;
+double fu = (   (pow((s1.uip1_j+s1.ui_j)/2.0, 2) + ((s1.Pip1_j+s1.Pi_j)/2.0) - ((s1.uip1_j-s1.ui_j)/(chx*RE)))
+            - (pow((s1.ui_j+s1.uim1_j)/2.0, 2) + ((s1.Pi_j+s1.Pim1_j)/2.0) - ((s1.ui_j-s1.uim1_j)/(chx*RE)))  )/chx; 
+                        
+double fv =   (   (((s1.uip1_j+s1.ui_j)/2.0)*((s1.vip1_j+s1.vi_j)/2.0) - ((s1.vip1_j-s1.vi_j)/(chx*RE)))
+            - (((s1.ui_j+s1.uim1_j)/2.0)*((s1.vi_j+s1.vim1_j)/2.0) - ((s1.vi_j-s1.vim1_j)/(chx*RE)))  )/chx;
+
+double gp = (((s1.vi_jp1 + s1.vi_j)/(2.0*BETA)) - ((s1.vi_j + s1.vi_jm1)/(2.0*BETA))) /chy;
+
+                        
+double gu =   (   (((s1.ui_jp1+s1.ui_j)/2.0)*((s1.vi_jp1+s1.vi_j)/2.0) - ((s1.ui_jp1-s1.ui_j)/(chy*RE)))
+            - (((s1.ui_j+s1.ui_jm1)/2.0)*((s1.vi_j+s1.vi_jm1)/2.0) - ((s1.ui_j-s1.ui_jm1)/(chy*RE)))  )/chy;
+
+double gv = (   (pow((s1.vi_jp1+s1.vi_j)/2.0, 2) + ((s1.Pi_jp1+s1.Pi_j)/2.0) - ((s1.vi_jp1-s1.vi_j)/(chy*RE)))
+            - (pow((s1.vi_j+s1.vi_jm1)/2.0, 2) + ((s1.Pi_j+s1.Pi_jm1)/2.0) - ((s1.vi_j-s1.vi_jm1)/(chy*RE)))  )/chy ;
+            
+            
+ftemp.P = -fp-gp;
+ftemp.u = -fu-gu;
+ftemp.v = -fv-gv;
 }
 
 
