@@ -54,23 +54,23 @@ void set_zero(carray & myarray)
 
 //-------------------------set intial condition----------------------------//
 
-void set_intial_cond(carray & myarray)
+void set_init_cond(carray & myarray)
 {
 double DIMx = myarray.DIMx;
 double DIMy = myarray.DIMy;
-double dx = 0.0;
-double dy = 0.0;
+
 
 for(int j = 0; j < myarray.sizey; ++j)
 {
 
     for(int i = 0; i < myarray.sizex; ++i)
     {
-    dy = (j-0.5)*DIMy;
+    double x = (i-0.5)*DIMx;
+	double y = (j-0.5)*DIMy;
     
-    myarray.s1[i][j].P = dy;
-    myarray.s1[i][j].u = 6.0*U0*dy*(1.0-dy);
-    myarray.s1[i][j].v = 0;
+    myarray.s1[i][j].P = P0*cos(PI*x)*cos(PI*y);
+    myarray.s1[i][j].u = U0*sin(PI*x)*sin(2.0*PI*y);
+    myarray.s1[i][j].v = V0*sin(2.0*PI*x)*sin(PI*y);;
     //printf("f: %f  dx: %f\n", f, dx);
     }
 
@@ -88,7 +88,7 @@ void solve_array_IE(carray & myarray, double tmax, double cfl)
 double tstep = cfl;
 double ctime = 0.0;
 
-set_intial_cond(myarray);
+set_init_cond(myarray);
 //set_ghostcells(myarray);
 
 compute_Flux(myarray);
@@ -320,22 +320,36 @@ void set_analytic(carray & myarray)
 double DIMx = myarray.DIMx;
 double DIMy = myarray.DIMy;
 
+
+
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
 
 	for(int i = 1; i < myarray.sizex-1; ++i)
 	{
-	double dx = (i-0.5)*DIMx;
-	double dy = (j-0.5)*DIMy;
+	double x = (i-0.5)*DIMx;
+	double y = (j-0.5)*DIMy;
 	
-	double a = U0*P0*PI*cos(2.0*PI*dx)*dy*sin(PI*dy);
-	double b = V0*P0*PI*dx*cos(PI*dx)*cos(2.0*PI*dy);
-	double c = (2.0*P0*pow(PI,2)*cos(PI*dx)*sin(PI*dy))/(RE*PR);
+	double cx = cos(PI*x);
+    double sx = sin(PI*x);
+    double cy = cos(PI*y);
+    double sy = sin(PI*y);
+	double c2x = cos(2.0*PI*x);
+    double s2x = sin(2.0*PI*x);
+    double c2y = cos(2.0*PI*y);
+    double s2y = sin(2.0*PI*y);
 	
-	double d = pow((U0*sin(PI*dx)+V0*cos(PI*dy)), 2);
-	double source = (EC/RE)*((2.0*pow((U0*PI*cos(PI*dx)*dy),2)+(2.0*pow((V0*PI*sin(PI*dy)*dx),2)))+d);
-	myarray.f1[i][j].P =  a + b + c + source;
 	
+	myarray.f1[i][j].P =  (-PI/BETA)*(U0*cx*s2y   +   V0*s2x*cy);
+	myarray.f1[i][j].u =  (P0*PI*sx*cy)  
+	                       -  (pow(U0,2)*PI*s2x*pow(s2y,2)) 
+	                       -  (U0*V0*PI*sx*s2x*(cy*s2y+2.0*c2y*sy))
+	                       -U0*((5.0*pow(PI,2)*sx*s2y)/(RE));
+	                       
+    myarray.f1[i][j].v =  (P0*PI*cx*sy)  
+	                       -  (pow(V0,2)*PI*pow(s2x,2)*s2y) 
+	                       -  (U0*V0*PI*sy*s2y*(cx*s2x+2.0*c2x*sx))
+	                       -V0*((5.0*pow(PI,2)*s2x*sy)/(RE));
 	}
 
 }

@@ -55,7 +55,7 @@ for (int i = 1; i < myarray2.sizex-1; i++)
 	for (int j = 1; j < myarray2.sizey-1; j++) 
 	{ float dx = DIMx*(i-0.5);
 	  float dy = DIMy*(j-0.5);
-	  float T = myarray2.f1[i][j].P;
+	  float T = myarray2.s1[i][j].P;
 
 	      gr5->SetPoint(N,dx,dy,T);
 	      ++N;
@@ -72,7 +72,7 @@ c4->cd();
    
    c2->cd();   
    gStyle->SetPalette(1);
-   gr1->Draw("colz");
+   gr1->Draw("surf1z");
    
 c4->cd();   
    gStyle->SetPalette(1);

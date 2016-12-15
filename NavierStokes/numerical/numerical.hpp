@@ -20,14 +20,15 @@ using namespace std;
 #define maxy 82
 #define PI 3.141592654
 
-#define P0 1
-#define U0 3
-#define V0 1
+#define P0 1.0
+#define U0 1.0
+#define V0 1.0
+#define BETA 1.0
 
 #define RE 50
 #define PR 0.7
 #define EC 0.001
-#define BETA 1.0
+
 
 struct vec{
 double P = 0;
@@ -107,7 +108,7 @@ void set_array_size(carray & myarray, int x, int y, double DIMx, double DIMy, in
 //-------------------Boundary and Intial Conditions------------------------//
 
 
-void set_intial_cond(carray & myarray);
+void set_init_cond(carray & myarray);
 
 
 //--------------------Solve Implicit Euler------------------------------------//

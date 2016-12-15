@@ -35,8 +35,8 @@ carray flow1;//my main array
 carray analytic;
 
 //set array size or default used 162x162
-set_array_size(flow1, 25, 10, 5.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(analytic, 20, 20, 5.0, 1.0, 0);
+set_array_size(flow1, 20, 20, 1.0, 1.0, 0);//array, xsize, ysize, dimension
+set_array_size(analytic, 20, 20, 1.0, 1.0, 0);
 
 set_zero(flow1);
 set_zero(analytic);
@@ -44,6 +44,7 @@ set_zero(analytic);
 
 
 //---------------------solve IE----------------------//
+set_init_cond(analytic);
 set_analytic(analytic);
 //solve_array_IE(flow1, 5.101, 0.1);
 //print_array(flow2);
