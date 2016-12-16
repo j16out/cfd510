@@ -31,12 +31,14 @@ int main(int argc, char **argv)
 {
 cdata mydata;
 
+int N = 10;
+while (N <= 80){
 carray flow1;//my main array
 carray analytic;
 
-//set array size or default used 162x162
-set_array_size(flow1, 20, 20, 1.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(analytic, 20, 20, 1.0, 1.0, 0);
+
+set_array_size(flow1, N, N, 1.0, 1.0, 0);//array, xsize, ysize, dimension
+set_array_size(analytic, N, N, 1.0, 1.0, 0);
 
 set_zero(flow1);
 set_zero(analytic);
@@ -46,16 +48,19 @@ set_zero(analytic);
 //---------------------solve IE----------------------//
 set_init_cond(analytic);
 set_analytic(analytic);
-solve_array_IE(flow1, 5.101, 0.1);
+solve_array_IE(flow1, 1.0, 0.1);
 //print_array(flow2);
+get_l2norm(flow1, analytic, mydata);
 
-
+N = N + 10;
+}
 
 //----------------------Draw Data---------------------//
 if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);//no more than two subs  
-	draw_3Dgraph(flow1, analytic);
+	//draw_3Dgraph(flow1, analytic);
+	draw_order_l2(mydata);
 	theApp.Run();
 }
 

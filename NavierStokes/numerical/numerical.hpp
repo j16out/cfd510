@@ -16,8 +16,8 @@
 using namespace std;
 
 #define BIG 10000
-#define maxx 202
-#define maxy 82
+#define maxx 120
+#define maxy 120
 #define PI 3.141592654
 
 #define P0 1.0
@@ -56,7 +56,9 @@ double ctime = 0;
 
 struct cdata{
 //data storage specific to array
-vector<double> l2norm;
+vector<double> l2normP;
+vector<double> l2normu;
+vector<double> l2normv;
 vector<double> l1norm;
 vector<double> linfnorm;
 vector<double> time1;
@@ -129,12 +131,13 @@ void calc_flux(carray & myarray, surr & s1, vec & ftemp);
 
 //-----------------------Error calc related functions---------------------------//
 /*
-double get_l2norm(carray & myarray, carray myarray2);//get estimated vale for l2 norm between arrays
 
 double get_l1normD(carray & myarray, carray myarray2);
 
 void get_discrete_Error(carray ray1, carray ray2, carray ray3);
 */
+void get_l2norm(carray & myarray, carray myarray2, cdata & mydata);
+
 void set_analytic(carray & myarray);//set analytic solution to a mesh
 
 

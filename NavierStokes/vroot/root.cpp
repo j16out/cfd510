@@ -208,46 +208,90 @@ c5->cd();
 titlefile = "Order Evaluation; Log(dx); Log(L2)";
 c = titlefile.c_str();
 
+TGraph *gr = new TGraph();
+gr->SetTitle(c);	
 
 TGraph *gr5 = new TGraph();	
-	gr5->SetMarkerColor(4);
-	gr5->SetMarkerStyle(23);
+	gr5->SetMarkerColor(1);
+	gr5->SetMarkerStyle(24);
 	gr5->SetLineColor(1);
-	gr5->SetTitle(c);  
+	gr5->SetTitle(c); 
+	
+	TGraph *gr51 = new TGraph();	
+	gr51->SetMarkerColor(1);
+	gr51->SetMarkerStyle(25);
+	gr51->SetLineColor(1);
+	gr51->SetTitle(c);  
+	
+	TGraph *gr52 = new TGraph();	
+	gr52->SetMarkerColor(1);
+	gr52->SetMarkerStyle(26);
+	gr52->SetLineColor(1);
+	gr52->SetTitle(c);   
 
 
-int size = mydata.l2norm.size();
+int size = mydata.l2normP.size();
 int n = 5;
 printf("array size %d\n", size);
 
 for(int i = 0; i < size; ++i)
 {
-double temp = mydata.l2norm.at(i);
-
-
+double temp = mydata.l2normP.at(i);
 gr5->SetPoint(i,log(1.0/n),log(temp));
 
-printf("l2: %f change x: %d\n", temp, n);
+temp = mydata.l2normu.at(i);
+gr51->SetPoint(i,log(1.0/n),log(temp));
+
+temp = mydata.l2normv.at(i);
+gr52->SetPoint(i,log(1.0/n),log(temp));
+
+printf("l2P: %f change x: %d\n", temp, n);
 n = n+5;
 }
 
+
+gr->SetPoint(0,-4,0);
+gr->SetPoint(1,0,-10);
 
 c5->SetGridx();
 c5->SetGridy();
 c5->SetTickx(1);
 c5->SetTicky(1);
 
+gr->Draw("AP");
 
 TF1 *tfit2 = new TF1("tfit2", "pol1");
 tfit2->SetLineColor(2);
 tfit2->SetLineWidth(1);
 gr5->Fit(tfit2, "", "", -10, 10);
 gStyle->SetOptFit();
-gr5->Draw("AP");
+gr5->Draw("sameP");
+
+TF1 *tfit21 = new TF1("tfit21", "pol1");
+tfit21->SetLineColor(3);
+tfit21->SetLineWidth(2);
+gr51->Fit(tfit21, "", "", -10, 10);
+gStyle->SetOptFit();
+gr51->Draw("sameP");
+
+TF1 *tfit22 = new TF1("tfit22", "pol1");
+tfit22->SetLineColor(4);
+tfit22->SetLineWidth(1);
+gr52->Fit(tfit22, "", "", -10, 10);
+gStyle->SetOptFit();
+gr52->Draw("sameP");
+
+
 TLegend *leg2 = new TLegend(0.75,0.9,0.9,0.8);
 
-leg2->AddEntry(gr5,"log(l2)","AP");
-leg2->AddEntry(tfit2,"Linear Fit","l");
+leg2->AddEntry(gr5,"P log(l2)","AP");
+leg2->AddEntry(tfit2,"P Linear Fit","l");
+
+leg2->AddEntry(gr51,"u log(l2)","AP");
+leg2->AddEntry(tfit21,"u Linear Fit","l");
+
+leg2->AddEntry(gr52,"v log(l2)","AP");
+leg2->AddEntry(tfit22,"v Linear Fit","l");
 leg2->Draw();
 
 
