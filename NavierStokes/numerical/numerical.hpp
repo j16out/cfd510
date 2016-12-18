@@ -13,7 +13,11 @@
 #include <math.h> 
 #include <iomanip>
 
+
 using namespace std;
+
+
+#define MAXSIZE (200+2)
 
 #define BIG 10000
 #define maxx 120
@@ -36,13 +40,32 @@ double v = 0.0;
 double u = 0.0;
 };
 
+struct vec3x3{
+vec rP;
+vec ru;
+vec rv;
+};
+
+
+struct LHScX{
+vec3x3 Ax;
+vec3x3 Bx;
+vec3x3 Cx;
+
+};
+
+struct LHScY{
+vec3x3 Ay;
+vec3x3 By;
+vec3x3 Cy;
+};
+
 struct carray{
 
 //flux and solution vector arrays
 struct vec f1 [maxx][maxy];
 struct vec s1 [maxx][maxy];
 struct vec lhs [maxx][maxy];
-
 
 //array attributes
 int sizex = maxx;
@@ -68,14 +91,14 @@ vector<double> time2;
 
 struct crow{
 //data for loaded row
-double LHS [maxx][3];
-double RHS [maxx];
+LHScX LHS [maxx];
+vec RHS [maxx];
 };
 
 struct ccol{
 //data for loaded col
-double LHS [maxy][3];
-double RHS [maxy];
+LHScY LHS [maxy];
+vec RHS [maxy];
 };
 
 struct surr{
@@ -101,22 +124,9 @@ double vi_jp1 = 0;
 };
 
 //------------------------LHS--------------------//
-struct vec3x3{
-vec rP;
-vec ru;
-vec rv;
-};
 
 
-struct LHSconst{
-vec3x3 Ax;
-vec3x3 Ay;
-vec3x3 Bx;
-vec3x3 By;
-vec3x3 Cx;
-vec3x3 Cy;
 
-};
 //--------------------Init Arrays-----------------------------------------//
 
 void set_zero(carray & myarray);//zero entire array
@@ -137,10 +147,17 @@ void solve_array_IE(carray & myarray, double tmax, double cfl);
 
 //------------------LHS calculation--------------------------------------//
 
-void calc_LHS_const(carray & myarray, LHSconst & c1, int i, int j);
+void calc_LHS_constX(carray & myarray, LHScX & c1, int i, int j);
+
+void calc_LHS_constY(carray & myarray, LHScY & c1, int i, int j);
+
+void calc_LHS_const(carray & a1, LHScX & c1,LHScY & c2, int i, int j);
 
 void solve_array_LHS(carray & myarray);
 
+void load_row(carray & myarray, crow & myrow, int j, double tstep);
+
+void solve_block_thomas(crow & r1, int NRows);
 
 //--------------------Flux calculation------------------------------------//
 
@@ -175,6 +192,8 @@ void print_row(crow & myrow, carray & myarray);
 
 void print_col(ccol & mycol, carray & myarray);
 */
+
+
 
 #endif
 
