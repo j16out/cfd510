@@ -45,6 +45,10 @@ void set_zero(carray & myarray)
         myarray.f1[i][j].P = 0;
         myarray.f1[i][j].u = 0;
         myarray.f1[i][j].v = 0;
+        
+        myarray.lhs[i][j].P = 0;
+        myarray.lhs[i][j].u = 0;
+        myarray.lhs[i][j].v = 0;
 
 		}
 	}
@@ -93,24 +97,133 @@ set_init_cond(myarray);
 
 update_flux(myarray);
 
+
+
 }
+
+
+void solve_array_LHS(carray & myarray)
+{
+
+set_init_cond(myarray);
+
+for(int j = 1; j < myarray.sizey-1; ++j)
+{
+    for(int i = 1; i < myarray.sizex-1; ++i)
+    {
+    LHSconst c1;
+    calc_LHS_const(myarray, c1, i, j);
+    
+    
+    }
+
+}
+
+}
+
 
 //---------------------------LHS approx factor----------------------------//
 
+//==========================================================================//
+//---------------------------LHS Jacobian-----------------------------------//
+//==========================================================================//
+
+
+void calc_LHS_const(carray & a1, LHSconst & c1, int i, int j)
+{
+surr s1;
+get_nsurcells(a1, i, j, s1); 
+
+double chx = a1.DIMx;
+double chy = a1.DIMy;
+//calc b
+c1.Bx.ru.u = (1.0/chx)*( ((s1.ui_j+s1.uip1_j)/2.0) - ((s1.ui_j+s1.uim1_j)/2.0) + (2.0/(RE*chx)) );
+c1.Bx.ru.v = (1.0/chx)*( ((s1.vi_j+s1.vip1_j)/4.0) - ((s1.vi_j+s1.vim1_j)/4.0));
+c1.Bx.rv.v = (1.0/chx)*( ((s1.ui_j+s1.uip1_j)/4.0) - ((s1.ui_j+s1.uim1_j)/4.0)+ (2.0/(RE*chx)) );
+
+c1.By.ru.u = (1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/4.0) - ((s1.vi_j+s1.vi_jm1)/4.0) + (2.0/(RE*chy)) );
+c1.By.rv.u = (1.0/chy)*( ((s1.ui_j+s1.ui_jp1)/4.0) - ((s1.ui_j+s1.ui_jm1)/4.0) );
+c1.By.rv.v = (1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/2.0) - ((s1.vi_j+s1.vi_jm1)/2.0) + (2.0/(RE*chy)) );
+
+//calc a
+
+c1.Ax.rP.u = (1.0/chx)*(1.0/2.0);
+c1.Ax.ru.P = (1.0/chx)*(1.0/(2.0*BETA));
+c1.Ax.ru.u = (1.0/chx)*( ((s1.ui_j+s1.uim1_j)/2.0) + (1.0/(RE*chx)) );
+c1.Ax.ru.v = (1.0/chx)*( ((s1.vi_j+s1.vim1_j)/4.0) );
+c1.Ax.rv.v = (1.0/chx)*( ((s1.ui_j+s1.uim1_j)/4.0) + (1.0/(RE*chx)) );
+
+c1.Ay.rP.u = (1.0/chy)*(1.0/2.0);
+c1.Ay.ru.u = (1.0/chy)*( ((s1.vi_j+s1.vi_jm1)/4.0) + (1.0/(RE*chy)) );
+c1.Ay.rv.P = (1.0/chy)*(1.0/(2.0*BETA));
+c1.Ay.rv.u = (1.0/chy)*( ((s1.ui_j+s1.ui_jm1)/4.0) );
+c1.Ay.rv.v = (1.0/chy)*( ((s1.vi_j+s1.vi_jm1)/2.0) + (1.0/(RE*chy)) );
+
+
+
+//calc c
+
+c1.Cx.rP.u = (1.0/chx)*(1.0/2.0);
+c1.Cx.ru.P = (1.0/chx)*(1.0/(2.0*BETA));
+c1.Cx.ru.u = (1.0/chx)*( ((s1.ui_j+s1.uip1_j)/2.0) - (1.0/(RE*chx)) );
+c1.Cx.ru.v = (1.0/chx)*( ((s1.vi_j+s1.vip1_j)/4.0) );
+c1.Cx.rv.v = (1.0/chx)*( ((s1.ui_j+s1.uip1_j)/4.0) - (1.0/(RE*chx)) );
+
+c1.Cy.rP.u = (1.0/chy)*(1.0/2.0);
+c1.Cy.ru.u = (1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/4.0) - (1.0/(RE*chy)) );
+c1.Cy.rv.P = (1.0/chy)*(1.0/(2.0*BETA));
+c1.Cy.rv.u = (1.0/chy)*( ((s1.ui_j+s1.ui_jp1)/4.0) );
+c1.Cy.rv.v = (1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/2.0) - (1.0/(RE*chy)) );
+ 
+
+//-------------------------------------------//
+vec BUx;
+vec BUy;
+vec AUx;
+vec AUy;
+vec CUx;
+vec CUy;
 
 
 
 
+BUx.P = a1.lhs[i][j].P*c1.Bx.rP.P + a1.lhs[i][j].u*c1.Bx.ru.P + a1.lhs[i][j].v*c1.Bx.rv.P;
+BUx.u = a1.lhs[i][j].P*c1.Bx.rP.u + a1.lhs[i][j].u*c1.Bx.ru.u + a1.lhs[i][j].v*c1.Bx.rv.u;
+BUx.v = a1.lhs[i][j].P*c1.Bx.rP.v + a1.lhs[i][j].u*c1.Bx.ru.v + a1.lhs[i][j].v*c1.Bx.rv.v;
+
+BUy.P = a1.lhs[i][j].P*c1.By.rP.P + a1.lhs[i][j].u*c1.By.ru.P + a1.lhs[i][j].v*c1.By.rv.P;
+BUy.u = a1.lhs[i][j].P*c1.By.rP.u + a1.lhs[i][j].u*c1.By.ru.u + a1.lhs[i][j].v*c1.By.rv.u;
+BUy.v = a1.lhs[i][j].P*c1.By.rP.v + a1.lhs[i][j].u*c1.By.ru.v + a1.lhs[i][j].v*c1.By.rv.v;
 
 
+AUx.P = a1.lhs[i-1][j].P*c1.Ax.rP.P + a1.lhs[i-1][j].u*c1.Ax.ru.P + a1.lhs[i-1][j].v*c1.Ax.rv.P;
+AUx.u = a1.lhs[i-1][j].P*c1.Ax.rP.u + a1.lhs[i-1][j].u*c1.Ax.ru.u + a1.lhs[i-1][j].v*c1.Ax.rv.u;
+AUx.v = a1.lhs[i-1][j].P*c1.Ax.rP.v + a1.lhs[i-1][j].u*c1.Ax.ru.v + a1.lhs[i-1][j].v*c1.Ax.rv.v;
+
+AUy.P = a1.lhs[i][j-1].P*c1.Ay.rP.P + a1.lhs[i][j-1].u*c1.Ay.ru.P + a1.lhs[i][j-1].v*c1.Ay.rv.P;
+AUy.u = a1.lhs[i][j-1].P*c1.Ay.rP.u + a1.lhs[i][j-1].u*c1.Ay.ru.u + a1.lhs[i][j-1].v*c1.Ay.rv.u;
+AUy.v = a1.lhs[i][j-1].P*c1.Ay.rP.v + a1.lhs[i][j-1].u*c1.Ay.ru.v + a1.lhs[i][j-1].v*c1.Ay.rv.v;
 
 
+CUx.P = a1.lhs[i+1][j].P*c1.Cx.rP.P + a1.lhs[i+1][j].u*c1.Cx.ru.P + a1.lhs[i+1][j].v*c1.Cx.rv.P;
+CUx.u = a1.lhs[i+1][j].P*c1.Cx.rP.u + a1.lhs[i+1][j].u*c1.Cx.ru.u + a1.lhs[i+1][j].v*c1.Cx.rv.u;
+CUx.v = a1.lhs[i+1][j].P*c1.Cx.rP.v + a1.lhs[i+1][j].u*c1.Cx.ru.v + a1.lhs[i+1][j].v*c1.Cx.rv.v;
+
+CUy.P = a1.lhs[i][j+1].P*c1.Cy.rP.P + a1.lhs[i][j+1].u*c1.Cy.ru.P + a1.lhs[i][j+1].v*c1.Cy.rv.P;
+CUy.u = a1.lhs[i][j+1].P*c1.Cy.rP.u + a1.lhs[i][j+1].u*c1.Cy.ru.u + a1.lhs[i][j+1].v*c1.Cy.rv.u;
+CUy.v = a1.lhs[i][j+1].P*c1.Cy.rP.v + a1.lhs[i][j+1].u*c1.Cy.ru.v + a1.lhs[i][j+1].v*c1.Cy.rv.v;
+
+vec LHS;
+
+a1.f1[i][j].P  = a1.lhs[i][j].P + 1.0*(AUx.P+AUy.P + BUx.P+BUy.P + CUx.P+CUy.P);
+a1.f1[i][j].u  = a1.lhs[i][j].u + 1.0*(AUx.u+AUy.u + BUx.u+BUy.u + CUx.u+CUy.u);
+a1.f1[i][j].v  = a1.lhs[i][j].v + 1.0*(AUx.v+AUy.v + BUx.v+BUy.v + CUx.v+CUy.v);
 
 
-
+}
 
 //==========================================================================//
-//---------------------------Compute Flux-----------------------------------//
+//-----------------------RHS Compute Flux-----------------------------------//
 //==========================================================================//
 
 

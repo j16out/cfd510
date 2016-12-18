@@ -31,9 +31,9 @@ using namespace std;
 
 
 struct vec{
-double P = 0;
-double v = 0;
-double u = 0;
+double P = 0.0;
+double v = 0.0;
+double u = 0.0;
 };
 
 struct carray{
@@ -41,6 +41,8 @@ struct carray{
 //flux and solution vector arrays
 struct vec f1 [maxx][maxy];
 struct vec s1 [maxx][maxy];
+struct vec lhs [maxx][maxy];
+
 
 //array attributes
 int sizex = maxx;
@@ -51,7 +53,6 @@ double DIMy = 0.0;
 int scheme = 0;
 double ctime = 0;
 };
-
 
 
 struct cdata{
@@ -99,7 +100,23 @@ double vi_jm1 = 0;
 double vi_jp1 = 0;
 };
 
+//------------------------LHS--------------------//
+struct vec3x3{
+vec rP;
+vec ru;
+vec rv;
+};
 
+
+struct LHSconst{
+vec3x3 Ax;
+vec3x3 Ay;
+vec3x3 Bx;
+vec3x3 By;
+vec3x3 Cx;
+vec3x3 Cy;
+
+};
 //--------------------Init Arrays-----------------------------------------//
 
 void set_zero(carray & myarray);//zero entire array
@@ -117,6 +134,12 @@ void set_init_cond(carray & myarray);
 
 void solve_array_IE(carray & myarray, double tmax, double cfl);
 
+
+//------------------LHS calculation--------------------------------------//
+
+void calc_LHS_const(carray & myarray, LHSconst & c1, int i, int j);
+
+void solve_array_LHS(carray & myarray);
 
 
 //--------------------Flux calculation------------------------------------//
@@ -143,9 +166,9 @@ void set_analytic(carray & myarray);//set analytic solution to a mesh
 
 //-----------------------Print related functions-------------------------------//
 
-void print_array(carray & myarray);//print array in terminal
+void print_array_sP(carray & myarray);//print array in terminal
 
-void print_arrayu(carray & myarray);
+void print_array_fP(carray & myarray);
 
 /*
 void print_row(crow & myrow, carray & myarray);
