@@ -51,7 +51,7 @@ set_zero(analytic);
 //---------------------solve IE----------------------//
 set_init_cond(analytic);
 set_analytic(analytic);
-solve_array_LHS(flow1, flow2);
+test_LHS(flow1, flow2);
 
 
 //get_l2norm(flow1, analytic, mydata);

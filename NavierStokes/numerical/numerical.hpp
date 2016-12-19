@@ -17,11 +17,11 @@
 using namespace std;
 
 
-#define MAXSIZE (200+2)
+#define MAXSIZE (122)
 
 #define BIG 10000
-#define maxx 120
-#define maxy 120
+#define maxx 122
+#define maxy 122
 #define PI 3.141592654
 
 #define P0 1.0
@@ -29,7 +29,7 @@ using namespace std;
 #define V0 1.0
 #define BETA 1.0
 
-#define RE 10
+#define RE 100
 #define PR 0.7
 #define EC 0.001
 
@@ -148,13 +148,13 @@ void solve_array_IE(carray & myarray, double tmax, double cfl);
 
 //------------------LHS calculation--------------------------------------//
 
-void calc_LHS_constX(carray & myarray, LHScX & c1, int i, int j);
+void calc_LHS_constX(carray & a1, LHScX & c1, int i, int j, double tstep);
 
 void calc_LHS_constY(carray & myarray, LHScY & c1, int i, int j);
 
 void calc_LHS_const(carray & a1, LHScX & c1,LHScY & c2, int i, int j);
 
-void solve_array_LHS(carray & myarray, carray & myarray2);
+void test_LHS(carray & myarray, carray & myarray2);
 
 void load_row(carray & myarray, crow & myrow, int j, double tstep);
 
