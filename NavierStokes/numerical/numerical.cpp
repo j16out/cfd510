@@ -133,26 +133,14 @@ solve_block_thomas(myarray, myrow, myarray.sizex, j);
 }
 
 print_array_fP(myarray, 1.0);
-//print_arrayu(myarray);
 
-//--linear system num 2---//
-/*
 ccol mycol;
-for(int i = 0; i < myarray.sizex; ++i)
+for(int i = 1; i < myarray.sizex-1; ++i)
 {
 load_col(myarray, mycol, i, tstep);
-solve_thomas(mycol, myarray.sizey);
-
-    for(int j = 0; j < myarray.sizey; ++j)
-    {
-    double temp = mycol.RHS[j];
-    if(abs(temp) > mdiff)
-    mdiff = abs(temp);
-    myarray.f1[i][j] = temp;
-    myarray.T1[i][j] = temp + myarray.T1[i][j];
-    }
-}*/
-//print_arrayu(myarray);
+solve_block_thomas(myarray, mycol, myarray.sizey, i);
+}
+print_array_sP(myarray);
 }
 
 
@@ -196,76 +184,45 @@ myrow.RHS[i].v = myarray.f1[i][j].v;
 }
 
 
-void set_wall(LHScX & temp, int par)
+void load_col(carray & myarray, ccol & mycol, int i, double tstep)
 {
-if(par == 1){
-temp.Ax.rP.P = 0.;
-temp.Ax.rP.u = 0.;
-temp.Ax.rP.v = 0.;
-temp.Ax.ru.P = 0.;
-temp.Ax.ru.u = 0.;
-temp.Ax.ru.v = 0.;
-temp.Ax.rv.P = 0.;
-temp.Ax.rv.u = 0.;
-temp.Ax.rv.v = 0.;
+LHScY c1;
 
-temp.Bx.rP.P = 1.;
-temp.Bx.rP.u = 0.;
-temp.Bx.rP.v = 0.;
-temp.Bx.ru.P = 0.;
-temp.Bx.ru.u = 1.;
-temp.Bx.ru.v = 0.;
-temp.Bx.rv.P = 0.;
-temp.Bx.rv.u = 0.;
-temp.Bx.rv.v = 1.;
+for(int j = 0; j < myarray.sizey; ++j)
+{
+calc_LHS_constY(myarray, c1, i, j, tstep);
 
-temp.Cx.rP.P = -1.;
-temp.Cx.rP.u = 0.;
-temp.Cx.rP.v = 0.;
-temp.Cx.ru.P = 0.;
-temp.Cx.ru.u = 1.;
-temp.Cx.ru.v = 0.;
-temp.Cx.rv.P = 0.;
-temp.Cx.rv.u = 0.;
-temp.Cx.rv.v = 1.0;
+if(j == 0)
+{
+set_wall(c1, 1);
+mycol.LHS[j] = c1;
+mycol.RHS[j].P = 0.0;
+mycol.RHS[j].u = 0.0;
+mycol.RHS[j].v = 0.0;
+}
+else if(j == myarray.sizey-1)
+{
+set_wall(c1, 0);
+mycol.LHS[j] = c1;
+mycol.RHS[j].P = 0.0;
+mycol.RHS[j].u = 0.0;
+mycol.RHS[j].v = 0.0;
+}
+else
+{
+mycol.LHS[j] = c1;
+mycol.RHS[j].P = myarray.f1[i][j].P;
+mycol.RHS[j].u = myarray.f1[i][j].u;
+mycol.RHS[j].v = myarray.f1[i][j].v;
 }
 
-if(par == 0){
-temp.Ax.rP.P = -1.;
-temp.Ax.rP.u = 0.;
-temp.Ax.rP.v = 0.;
-temp.Ax.ru.P = 0.;
-temp.Ax.ru.u = 1.;
-temp.Ax.ru.v = 0.;
-temp.Ax.rv.P = 0.;
-temp.Ax.rv.u = 0.;
-temp.Ax.rv.v = 1.;
 
-temp.Bx.rP.P = 1.;
-temp.Bx.rP.u = 0.;
-temp.Bx.rP.v = 0.;
-temp.Bx.ru.P = 0.;
-temp.Bx.ru.u = 1.;
-temp.Bx.ru.v = 0.;
-temp.Bx.rv.P = 0.;
-temp.Bx.rv.u = 0.;
-temp.Bx.rv.v = 1.;
+}
 
-temp.Cx.rP.P = 0.;
-temp.Cx.rP.u = 0.;
-temp.Cx.rP.v = 0.;
-temp.Cx.ru.P = 0.;
-temp.Cx.ru.u = 0.;
-temp.Cx.ru.v = 0.;
-temp.Cx.rv.P = 0.;
-temp.Cx.rv.u = 0.;
-temp.Cx.rv.v = 0.;
 }
 
 
 
-
-}
 
 //-------------------------------get x constants----------------------------------//
 
@@ -316,7 +273,7 @@ c1.Cx.rv.v = tstep*(-1.0/chx)*( ((s1.ui_j+s1.uip1_j)/4.0) - (1.0/(RE*chx)) );
 
 //-------------------------------get y constants----------------------------------//
 
-void calc_LHS_constY(carray & a1, LHScY & c2, int i, int j)
+void calc_LHS_constY(carray & a1, LHScY & c2, int i, int j, double tstep)
 {
 surr s1;
 get_nsurcells(a1, i, j, s1); 
@@ -324,21 +281,38 @@ get_nsurcells(a1, i, j, s1);
 double chx = a1.DIMx;
 double chy = a1.DIMy;
 
-c2.Ay.rP.v = (1.0/chy)*(1.0/2.0);
-c2.Ay.ru.u = (1.0/chy)*( ((s1.vi_j+s1.vi_jm1)/4.0) + (1.0/(RE*chy)) );
-c2.Ay.rv.P = (1.0/chy)*(1.0/(2.0*BETA));
-c2.Ay.rv.u = (1.0/chy)*( ((s1.ui_j+s1.ui_jm1)/4.0) );
-c2.Ay.rv.v = (1.0/chy)*( ((s1.vi_j+s1.vi_jm1)/2.0) + (1.0/(RE*chy)) );
+tstep = -tstep;
 
-c2.By.ru.u = (-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/4.0) - ((s1.vi_j+s1.vi_jm1)/4.0) + (2.0/(RE*chy)) );
-c2.By.rv.u = (-1.0/chy)*( ((s1.ui_j+s1.ui_jp1)/4.0) - ((s1.ui_j+s1.ui_jm1)/4.0) );
-c2.By.rv.v = (-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/2.0) - ((s1.vi_j+s1.vi_jm1)/2.0) + (2.0/(RE*chy)) );
+c2.Ay.rP.P = 0.0;
+c2.Ay.rP.u = 0.0;
+c2.Ay.rP.v = tstep*(1.0/chy)*(1.0/2.0);
+c2.Ay.ru.P = 0.0;
+c2.Ay.ru.u = tstep*(1.0/chy)*( ((s1.vi_j+s1.vi_jm1)/4.0) + (1.0/(RE*chy)) );
+c2.Ay.ru.v = 0.0;
+c2.Ay.rv.P = tstep*(1.0/chy)*(1.0/(2.0*BETA));
+c2.Ay.rv.u = tstep*(1.0/chy)*( ((s1.ui_j+s1.ui_jm1)/4.0) );
+c2.Ay.rv.v = tstep*(1.0/chy)*( ((s1.vi_j+s1.vi_jm1)/2.0) + (1.0/(RE*chy)) );
 
-c2.Cy.rP.v = (-1.0/chy)*(1.0/2.0);
-c2.Cy.ru.u = (-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/4.0) - (1.0/(RE*chy)) );
-c2.Cy.rv.P = (-1.0/chy)*(1.0/(2.0*BETA));
-c2.Cy.rv.u = (-1.0/chy)*( ((s1.ui_j+s1.ui_jp1)/4.0) );
-c2.Cy.rv.v = (-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/2.0) - (1.0/(RE*chy)) );
+c2.By.rP.P = 1.0;
+c2.By.rP.u = 0.0;
+c2.By.rP.v = 0.0;
+c2.By.ru.P = 0.0;
+c2.By.ru.u = 1.0 + tstep*(-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/4.0) - ((s1.vi_j+s1.vi_jm1)/4.0) + (2.0/(RE*chy)) );
+c2.By.ru.v = 0.0;
+c2.By.rv.P = 0.0;
+c2.By.rv.u = tstep*(-1.0/chy)*( ((s1.ui_j+s1.ui_jp1)/4.0) - ((s1.ui_j+s1.ui_jm1)/4.0) );
+c2.By.rv.v = 1.0 + tstep*(-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/2.0) - ((s1.vi_j+s1.vi_jm1)/2.0) + (2.0/(RE*chy)) );
+
+
+c2.Cy.rP.P = 0.0;
+c2.Cy.rP.u = 0.0;
+c2.Cy.rP.v = tstep*(-1.0/chy)*(1.0/2.0);
+c2.Cy.ru.P = 0.0;
+c2.Cy.ru.u = tstep*(-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/4.0) - (1.0/(RE*chy)) );
+c2.Cy.ru.v = 0.0;
+c2.Cy.rv.P = tstep*(-1.0/chy)*(1.0/(2.0*BETA));
+c2.Cy.rv.u = tstep*(-1.0/chy)*( ((s1.ui_j+s1.ui_jp1)/4.0) );
+c2.Cy.rv.v = tstep*(-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/2.0) - (1.0/(RE*chy)) );
 
 }
 
@@ -659,7 +633,9 @@ printf("setting analytic\n");
 
 void print_array_sP(carray & myarray)
 {
-cout << "Solution:\n       |";
+cout << "------------------------------------------------------------------------------------------------\n";
+
+cout << "Solution Pressure:\n       |";
 for(int i = 0; i < myarray.sizex; ++i)
 		{
 		if(i < 10)
@@ -680,6 +656,58 @@ cout << "\n";
 		cout << setprecision(6) << fixed << myarray.s1[i][j].P <<"|";
 		if(myarray.s1[i][j].P < 0)
 		cout << setprecision(5) << fixed << myarray.s1[i][j].P <<"|";
+		}
+	
+	}
+	
+	
+	cout << "\nSolution u:\n       |";
+for(int i = 0; i < myarray.sizex; ++i)
+		{
+		if(i < 10)
+		cout << "   i:  " << i <<"|";
+		if(i > 9)
+		cout << "   i: " << i <<"|";
+        }
+cout << "\n";
+	for(int j = 0; j < myarray.sizey; ++j)
+	{
+	if(j > 9)
+	cout << "\nj:" << j << "|  |";
+	if(j < 10)	
+	cout << "\nj: " << j << "|  |";
+		for(int i = 0; i < myarray.sizex; ++i)
+		{
+		if(myarray.s1[i][j].P >= 0)
+		cout << setprecision(6) << fixed << myarray.s1[i][j].u <<"|";
+		if(myarray.s1[i][j].P < 0)
+		cout << setprecision(5) << fixed << myarray.s1[i][j].u <<"|";
+		}
+	
+	}
+	
+	
+	cout << "\nSolution v:\n       |";
+for(int i = 0; i < myarray.sizex; ++i)
+		{
+		if(i < 10)
+		cout << "   i:  " << i <<"|";
+		if(i > 9)
+		cout << "   i: " << i <<"|";
+        }
+cout << "\n";
+	for(int j = 0; j < myarray.sizey; ++j)
+	{
+	if(j > 9)
+	cout << "\nj:" << j << "|  |";
+	if(j < 10)	
+	cout << "\nj: " << j << "|  |";
+		for(int i = 0; i < myarray.sizex; ++i)
+		{
+		if(myarray.s1[i][j].P >= 0)
+		cout << setprecision(6) << fixed << myarray.s1[i][j].v <<"|";
+		if(myarray.s1[i][j].P < 0)
+		cout << setprecision(5) << fixed << myarray.s1[i][j].v <<"|";
 		}
 	
 	}
@@ -1112,7 +1140,62 @@ void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j)
 }
 
 
+void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i)
+{
+  double LHS[100][3][3][3], RHS[100][3];
+  int j;
+          //|row|col
+  for (j = 0; j < NRows; j++) {
+  //A
+    LHS[j][0][0][0] = r1.LHS[j].Ay.rP.P;
+    LHS[j][0][0][1] = r1.LHS[j].Ay.ru.P;
+    LHS[j][0][0][2] = r1.LHS[j].Ay.rv.P;   
+    LHS[j][0][1][0] = r1.LHS[j].Ay.rP.u;
+    LHS[j][0][1][1] = r1.LHS[j].Ay.ru.u;
+    LHS[j][0][1][2] = r1.LHS[j].Ay.rv.u;    
+    LHS[j][0][2][0] = r1.LHS[j].Ay.rP.v;
+    LHS[j][0][2][1] = r1.LHS[j].Ay.ru.v;
+    LHS[j][0][2][2] = r1.LHS[j].Ay.rv.v;
+ //B
+    LHS[j][1][0][0] = r1.LHS[j].By.rP.P;
+    LHS[j][1][0][1] = r1.LHS[j].By.ru.P;
+    LHS[j][1][0][2] = r1.LHS[j].By.rv.P;   
+    LHS[j][1][1][0] = r1.LHS[j].By.rP.u;
+    LHS[j][1][1][1] = r1.LHS[j].By.ru.u;
+    LHS[j][1][1][2] = r1.LHS[j].By.rv.u;   
+    LHS[j][1][2][0] = r1.LHS[j].By.rP.v;
+    LHS[j][1][2][1] = r1.LHS[j].By.ru.v;
+    LHS[j][1][2][2] = r1.LHS[j].By.rv.v;
+ //C
+    LHS[j][2][0][0] = r1.LHS[j].Cy.rP.P;
+    LHS[j][2][0][1] = r1.LHS[j].Cy.ru.P;
+    LHS[j][2][0][2] = r1.LHS[j].Cy.rv.P;   
+    LHS[j][2][1][0] = r1.LHS[j].Cy.rP.u;
+    LHS[j][2][1][1] = r1.LHS[j].Cy.ru.u;
+    LHS[j][2][1][2] = r1.LHS[j].Cy.rv.u;    
+    LHS[j][2][2][0] = r1.LHS[j].Cy.rP.v;
+    LHS[j][2][2][1] = r1.LHS[j].Cy.ru.v;
+    LHS[j][2][2][2] = r1.LHS[j].Cy.rv.v;
 
+    RHS[j][0] = r1.RHS[j].P;
+    RHS[j][1] = r1.RHS[j].u;
+    RHS[j][2] = r1.RHS[j].v;
+  }
+
+
+  SolveBlockTri(LHS, RHS, NRows);
+
+  /*for (i = 0; i < NRows; i++) {
+    printf("%d %15.10f %15.10f %15.10f\n",
+	   i, RHS[i][0], RHS[i][1], RHS[i][2]);
+  }*/
+  
+  for (j = 1; j < NRows-1; j++) {
+    myarray.s1[i][j].P = RHS[j][0];
+    myarray.s1[i][j].u = RHS[j][1];
+    myarray.s1[i][j].v = RHS[j][2];
+  }
+}
 
 
 
@@ -1282,6 +1365,151 @@ vec LHS;
 a1.lhs2[i][j].P = 1.0*(AUx.P+AUy.P + BUx.P+BUy.P + CUx.P+CUy.P);
 a1.lhs2[i][j].u = 1.0*(AUx.u+AUy.u + BUx.u+BUy.u + CUx.u+CUy.u);
 a1.lhs2[i][j].v = 1.0*(AUx.v+AUy.v + BUx.v+BUy.v + CUx.v+CUy.v);
+
+
+}
+
+
+
+void set_wall(LHScX & temp, int par)
+{
+if(par == 1){
+temp.Ax.rP.P = 0.;
+temp.Ax.rP.u = 0.;
+temp.Ax.rP.v = 0.;
+temp.Ax.ru.P = 0.;
+temp.Ax.ru.u = 0.;
+temp.Ax.ru.v = 0.;
+temp.Ax.rv.P = 0.;
+temp.Ax.rv.u = 0.;
+temp.Ax.rv.v = 0.;
+
+temp.Bx.rP.P = 1.;
+temp.Bx.rP.u = 0.;
+temp.Bx.rP.v = 0.;
+temp.Bx.ru.P = 0.;
+temp.Bx.ru.u = 1.;
+temp.Bx.ru.v = 0.;
+temp.Bx.rv.P = 0.;
+temp.Bx.rv.u = 0.;
+temp.Bx.rv.v = 1.;
+
+temp.Cx.rP.P = -1.;
+temp.Cx.rP.u = 0.;
+temp.Cx.rP.v = 0.;
+temp.Cx.ru.P = 0.;
+temp.Cx.ru.u = 1.;
+temp.Cx.ru.v = 0.;
+temp.Cx.rv.P = 0.;
+temp.Cx.rv.u = 0.;
+temp.Cx.rv.v = 1.0;
+}
+
+if(par == 0){
+temp.Ax.rP.P = -1.;
+temp.Ax.rP.u = 0.;
+temp.Ax.rP.v = 0.;
+temp.Ax.ru.P = 0.;
+temp.Ax.ru.u = 1.;
+temp.Ax.ru.v = 0.;
+temp.Ax.rv.P = 0.;
+temp.Ax.rv.u = 0.;
+temp.Ax.rv.v = 1.;
+
+temp.Bx.rP.P = 1.;
+temp.Bx.rP.u = 0.;
+temp.Bx.rP.v = 0.;
+temp.Bx.ru.P = 0.;
+temp.Bx.ru.u = 1.;
+temp.Bx.ru.v = 0.;
+temp.Bx.rv.P = 0.;
+temp.Bx.rv.u = 0.;
+temp.Bx.rv.v = 1.;
+
+temp.Cx.rP.P = 0.;
+temp.Cx.rP.u = 0.;
+temp.Cx.rP.v = 0.;
+temp.Cx.ru.P = 0.;
+temp.Cx.ru.u = 0.;
+temp.Cx.ru.v = 0.;
+temp.Cx.rv.P = 0.;
+temp.Cx.rv.u = 0.;
+temp.Cx.rv.v = 0.;
+}
+
+
+
+
+}
+
+
+void set_wall(LHScY & temp, int par)
+{
+if(par == 1){
+temp.Ay.rP.P = 0.;
+temp.Ay.rP.u = 0.;
+temp.Ay.rP.v = 0.;
+temp.Ay.ru.P = 0.;
+temp.Ay.ru.u = 0.;
+temp.Ay.ru.v = 0.;
+temp.Ay.rv.P = 0.;
+temp.Ay.rv.u = 0.;
+temp.Ay.rv.v = 0.;
+
+temp.By.rP.P = 1.;
+temp.By.rP.u = 0.;
+temp.By.rP.v = 0.;
+temp.By.ru.P = 0.;
+temp.By.ru.u = 1.;
+temp.By.ru.v = 0.;
+temp.By.rv.P = 0.;
+temp.By.rv.u = 0.;
+temp.By.rv.v = 1.;
+
+temp.Cy.rP.P = -1.;
+temp.Cy.rP.u = 0.;
+temp.Cy.rP.v = 0.;
+temp.Cy.ru.P = 0.;
+temp.Cy.ru.u = 1.;
+temp.Cy.ru.v = 0.;
+temp.Cy.rv.P = 0.;
+temp.Cy.rv.u = 0.;
+temp.Cy.rv.v = 1.0;
+}
+
+if(par == 0){
+temp.Ay.rP.P = -1.;
+temp.Ay.rP.u = 0.;
+temp.Ay.rP.v = 0.;
+temp.Ay.ru.P = 0.;
+temp.Ay.ru.u = 1.;
+temp.Ay.ru.v = 0.;
+temp.Ay.rv.P = 0.;
+temp.Ay.rv.u = 0.;
+temp.Ay.rv.v = 1.;
+
+temp.By.rP.P = 1.;
+temp.By.rP.u = 0.;
+temp.By.rP.v = 0.;
+temp.By.ru.P = 0.;
+temp.By.ru.u = 1.;
+temp.By.ru.v = 0.;
+temp.By.rv.P = 0.;
+temp.By.rv.u = 0.;
+temp.By.rv.v = 1.;
+
+temp.Cy.rP.P = 0.;
+temp.Cy.rP.u = 0.;
+temp.Cy.rP.v = 0.;
+temp.Cy.ru.P = 0.;
+temp.Cy.ru.u = 0.;
+temp.Cy.ru.v = 0.;
+temp.Cy.rv.P = 0.;
+temp.Cy.rv.u = 0.;
+temp.Cy.rv.v = 0.;
+}
+
+
 
 
 }

@@ -150,7 +150,7 @@ void solve_array_IE(carray & myarray, double tmax, double cfl);
 
 void calc_LHS_constX(carray & a1, LHScX & c1, int i, int j, double tstep);
 
-void calc_LHS_constY(carray & myarray, LHScY & c1, int i, int j);
+void calc_LHS_constY(carray & a1, LHScY & c2, int i, int j, double tstep);
 
 void calc_LHS_const(carray & a1, LHScX & c1,LHScY & c2, int i, int j);
 
@@ -158,9 +158,15 @@ void test_LHS(carray & myarray, carray & myarray2);
 
 void load_row(carray & myarray, crow & myrow, int j, double tstep);
 
+void load_col(carray & myarray, ccol & mycol, int i, double tstep);
+
 void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j);
 
+void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int j);
+
 void set_wall(LHScX & temp, int par);
+
+void set_wall(LHScY & temp, int par);
 
 void solve_LinSys(carray & myarray, double tstep, double & mdiff);
 
