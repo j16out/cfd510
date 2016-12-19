@@ -31,37 +31,29 @@ int main(int argc, char **argv)
 {
 cdata mydata;
 
-int N = 20;
+int N = 10;
 
 carray flow1;//my main array
-carray flow2;
 carray analytic;
 
 
 set_array_size(flow1, N, N, 1.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(flow2, N, N, 1.0, 1.0, 0);
-set_array_size(analytic, N, N, 1.0, 1.0, 0);
 
 set_zero(flow1);
-set_zero(flow2);
-set_zero(analytic);
-//print_array(flow2);
 
 
 //---------------------solve IE----------------------//
-set_init_cond(analytic);
-set_analytic(analytic);
-solve_array_LHS(flow1, flow2);
+
+solve_array_IE(flow1, 1.0, 0.05);
 
 
-//get_l2norm(flow1, analytic, mydata);
 
 
 //----------------------Draw Data---------------------//
 if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);//no more than two subs  
-	//draw_3Dgraph(flow2, analytic);
+	//draw_3Dgraph(flow1, analytic);
 	//draw_order_l2(mydata);
 	theApp.Run();
 }
@@ -70,6 +62,3 @@ if(1)//start root application
 
 //end
 }
-
-
-

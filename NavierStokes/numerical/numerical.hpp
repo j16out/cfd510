@@ -66,6 +66,7 @@ struct carray{
 struct vec f1 [maxx][maxy];
 struct vec s1 [maxx][maxy];
 struct vec lhs [maxx][maxy];
+struct vec lhs2 [maxx][maxy];
 
 //array attributes
 int sizex = maxx;
@@ -153,15 +154,19 @@ void calc_LHS_constY(carray & myarray, LHScY & c1, int i, int j);
 
 void calc_LHS_const(carray & a1, LHScX & c1,LHScY & c2, int i, int j);
 
-void solve_array_LHS(carray & myarray);
+void solve_array_LHS(carray & myarray, carray & myarray2);
 
 void load_row(carray & myarray, crow & myrow, int j, double tstep);
 
-void solve_block_thomas(crow & r1, int NRows);
+void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j);
+
+void set_wall(LHScX & temp, int par);
+
+void solve_LinSys(carray & myarray, double tstep, double & mdiff);
 
 //--------------------Flux calculation------------------------------------//
 
-void update_flux(carray & myarray);
+void update_flux(carray & myarray, double tstep);
 
 void get_nsurcells(carray & myarray, int i, int j, surr & mysurr);
 
@@ -185,7 +190,7 @@ void set_analytic(carray & myarray);//set analytic solution to a mesh
 
 void print_array_sP(carray & myarray);//print array in terminal
 
-void print_array_fP(carray & myarray);
+void print_array_fP(carray & myarray, double tstep);
 
 /*
 void print_row(crow & myrow, carray & myarray);
