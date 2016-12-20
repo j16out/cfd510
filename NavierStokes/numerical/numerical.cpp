@@ -46,9 +46,6 @@ void set_zero(carray & myarray)
         myarray.f1[i][j].u = 0.0;
         myarray.f1[i][j].v = 0.0;
         
-        myarray.lhs[i][j].P = 0.0;
-        myarray.lhs[i][j].u = 0.0;
-        myarray.lhs[i][j].v = 0.0;
 
 		}
 	}
@@ -96,7 +93,7 @@ double Uwall = 0.0;
 	{
 	//top
 	myarray.s1[i][0].P = myarray.s1[i][1].P ;
-	myarray.s1[i][0].u = (2.0*Uwall)-myarray.s1[i][1].u ;
+	myarray.s1[i][0].u = (2.0*UW)-myarray.s1[i][1].u ;
 	myarray.s1[i][0].v = -myarray.s1[i][1].v ;
 	//bottom
 	myarray.s1[i][myarray.sizey-1].P = myarray.s1[i][myarray.sizey-2].P ;
@@ -132,10 +129,11 @@ void solve_array_IE(carray & myarray, double tmax, double cfl)
 double tstep = cfl;
 double ctime = 0.0;
 
+//set intial conditions/boundaries
 set_init_cond(myarray);
 set_ghostcells(myarray);
 
-print_array_sP(myarray);
+//print_array_sP(myarray);
 
 
 printf("\n\nRunning size: %d time step: %f\n",myarray.sizex,tstep);
@@ -143,20 +141,21 @@ printf("\n\nRunning size: %d time step: %f\n",myarray.sizex,tstep);
 
 int n = 0;
 int nt = 10;
-double mdiff = 0;
+double mdiff = -1.0;
 
 while(ctime < tmax-tstep)
 {
+ctime = ctime+tstep;
+
+//update flux
+update_flux(myarray, tstep);
+//print_array_fP(myarray, 1.0);
 
 //implicit time advance
-ctime = ctime+tstep;
-update_flux(myarray, tstep);
-print_array_fP(myarray, 1.0);
-
 solve_LinSys(myarray, tstep, mdiff);
 
+//update boundaries
 set_ghostcells(myarray);
-
 
 
 if(n >= nt)//status
@@ -164,16 +163,15 @@ if(n >= nt)//status
 printf("Run: %d time: %f diff %f\n",n,ctime, mdiff);
 nt = 10+n;
 } 
-if(mdiff<0.000001)
-break; 
 
+if(mdiff<0.000001)
+break;
+ 
 ++n;
 }
 
 myarray.ctime = ctime;
-
 printf("Solved numeric at %f time with tstep %f\n",ctime, tstep);
-
 
 }
 
@@ -203,18 +201,34 @@ solve_block_thomas(myarray, myrow, myarray.sizex, j);
 
 }
 
-print_array_fP(myarray, 1.0);
+//print_array_fP(myarray, 1.0);
 
 ccol mycol;
 for(int i = 1; i < myarray.sizex-1; ++i)
 {
 load_col(myarray, mycol, i, tstep);
-solve_block_thomas(myarray, mycol, myarray.sizey, i);
+solve_block_thomas(myarray, mycol, myarray.sizey, i, mdiff);
 }
-print_array_sP(myarray);
+//print_array_sP(myarray);
+//print_array_fP(myarray, 1.0);
+
+update_sol(myarray);
+//print_array_sP(myarray);
 }
 
+void update_sol(carray & myarray)
+{
+ for(int j = 0; j < myarray.sizey; ++j)
+{
+    for(int i = 0; i < myarray.sizex; ++i)
+    {
+    myarray.s1[i][j].P = myarray.f1[i][j].P + myarray.s1[i][j].P;
+    myarray.s1[i][j].u = myarray.f1[i][j].u + myarray.s1[i][j].u;
+    myarray.s1[i][j].v = myarray.f1[i][j].v + myarray.s1[i][j].v;
+    }
+}
 
+}
 //--------------------------Load row for Thomson---------------------------//
 
 void load_row(carray & myarray, crow & myrow, int j, double tstep)
@@ -400,15 +414,14 @@ void update_flux(carray & myarray, double tstep)
 {
 surr mysurr;
 vec ftemp;
-
+double artP = 1.0;
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
     for(int i = 1; i < myarray.sizex-1; ++i)
     {
     //----get surrounding cells and compute new cell----//
     get_nsurcells(myarray, i, j, mysurr);    
-    calc_flux(myarray, mysurr, ftemp); 
-    
+    calc_flux(myarray, mysurr, ftemp, tstep); 
     //-----update current cell----//  
     myarray.f1[i][j].P = tstep * ftemp.P;
     myarray.f1[i][j].u = tstep * ftemp.u;
@@ -417,6 +430,7 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 
 }
 }
+
 
 //--------------------------get surrounding cells-----------------------//
 
@@ -446,7 +460,7 @@ mysurr.vip1_j = myarray.s1[i+1][j].v;
 
 //-----------------------calculate flux for new cell--------------------//
 
-void calc_flux(carray & myarray, surr & s1, vec & ftemp)
+void calc_flux(carray & myarray, surr & s1, vec & ftemp, double tstep)
 {
 double chx = myarray.DIMx;
 double chy = myarray.DIMy;
@@ -472,9 +486,10 @@ double gu =   (   (((s1.ui_jp1+s1.ui_j)/2.0)*((s1.vi_jp1+s1.vi_j)/2.0) - ((s1.ui
 
 double gv = (   (pow((s1.vi_jp1+s1.vi_j)/2.0, 2) + ((s1.Pi_jp1+s1.Pi_j)/2.0) - ((s1.vi_jp1-s1.vi_j)/(chy*RE)))
             - (pow((s1.vi_j+s1.vi_jm1)/2.0, 2) + ((s1.Pi_j+s1.Pi_jm1)/2.0) - ((s1.vi_j-s1.vi_jm1)/(chy*RE)))  )/chy ;
+  
+double artP = ARTVIS*((s1.Pip1_j-2.0*s1.Pi_j+s1.Pim1_j)/(2.0*pow(chx,2)) + (s1.Pi_jp1-2.0*s1.Pi_j+s1.Pi_jm1)/(2.0*pow(chy,2)))*chx*chy;            
             
-            
-ftemp.P = -fp-gp;
+ftemp.P = (-fp-gp)+(artP/tstep);
 ftemp.u = -fu-gu;
 ftemp.v = -fv-gv;
 }
@@ -622,34 +637,7 @@ mydata.l2normu.push_back(l2u);
 mydata.l2normv.push_back(l2v);
 }
 
-/*
-//-------------------------------------l2norm between diff--------------------------//
 
-double get_l1normD(carray & myarray, carray myarray2)
-{
-double l2sum =0;
-
-double sx = myarray.sizex-2;
-double sy = myarray.sizey-2;
-
-for(int j = 1; j < myarray.sizey-1; ++j)
-{	
-	for(int i = 1; i < myarray.sizex-1; ++i)
-	{
-	double P = myarray.f1[i][j];
-	double T = myarray2.f1[i*2][j*2];
-	l2sum =  l2sum + abs(P-T);
-
-	}
-
-
-}
-
-double l2 = l2sum/(sx*sy);
-cout << setprecision(9) << fixed << "L1 norm: " << l2 << "\n";
-return l2;
-}
-*/
 //----------------------------Set a Analytical Solution------------------------------//
 void set_analytic(carray & myarray)
 {
@@ -867,66 +855,6 @@ cout << "\n";
 	}		
 cout << "\n\n";
 }
-
-/*
-//-------------------------------print row------------------------------------//
-
-void print_row(crow & myrow, carray & myarray)
-{
-cout << "\nprint rows\n";
-for(int i = 0; i < myarray.sizex; ++i)
-{
-cout << "|" << myrow.LHS[i][0] << "|" << myrow.LHS[i][1] << "|" << myrow.LHS[i][2] << "|   |" << myrow.RHS[i] << "|\n";
-
-}
-
-}
-
-
-
-void print_col(ccol & mycol, carray & myarray)
-{
-cout << "\nprint rows\n";
-for(int i = 0; i < myarray.sizey; ++i)
-{
-cout << "|" << mycol.LHS[i][0] << "|" << mycol.LHS[i][1] << "|" << mycol.LHS[i][2] << "|   |" << mycol.RHS[i] << "|\n";
-
-}
-
-}
-*/
-/*
-void set_ghostcells(carray & myarray)
-{
-double DIMx = myarray.DIMx;
-double DIMy = myarray.DIMy;
-double dx = 0.0;
-double dy = 0.0;
-    //set ghost cells top/bottom
-	for(int i = 0; i < myarray.sizex; ++i)
-	{
-	myarray.P1[i][0] = 2.0*(0.0) - myarray.P1[i][1];
-	myarray.P1[i][myarray.sizey-1] =2.0*(1.0)-myarray.P1[i][myarray.sizey-2];
-	}	
-	
-    //set ghost cells inflow/outflow	
-	for(int j = 0; j < myarray.sizey; ++j)
-	{ 
-    dy = (j-0.5)*DIMy;
-    
-	myarray.P1[0][j] = 2.0*( dy+((3.0/4.0)*PR*EC*(pow(U0,2))*(1.0-pow((1.0-2.0*dy),4))) ) - myarray.P1[1][j];
-	
-	
-	myarray.P1[myarray.sizex-1][j] = myarray.P1[myarray.sizex-2][j];
-
-	}
-}
-*/
-
-
-
-
-
 
 
 /* Code for solving block-tridiagonal matrix problems, using the Thomas
@@ -1211,9 +1139,10 @@ void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j)
 }
 
 
-void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i)
+void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i, double & mdiff)
 {
   double LHS[100][3][3][3], RHS[100][3];
+  double tomp = 0;
   int j;
           //|row|col
   for (j = 0; j < NRows; j++) {
@@ -1261,185 +1190,23 @@ void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i)
 	   i, RHS[i][0], RHS[i][1], RHS[i][2]);
   }*/
   
+    for (j = 1; j < NRows-1; j++) {
+    tomp = (abs(RHS[j][0]) + abs(RHS[j][1]) + abs(RHS[j][2]))/3.0;
+    if(tomp > mdiff)
+    mdiff = tomp;
+  }
+  
   for (j = 1; j < NRows-1; j++) {
-    myarray.s1[i][j].P = RHS[j][0];
-    myarray.s1[i][j].u = RHS[j][1];
-    myarray.s1[i][j].v = RHS[j][2];
+    myarray.f1[i][j].P = RHS[j][0];
+    myarray.f1[i][j].u = RHS[j][1];
+    myarray.f1[i][j].v = RHS[j][2];
   }
 }
 
 
 
 
-//==========================================================================//
-//-----------------------LHS Validation test--------------------------------//
-//==========================================================================//
-
-
-
-void test_LHS(carray & myarray, carray & myarray2)
-{
-
-set_init_cond(myarray);
-set_init_cond(myarray2);
-myarray2.s1[10][10].P = myarray.s1[10][10].P + 0.000001;
-myarray2.s1[10][10].u = myarray.s1[10][10].u + 0.000001;
-myarray2.s1[10][10].v = myarray.s1[10][10].v + 0.000001;
-
-update_flux(myarray, 1.0);
-update_flux(myarray2, 1.0);
-
-
-myarray.lhs[10][10].P = 0.000001;
-myarray.lhs[10][10].u = 0.000001;
-myarray.lhs[10][10].v = 0.000001;
-
-for(int j = 1; j < myarray.sizey-1; ++j)
-{
-    for(int i = 1; i < myarray.sizex-1; ++i)
-    {
-    LHScX c1;
-    LHScY c2;
-    calc_LHS_const(myarray, c1, c2, i, j);
-    
-    
-    }
-
-}
-
-for(int j = 1; j < myarray2.sizey-1; ++j)
-{
-    for(int i = 1; i < myarray2.sizex-1; ++i)
-    {
-    
-    myarray2.f1[i][j].P = 10000000000.0*((myarray2.f1[i][j].P - myarray.f1[i][j].P) - myarray.lhs2[i][j].P );
-    myarray2.f1[i][j].u = 10000000000.0*((myarray2.f1[i][j].u - myarray.f1[i][j].u) - myarray.lhs2[i][j].u );
-    myarray2.f1[i][j].v = 10000000000.0*((myarray2.f1[i][j].v - myarray.f1[i][j].v) - myarray.lhs2[i][j].v );  
-    }
-
-}
-print_array_fP(myarray2, 1.0);
-
-}
-
-void calc_LHS_const(carray & a1, LHScX & c1,LHScY & c2, int i, int j)
-{
-surr s1;
-get_nsurcells(a1, i, j, s1); 
-
-double chx = a1.DIMx;
-double chy = a1.DIMy;
-
-double tstep = 1.0;
-
-c1.Ax.rP.P = 0.0;
-c1.Ax.rP.u = tstep*(1.0/chx)*(1.0/2.0);
-c1.Ax.rP.v = 0.0;
-c1.Ax.ru.P = tstep*(1.0/chx)*(1.0/(2.0*BETA));
-c1.Ax.ru.u = tstep*(1.0/chx)*( ((s1.ui_j+s1.uim1_j)/2.0) + (1.0/(RE*chx)) );
-c1.Ax.ru.v = tstep*(1.0/chx)*( ((s1.vi_j+s1.vim1_j)/4.0) );
-c1.Ax.rv.P = 0.0;
-c1.Ax.rv.u = 0.0;
-c1.Ax.rv.v = tstep*(1.0/chx)*( ((s1.ui_j+s1.uim1_j)/4.0) + (1.0/(RE*chx)) );
-
-
-c1.Bx.rP.P = 0.0; 
-c1.Bx.rP.u = 0.0;
-c1.Bx.rP.v = 0.0;
-c1.Bx.ru.P = 0.0;
-c1.Bx.ru.u = (tstep*(-1.0/chx)*( ((s1.ui_j+s1.uip1_j)/2.0) - ((s1.ui_j+s1.uim1_j)/2.0) + (2.0/(RE*chx)) ));
-c1.Bx.ru.v = tstep*(-1.0/chx)*( ((s1.vi_j+s1.vip1_j)/4.0) - ((s1.vi_j+s1.vim1_j)/4.0));
-c1.Bx.rv.P = 0.0;
-c1.Bx.rv.u = 0.0; 
-c1.Bx.rv.v = (tstep*(-1.0/chx)*( ((s1.ui_j+s1.uip1_j)/4.0) - ((s1.ui_j+s1.uim1_j)/4.0)+ (2.0/(RE*chx)) ));
-
-
-c1.Cx.rP.P = 0.0;
-c1.Cx.rP.u = (-1.0/chx)*(1.0/2.0);
-c1.Cx.rP.v = 0.0;
-c1.Cx.ru.P = (-1.0/chx)*(1.0/(2.0*BETA));
-c1.Cx.ru.u = (-1.0/chx)*( ((s1.ui_j+s1.uip1_j)/2.0) - (1.0/(RE*chx)) );
-c1.Cx.ru.v = (-1.0/chx)*( ((s1.vi_j+s1.vip1_j)/4.0) );
-c1.Cx.rv.P = 0.0;
-c1.Cx.rv.u = 0.0;
-c1.Cx.rv.v = (-1.0/chx)*( ((s1.ui_j+s1.uip1_j)/4.0) - (1.0/(RE*chx)) );
-
-
-
-
-c2.By.ru.u = (-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/4.0) - ((s1.vi_j+s1.vi_jm1)/4.0) + (2.0/(RE*chy)) );
-c2.By.rv.u = (-1.0/chy)*( ((s1.ui_j+s1.ui_jp1)/4.0) - ((s1.ui_j+s1.ui_jm1)/4.0) );
-c2.By.rv.v = (-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/2.0) - ((s1.vi_j+s1.vi_jm1)/2.0) + (2.0/(RE*chy)) );
-
-//calc a
-
-c2.Ay.rP.v = (1.0/chy)*(1.0/2.0);
-c2.Ay.ru.u = (1.0/chy)*( ((s1.vi_j+s1.vi_jm1)/4.0) + (1.0/(RE*chy)) );
-c2.Ay.rv.P = (1.0/chy)*(1.0/(2.0*BETA));
-c2.Ay.rv.u = (1.0/chy)*( ((s1.ui_j+s1.ui_jm1)/4.0) );
-c2.Ay.rv.v = (1.0/chy)*( ((s1.vi_j+s1.vi_jm1)/2.0) + (1.0/(RE*chy)) );
-
-
-
-//calc c
-
-c2.Cy.rP.P = 0.;
-c2.Cy.rP.u = 0.;
-c2.Cy.rP.v = (-1.0/chy)*(1.0/2.0);
-c2.Cy.ru.P = 0.;
-c2.Cy.ru.u = (-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/4.0) - (1.0/(RE*chy)) );
-c2.Cy.ru.v = 0.;
-c2.Cy.rv.P = (-1.0/chy)*(1.0/(2.0*BETA));
-c2.Cy.rv.u = (-1.0/chy)*( ((s1.ui_j+s1.ui_jp1)/4.0) );
-c2.Cy.rv.v = (-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/2.0) - (1.0/(RE*chy)) );
- 
-
-//-------------------------------------------//
-vec BUx;
-vec BUy;
-vec AUx;
-vec AUy;
-vec CUx;
-vec CUy;
-
-
-
-
-BUx.P = a1.lhs[i][j].P*c1.Bx.rP.P + a1.lhs[i][j].u*c1.Bx.ru.P + a1.lhs[i][j].v*c1.Bx.rv.P;
-BUx.u = a1.lhs[i][j].P*c1.Bx.rP.u + a1.lhs[i][j].u*c1.Bx.ru.u + a1.lhs[i][j].v*c1.Bx.rv.u;
-BUx.v = a1.lhs[i][j].P*c1.Bx.rP.v + a1.lhs[i][j].u*c1.Bx.ru.v + a1.lhs[i][j].v*c1.Bx.rv.v;
-
-BUy.P = a1.lhs[i][j].P*c2.By.rP.P + a1.lhs[i][j].u*c2.By.ru.P + a1.lhs[i][j].v*c2.By.rv.P;
-BUy.u = a1.lhs[i][j].P*c2.By.rP.u + a1.lhs[i][j].u*c2.By.ru.u + a1.lhs[i][j].v*c2.By.rv.u;
-BUy.v = a1.lhs[i][j].P*c2.By.rP.v + a1.lhs[i][j].u*c2.By.ru.v + a1.lhs[i][j].v*c2.By.rv.v;
-
-
-AUx.P = a1.lhs[i-1][j].P*c1.Ax.rP.P + a1.lhs[i-1][j].u*c1.Ax.ru.P + a1.lhs[i-1][j].v*c1.Ax.rv.P;
-AUx.u = a1.lhs[i-1][j].P*c1.Ax.rP.u + a1.lhs[i-1][j].u*c1.Ax.ru.u + a1.lhs[i-1][j].v*c1.Ax.rv.u;
-AUx.v = a1.lhs[i-1][j].P*c1.Ax.rP.v + a1.lhs[i-1][j].u*c1.Ax.ru.v + a1.lhs[i-1][j].v*c1.Ax.rv.v;
-
-AUy.P = a1.lhs[i][j-1].P*c2.Ay.rP.P + a1.lhs[i][j-1].u*c2.Ay.ru.P + a1.lhs[i][j-1].v*c2.Ay.rv.P;
-AUy.u = a1.lhs[i][j-1].P*c2.Ay.rP.u + a1.lhs[i][j-1].u*c2.Ay.ru.u + a1.lhs[i][j-1].v*c2.Ay.rv.u;
-AUy.v = a1.lhs[i][j-1].P*c2.Ay.rP.v + a1.lhs[i][j-1].u*c2.Ay.ru.v + a1.lhs[i][j-1].v*c2.Ay.rv.v;
-
-
-CUx.P = a1.lhs[i+1][j].P*c1.Cx.rP.P + a1.lhs[i+1][j].u*c1.Cx.ru.P + a1.lhs[i+1][j].v*c1.Cx.rv.P;
-CUx.u = a1.lhs[i+1][j].P*c1.Cx.rP.u + a1.lhs[i+1][j].u*c1.Cx.ru.u + a1.lhs[i+1][j].v*c1.Cx.rv.u;
-CUx.v = a1.lhs[i+1][j].P*c1.Cx.rP.v + a1.lhs[i+1][j].u*c1.Cx.ru.v + a1.lhs[i+1][j].v*c1.Cx.rv.v;
-
-CUy.P = a1.lhs[i][j+1].P*c2.Cy.rP.P + a1.lhs[i][j+1].u*c2.Cy.ru.P + a1.lhs[i][j+1].v*c2.Cy.rv.P;
-CUy.u = a1.lhs[i][j+1].P*c2.Cy.rP.u + a1.lhs[i][j+1].u*c2.Cy.ru.u + a1.lhs[i][j+1].v*c2.Cy.rv.u;
-CUy.v = a1.lhs[i][j+1].P*c2.Cy.rP.v + a1.lhs[i][j+1].u*c2.Cy.ru.v + a1.lhs[i][j+1].v*c2.Cy.rv.v;
-
-vec LHS;
-
-a1.lhs2[i][j].P = 1.0*(AUx.P+AUy.P + BUx.P+BUy.P + CUx.P+CUy.P);
-a1.lhs2[i][j].u = 1.0*(AUx.u+AUy.u + BUx.u+BUy.u + CUx.u+CUy.u);
-a1.lhs2[i][j].v = 1.0*(AUx.v+AUy.v + BUx.v+BUy.v + CUx.v+CUy.v);
-
-
-}
-
+//----------------------implicit wall boundaries-------------------------//
 
 
 void set_wall(LHScX & temp, int par)

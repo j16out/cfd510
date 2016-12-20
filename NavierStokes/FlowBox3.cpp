@@ -31,20 +31,23 @@ int main(int argc, char **argv)
 {
 cdata mydata;
 
-int N = 10;
+int N = 40;
 
 carray flow1;//my main array
 carray analytic;
 
 
 set_array_size(flow1, N, N, 1.0, 1.0, 0);//array, xsize, ysize, dimension
+set_array_size(analytic, N, N, 1.0, 1.0, 0);
 
 set_zero(flow1);
+set_zero(analytic);
+set_init_cond(analytic);
 
 
 //---------------------solve IE----------------------//
 
-solve_array_IE(flow1, 1.0, 0.05);
+solve_array_IE(flow1, 25.0, 0.05);
 
 
 
@@ -53,7 +56,7 @@ solve_array_IE(flow1, 1.0, 0.05);
 if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);//no more than two subs  
-	//draw_3Dgraph(flow1, analytic);
+	draw_3Dgraph_s(flow1, analytic);
 	//draw_order_l2(mydata);
 	theApp.Run();
 }

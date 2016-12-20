@@ -46,7 +46,8 @@ using namespace std;
 
 
 
-void draw_3Dgraph(carray myarray, carray myarray2);
+void draw_3Dgraph_s(carray myarray, carray myarray2);
+void draw_3Dgraph_f(carray myarray, carray myarray2);
 
 void draw_order_l2(cdata & mydata);
 

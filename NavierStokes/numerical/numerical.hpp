@@ -24,11 +24,17 @@ using namespace std;
 #define maxy 122
 #define PI 3.141592654
 
+//intial conditions
+#define UW -0.1
 #define P0 1.0
 #define U0 1.0
 #define V0 1.0
-#define BETA 1.0
 
+//artificial constants
+#define BETA 1.0
+#define ARTVIS 0.01
+
+//non-dim constants
 #define RE 100
 #define PR 0.7
 #define EC 0.001
@@ -65,8 +71,7 @@ struct carray{
 //flux and solution vector arrays
 struct vec f1 [maxx][maxy];
 struct vec s1 [maxx][maxy];
-struct vec lhs [maxx][maxy];
-struct vec lhs2 [maxx][maxy];
+
 
 //array attributes
 int sizex = maxx;
@@ -162,7 +167,7 @@ void load_col(carray & myarray, ccol & mycol, int i, double tstep);
 
 void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j);
 
-void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int j);
+void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i, double & mdiff);
 
 void set_wall(LHScX & temp, int par);
 
@@ -170,13 +175,17 @@ void set_wall(LHScY & temp, int par);
 
 void solve_LinSys(carray & myarray, double tstep, double & mdiff);
 
+void update_sol(carray & myarray);
+
 //--------------------Flux calculation------------------------------------//
 
 void update_flux(carray & myarray, double tstep);
 
 void get_nsurcells(carray & myarray, int i, int j, surr & mysurr);
 
-void calc_flux(carray & myarray, surr & s1, vec & ftemp);
+void calc_flux(carray & myarray, surr & s1, vec & ftemp, double tstep);
+
+void art_visc(carray myarray, int i, int j, double & artP);
 
 
 
