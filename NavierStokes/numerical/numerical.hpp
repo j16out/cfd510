@@ -25,14 +25,14 @@ using namespace std;
 #define PI 3.141592654
 
 //intial conditions
-#define UW 0.0
+#define UW 1.0
 #define P0 1.0
 #define U0 1.0
 #define V0 1.0
 
 //artificial constants
 #define BETA 1.0
-#define ARTVIS 0.00
+#define ARTVIS 0.5
 
 //non-dim constants
 #define RE 100

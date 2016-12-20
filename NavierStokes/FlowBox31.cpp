@@ -47,7 +47,7 @@ set_init_cond(analytic);
 
 //---------------------solve IE----------------------//
 
-solve_array_IE(flow1, 100.0, 0.1, mydata);
+solve_array_IE(flow1, 10.0, 0.05, mydata);
 
 
 
@@ -58,7 +58,6 @@ if(1)//start root application
 	TApplication theApp("App", &argc, argv);//no more than two subs  
 	draw_stab_l2(mydata);
 	draw_3Dgraph_s(flow1, analytic);
-	//draw_u(flow1);
 	//draw_order_l2(mydata);
 	theApp.Run();
 }

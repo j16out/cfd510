@@ -55,9 +55,9 @@ void draw_order_eff(cdata & mydata);
 
 void find_maxvalues(carray & myarray, carray & myarray2, carray & myarray3);
 
+void draw_stab_l2(cdata & mydata);
 
-
-
+void draw_u(carray myarray);
 
 
 #endif
