@@ -59,5 +59,7 @@ void draw_stab_l2(cdata & mydata);
 
 void draw_u(carray myarray);
 
+void draw_3Dgraph_san(carray myarray, carray myarray2);
+
 
 #endif

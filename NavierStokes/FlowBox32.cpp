@@ -30,28 +30,25 @@ using namespace std;
 int main(int argc, char **argv)
 {
 cdata mydata;
-cdata mydata2;
 
 int N = 20;
 
 carray flow1;//my main array
-carray flow2;
+carray analytic;
 
 
 set_array_size(flow1, N, N, 1.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(flow2, N, N, 1.0, 1.0, 0);
+set_array_size(analytic, N, N, 1.0, 1.0, 0);
 
 set_zero(flow1);
-set_zero(flow2);
-
+set_zero(analytic);
+set_init_cond(analytic);
 
 
 //---------------------solve IE----------------------//
 
 //solve:( array, maxtime, cfl/timestep, lid velocity, data array)
 solve_array_IE(flow1, 100.0, 0.1, 1.0, mydata); 
-
-solve_array_IE(flow2, 100.0, 0.1, -1.0, mydata2); 
 
 
 
@@ -61,7 +58,7 @@ if(1)//start root application
 {
 	TApplication theApp("App", &argc, argv);//no more than two subs  
 	//draw_stab_l2(mydata);
-	draw_3Dgraph_san(flow2, flow1);
+	draw_3Dgraph_s(flow1, analytic);
 	draw_u(flow1);
 	//draw_order_l2(mydata);
 	theApp.Run();

@@ -2,8 +2,6 @@
 
 
 
-
-
 //==========================================================================//
 //---------------------------Setting Array----------------------------------//
 //==========================================================================//
@@ -19,7 +17,6 @@ void set_array_size(carray & myarray, int x, int y, double DIMx, double DIMy, in
 	myarray.sizey = y+2;
 	myarray.DIMx = DIMx/(x);
 	myarray.DIMy = DIMy/(y);
-	myarray.scheme = scheme;
 	}
 	else
 	cout << "Array size to big, array not set***" << "\n";
@@ -93,7 +90,7 @@ double Uwall = 0.0;
 	{
 	//top
 	myarray.s1[i][0].P = myarray.s1[i][1].P ;
-	myarray.s1[i][0].u = (2.0*UW)-myarray.s1[i][1].u ;
+	myarray.s1[i][0].u = (2.0*myarray.UW)-myarray.s1[i][1].u ;
 	myarray.s1[i][0].v = -myarray.s1[i][1].v ;
 	//bottom
 	myarray.s1[i][myarray.sizey-1].P = myarray.s1[i][myarray.sizey-2].P ;
@@ -121,11 +118,11 @@ double Uwall = 0.0;
 //-----------------------------IE Array Solving-----------------------------//
 //==========================================================================//
 
-void solve_array_IE(carray & myarray, double tmax, double cfl, cdata & mydata)
+void solve_array_IE(carray & myarray, double tmax, double cfl, double UW, cdata & mydata)
 {
 
 //double tstep = (cfl*(myarray.DIMx))/2.0;
-
+myarray.UW = UW;
 double tstep = cfl;
 double ctime = 0.0;
 
@@ -238,9 +235,10 @@ LHScX c1;
 
 for(int i = 0; i < myarray.sizex; ++i)
 {
+//get jacobians
 calc_LHS_constX(myarray, c1, i, j, tstep);
 
-if(i == 0)
+if(i == 0)    //set left boundary
 {
 set_wall(c1, 1);
 myrow.LHS[i] = c1;
@@ -248,7 +246,7 @@ myrow.RHS[i].P = 0.0;
 myrow.RHS[i].u = 0.0;
 myrow.RHS[i].v = 0.0;
 }
-else if(i == myarray.sizex-1)
+else if(i == myarray.sizex-1)//set right boundary
 {
 set_wall(c1, 0);
 myrow.LHS[i] = c1;
@@ -256,7 +254,7 @@ myrow.RHS[i].P = 0.0;
 myrow.RHS[i].u = 0.0;
 myrow.RHS[i].v = 0.0;
 }
-else
+else     //set interior
 {
 myrow.LHS[i] = c1;
 myrow.RHS[i].P = myarray.f1[i][j].P;
@@ -269,6 +267,7 @@ myrow.RHS[i].v = myarray.f1[i][j].v;
 
 }
 
+//--------------------------Load Col for thomas----------------------//
 
 void load_col(carray & myarray, ccol & mycol, int i, double tstep)
 {
@@ -276,9 +275,10 @@ LHScY c1;
 
 for(int j = 0; j < myarray.sizey; ++j)
 {
+//get jacobians
 calc_LHS_constY(myarray, c1, i, j, tstep);
 
-if(j == 0)
+if(j == 0)      //set top boundary
 {
 set_wall(c1, 1);
 mycol.LHS[j] = c1;
@@ -286,7 +286,7 @@ mycol.RHS[j].P = 0.0;
 mycol.RHS[j].u = 0.0;
 mycol.RHS[j].v = 0.0;
 }
-else if(j == myarray.sizey-1)
+else if(j == myarray.sizey-1)//set bottom boundary
 {
 set_wall(c1, 0);
 mycol.LHS[j] = c1;
@@ -294,7 +294,7 @@ mycol.RHS[j].P = 0.0;
 mycol.RHS[j].u = 0.0;
 mycol.RHS[j].v = 0.0;
 }
-else
+else     //set interior
 {
 mycol.LHS[j] = c1;
 mycol.RHS[j].P = myarray.f1[i][j].P;
@@ -310,11 +310,12 @@ mycol.RHS[j].v = myarray.f1[i][j].v;
 
 
 
-//-------------------------------get x constants----------------------------------//
+//-------------------------------get x Jacobians----------------------------------//
 
 void calc_LHS_constX(carray & a1, LHScX & c1, int i, int j, double tstep)
 {
 surr s1;
+//retrieve neighboring cell data
 get_nsurcells(a1, i, j, s1); 
 
 double chx = a1.DIMx;
@@ -322,6 +323,7 @@ double chy = a1.DIMy;
 
 tstep = -tstep;
 
+//set values for jacobian Ax
 c1.Ax.rP.P = 0.0;
 c1.Ax.rP.u = tstep*(1.0/chx)*(1.0/2.0);
 c1.Ax.rP.v = 0.0;
@@ -332,7 +334,7 @@ c1.Ax.rv.P = 0.0;
 c1.Ax.rv.u = 0.0;
 c1.Ax.rv.v = tstep*(1.0/chx)*( ((s1.ui_j+s1.uim1_j)/4.0) + (1.0/(RE*chx)) );
 
-
+//set values for jacobian Bx
 c1.Bx.rP.P = 1.0; 
 c1.Bx.rP.u = 0.0;
 c1.Bx.rP.v = 0.0;
@@ -343,7 +345,7 @@ c1.Bx.rv.P = 0.0;
 c1.Bx.rv.u = 0.0; 
 c1.Bx.rv.v = 1.0 + (tstep*(-1.0/chx)*( ((s1.ui_j+s1.uip1_j)/4.0) - ((s1.ui_j+s1.uim1_j)/4.0)+ (2.0/(RE*chx)) ));
 
-
+//set values for jacobian Cx
 c1.Cx.rP.P = 0.0;
 c1.Cx.rP.u = tstep*(-1.0/chx)*(1.0/2.0);
 c1.Cx.rP.v = 0.0;
@@ -357,18 +359,19 @@ c1.Cx.rv.v = tstep*(-1.0/chx)*( ((s1.ui_j+s1.uip1_j)/4.0) - (1.0/(RE*chx)) );
 
 }
 
-//-------------------------------get y constants----------------------------------//
+//-------------------------------get y Jacobians----------------------------------//
 
 void calc_LHS_constY(carray & a1, LHScY & c2, int i, int j, double tstep)
 {
 surr s1;
+//retrieve neighboring cell data
 get_nsurcells(a1, i, j, s1); 
 
 double chx = a1.DIMx;
 double chy = a1.DIMy;
-
 tstep = -tstep;
 
+//set values for jacobian Ay
 c2.Ay.rP.P = 0.0;
 c2.Ay.rP.u = 0.0;
 c2.Ay.rP.v = tstep*(1.0/chy)*(1.0/2.0);
@@ -379,6 +382,7 @@ c2.Ay.rv.P = tstep*(1.0/chy)*(1.0/(2.0*BETA));
 c2.Ay.rv.u = tstep*(1.0/chy)*( ((s1.ui_j+s1.ui_jm1)/4.0) );
 c2.Ay.rv.v = tstep*(1.0/chy)*( ((s1.vi_j+s1.vi_jm1)/2.0) + (1.0/(RE*chy)) );
 
+//set values for jacobian By
 c2.By.rP.P = 1.0;
 c2.By.rP.u = 0.0;
 c2.By.rP.v = 0.0;
@@ -389,7 +393,7 @@ c2.By.rv.P = 0.0;
 c2.By.rv.u = tstep*(-1.0/chy)*( ((s1.ui_j+s1.ui_jp1)/4.0) - ((s1.ui_j+s1.ui_jm1)/4.0) );
 c2.By.rv.v = 1.0 + tstep*(-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/2.0) - ((s1.vi_j+s1.vi_jm1)/2.0) + (2.0/(RE*chy)) );
 
-
+//set values for jacobian Cy
 c2.Cy.rP.P = 0.0;
 c2.Cy.rP.u = 0.0;
 c2.Cy.rP.v = tstep*(-1.0/chy)*(1.0/2.0);
@@ -487,7 +491,8 @@ double gu =   (   (((s1.ui_jp1+s1.ui_j)/2.0)*((s1.vi_jp1+s1.vi_j)/2.0) - ((s1.ui
 
 double gv = (   (pow((s1.vi_jp1+s1.vi_j)/2.0, 2) + ((s1.Pi_jp1+s1.Pi_j)/2.0) - ((s1.vi_jp1-s1.vi_j)/(chy*RE)))
             - (pow((s1.vi_j+s1.vi_jm1)/2.0, 2) + ((s1.Pi_j+s1.Pi_jm1)/2.0) - ((s1.vi_j-s1.vi_jm1)/(chy*RE)))  )/chy ;
-  
+ 
+//Term added to smooth oscillations  
 double artP = ARTVIS*((s1.Pip1_j-2.0*s1.Pi_j+s1.Pim1_j)/(2.0*pow(chx,2)) + (s1.Pi_jp1-2.0*s1.Pi_j+s1.Pi_jm1)/(2.0*pow(chy,2)))*chx*chy;            
             
 ftemp.P = (-fp-gp)+(artP/tstep);
@@ -879,24 +884,8 @@ cout << "\n\n";
 }
 
 
-/* Code for solving block-tridiagonal matrix problems, using the Thomas
-   algorithm.  The only subroutine in here that you'll -need- to call is
-   SolveThomas, although things like Add3x3 or AddVec might be useful,
-   too. */
+// Code for solving block-tridiagonal matrix problems, using the Thomas Algorythm
 
-/* LHS array is sized as [*][3][3][3].  The last two indices identify
-   the element within a block; the third index is the row and the fourth
-   is the column of the Jacobian matrix.  The second index tells which
-   block it is: 0 is below the main diagonal, 1 is on the main diagonal,
-   2 is above the main diagonal.  The first index tells which block row
-   you're looking at (the i or j index from the discretization). */
-
-/* RHS array is [*][3].  The second index tells which element of the
-   solution vector, and the first is the block row. */
-
-/* Before linking this with your own code, you'll want to remove the
-   main program included here as a test. */
-#include "numerical.hpp"
 
 static void SpewMatrix(double Source[3][3])
 {
@@ -1105,7 +1094,7 @@ void SolveBlockTri(double LHS[MAXSIZE][3][3][3],
 
 void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j)
 {
-  double LHS[100][3][3][3], RHS[100][3];
+  double LHS[MAXSIZE][3][3][3], RHS[MAXSIZE][3];
   int i;
           //|row|col
   for (i = 0; i < NRows; i++) {
@@ -1145,13 +1134,7 @@ void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j)
     RHS[i][2] = r1.RHS[i].v;
   }
 
-
   SolveBlockTri(LHS, RHS, NRows);
-
-  /*for (i = 0; i < NRows; i++) {
-    printf("%d %15.10f %15.10f %15.10f\n",
-	   i, RHS[i][0], RHS[i][1], RHS[i][2]);
-  }*/
   
   for (i = 1; i < NRows-1; i++) {
     myarray.f1[i][j].P = RHS[i][0];
@@ -1204,14 +1187,8 @@ void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i, double & 
     RHS[j][2] = r1.RHS[j].v;
   }
 
-
   SolveBlockTri(LHS, RHS, NRows);
 
-  /*for (i = 0; i < NRows; i++) {
-    printf("%d %15.10f %15.10f %15.10f\n",
-	   i, RHS[i][0], RHS[i][1], RHS[i][2]);
-  }*/
-  
     for (j = 1; j < NRows-1; j++) {
     tomp = (abs(RHS[j][0]) + abs(RHS[j][1]) + abs(RHS[j][2]))/3.0;
     if(tomp > mdiff)

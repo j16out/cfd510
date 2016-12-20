@@ -25,7 +25,6 @@ using namespace std;
 #define PI 3.141592654
 
 //intial conditions
-#define UW 1.0
 #define P0 1.0
 #define U0 1.0
 #define V0 1.0
@@ -79,8 +78,8 @@ int sizey = maxy;
 double DIMx = 0.0;
 double DIMy = 0.0;
 //scheme
-int scheme = 0;
 double ctime = 0;
+double UW = 0;
 };
 
 
@@ -148,7 +147,7 @@ void set_init_cond(carray & myarray);
 
 //--------------------Solve Implicit Euler------------------------------------//
 
-void solve_array_IE(carray & myarray, double tmax, double cfl, cdata & mydata);
+void solve_array_IE(carray & myarray, double tmax, double cfl, double UW, cdata & mydata);
 
 
 //------------------LHS calculation--------------------------------------//

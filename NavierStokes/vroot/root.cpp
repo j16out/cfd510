@@ -3,6 +3,98 @@
 using namespace std;
 
 
+//------------------------------------------------------------------------3.22
+
+void draw_3Dgraph_san(carray myarray, carray myarray2)
+{
+float DIMx = myarray.DIMx;
+float DIMy = myarray.DIMy;
+
+
+
+
+TCanvas *c22 = new TCanvas("c22","The FillRandom example",200,350,500,300);
+TCanvas *c44 = new TCanvas("c44","The FillRandom example",800,350,500,300);
+
+
+
+
+string titlefile;
+const char* c; 
+
+
+
+//-------------u-------------//
+
+TGraph2D *gr11 = new TGraph2D();
+TGraph2D *gr51 = new TGraph2D();
+
+titlefile = "u flow1; x; y; u";
+c = titlefile.c_str();	
+gr11->SetTitle(c);
+
+titlefile = "u analytic; x; y; u";
+c = titlefile.c_str();
+gr51->SetTitle(c);	
+
+
+int N = 0;
+for (int i = 1; i < myarray.sizex-1; i++) 
+{
+	
+	for (int j = 1; j < myarray.sizey-1; j++) 
+	{ float dx = DIMx*(i-0.5);
+	  float dy = DIMy*(j-0.5);
+	  float T = myarray.s1[i][j].u;
+
+	      gr11->SetPoint(N,dx,dy,T);
+	      ++N;
+	 }     
+}
+
+
+N = 0;
+for (int i = 1; i < myarray2.sizex-1; i++) 
+{
+	
+	for (int j = 1; j < myarray2.sizey-1; j++) 
+	{ float dx = (1.0-DIMx*(i-0.5));
+	  float dy = DIMy*(j-0.5);
+	  float T = myarray2.s1[i][j].u;
+
+	      gr51->SetPoint(N,dx,dy,T);
+	      ++N;
+	 }     
+}
+
+
+/*
+c2->cd();   
+   gStyle->SetPalette(1);
+   gr1->Draw("colz");
+   
+c4->cd();   
+   gStyle->SetPalette(1);
+   gr5->Draw("colz");   */
+   
+ 
+   
+   c22->cd();   
+   gStyle->SetPalette(1);
+   gr11->Draw("cont4z");
+   
+c44->cd();   
+   gStyle->SetPalette(1);
+   gr51->Draw("cont4z"); 
+   
+   
+
+   
+}
+
+
+//-------------------------------------------------------------------------------------------------------3.21
+
 void draw_u(carray myarray)
 {
 
@@ -13,7 +105,7 @@ const char* c;
 TCanvas *c5 = new TCanvas("c5","The FillRandom example",200,50,900,700); 
 //TCanvas *c7 = new TCanvas("c7","The FillRandom example",200,50,900,700);
 c5->cd();
-titlefile = "Order Evaluation; Height; Velocity u";
+titlefile = "Order Evaluation; y vertical; Velocity u";
 c = titlefile.c_str();
 
 TGraph *gr = new TGraph();
