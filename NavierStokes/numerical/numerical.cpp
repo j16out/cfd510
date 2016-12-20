@@ -121,7 +121,7 @@ double Uwall = 0.0;
 //-----------------------------IE Array Solving-----------------------------//
 //==========================================================================//
 
-void solve_array_IE(carray & myarray, double tmax, double cfl)
+void solve_array_IE(carray & myarray, double tmax, double cfl, cdata & mydata)
 {
 
 //double tstep = (cfl*(myarray.DIMx))/2.0;
@@ -153,6 +153,7 @@ update_flux(myarray, tstep);
 
 //implicit time advance
 solve_LinSys(myarray, tstep, mdiff);
+get_l2norm_tstep(myarray, mydata);
 
 //update boundaries
 set_ghostcells(myarray);
@@ -597,6 +598,46 @@ printf("ea21: %f  \ne_ext21: %f  \nGC121 %f \n", ea21, e_ext21, GCI_21);
 }
 //-------------------------------------l2norm--------------------------//
 */
+void get_l2norm_tstep(carray & myarray, cdata & mydata)
+{
+double l2sumP =0;
+double l2sumu =0;
+double l2sumv =0;
+
+
+double sx = myarray.sizex-2;
+double sy = myarray.sizey-2;
+
+for(int j = 1; j < myarray.sizey-1; ++j)
+{	
+	for(int i = 1; i < myarray.sizex-1; ++i)
+	{
+	double P = myarray.f1[i][j].P;
+	l2sumP =  l2sumP + pow((P),2);
+	
+	P = myarray.f1[i][j].u;
+	l2sumu =  l2sumu + pow((P),2);
+	
+	P = myarray.f1[i][j].v;
+	l2sumv =  l2sumv + pow((P),2);
+
+	}
+
+}
+
+double l2P = sqrt(l2sumP/(sx*sy));
+double l2u = sqrt(l2sumu/(sx*sy));
+double l2v = sqrt(l2sumv/(sx*sy));
+
+cout << setprecision(8) << fixed << "L2 norm (P|u|v): " << l2P << " | " << l2u<< " | "  <<  l2v << "\n";
+mydata.l2normP.push_back(l2P);
+mydata.l2normu.push_back(l2u);
+mydata.l2normv.push_back(l2v);
+}
+
+
+//------------------------------L2 norm between known and exact--------------------------//
+
 void get_l2norm(carray & myarray, carray myarray2, cdata & mydata)
 {
 double l2sumP =0;

@@ -25,14 +25,14 @@ using namespace std;
 #define PI 3.141592654
 
 //intial conditions
-#define UW -0.1
+#define UW 0.0
 #define P0 1.0
 #define U0 1.0
 #define V0 1.0
 
 //artificial constants
 #define BETA 1.0
-#define ARTVIS 0.01
+#define ARTVIS 0.00
 
 //non-dim constants
 #define RE 100
@@ -148,18 +148,24 @@ void set_init_cond(carray & myarray);
 
 //--------------------Solve Implicit Euler------------------------------------//
 
-void solve_array_IE(carray & myarray, double tmax, double cfl);
+void solve_array_IE(carray & myarray, double tmax, double cfl, cdata & mydata);
 
 
 //------------------LHS calculation--------------------------------------//
+
+void solve_LinSys(carray & myarray, double tstep, double & mdiff);
 
 void calc_LHS_constX(carray & a1, LHScX & c1, int i, int j, double tstep);
 
 void calc_LHS_constY(carray & a1, LHScY & c2, int i, int j, double tstep);
 
-void calc_LHS_const(carray & a1, LHScX & c1,LHScY & c2, int i, int j);
 
-void test_LHS(carray & myarray, carray & myarray2);
+void set_wall(LHScX & temp, int par);
+
+void set_wall(LHScY & temp, int par);
+
+void update_sol(carray & myarray);
+//---------------------Thomas Algorythm Related----------------------------//
 
 void load_row(carray & myarray, crow & myrow, int j, double tstep);
 
@@ -168,14 +174,6 @@ void load_col(carray & myarray, ccol & mycol, int i, double tstep);
 void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j);
 
 void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i, double & mdiff);
-
-void set_wall(LHScX & temp, int par);
-
-void set_wall(LHScY & temp, int par);
-
-void solve_LinSys(carray & myarray, double tstep, double & mdiff);
-
-void update_sol(carray & myarray);
 
 //--------------------Flux calculation------------------------------------//
 
@@ -197,6 +195,8 @@ double get_l1normD(carray & myarray, carray myarray2);
 void get_discrete_Error(carray ray1, carray ray2, carray ray3);
 */
 void get_l2norm(carray & myarray, carray myarray2, cdata & mydata);
+
+void get_l2norm_tstep(carray & myarray, cdata & mydata);
 
 void set_analytic(carray & myarray);//set analytic solution to a mesh
 

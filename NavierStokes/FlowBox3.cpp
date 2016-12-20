@@ -47,7 +47,7 @@ set_init_cond(analytic);
 
 //---------------------solve IE----------------------//
 
-solve_array_IE(flow1, 25.0, 0.05);
+solve_array_IE(flow1, 15.0, 0.05, mydata);
 
 
 
