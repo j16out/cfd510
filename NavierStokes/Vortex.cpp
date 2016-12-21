@@ -40,7 +40,7 @@ carray flow3;//my main array
 carray flow4;
 
 
-set_array_size(flow1, 40, 120, 1.0, 3.0, 0);//array, xsize, ysize, dimension
+set_array_size(flow1, 80, 240, 1.0, 3.0, 0);//array, xsize, ysize, dimension
 //set_array_size(flow2, 3*N, 3*N, 1.0, 1.0, 0);
 //set_array_size(flow3, 9*N, 9*N, 1.0, 1.0, 0);//array, xsize, ysize, dimension
 //set_array_size(flow4, N, N, 1.0, 1.0, 0);
@@ -72,6 +72,7 @@ if(1)//start root application
 	TApplication theApp("App", &argc, argv);//no more than two subs 
 	draw_3Dgraph_s(flow1, flow2); 
 	get_vortex(flow1);
+	//draw_u(flow1);
 	theApp.Run();
 }
 	//draw_u(flow1);

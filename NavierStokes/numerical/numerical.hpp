@@ -17,11 +17,11 @@
 using namespace std;
 
 
-#define MAXSIZE (162)
+#define MAXSIZE (275)
 
 #define BIG 10000
-#define maxx 162
-#define maxy 162
+#define maxx 95
+#define maxy 275
 #define PI 3.141592654
 
 //intial conditions

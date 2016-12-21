@@ -14,8 +14,10 @@ string titlefile;
 const char* c; 
 
 
-titlefile = "Order Evaluation; y vertical; parabola center";
+titlefile = "Order Evaluation; x; y";
 c = titlefile.c_str();
+	TGraph *gr = new TGraph();
+	gr->SetTitle(c);
 	
 	TGraph *gr5a = new TGraph();	
 	gr5a->SetMarkerColor(4);
@@ -29,9 +31,9 @@ c = titlefile.c_str();
 	gr5b->SetLineColor(1);
 	gr5b->SetTitle(c);
 	
-
+float q = 1.0;
 //adjust j to shorten
-for(int j = 8; j < 16; ++j)
+for(int j = q*109; j < q*114; ++j)
 {
 float DIMx = myarray.DIMx;
 float DIMy = myarray.DIMy;
@@ -41,7 +43,7 @@ float dy = DIMy*(j-0.5);
  
  int n = 0;
 TGraph *gr6 = new TGraph();	 
-for(int i = 20; i < 28; ++i)
+for(int i = q*16; i < q*24; ++i)
 {
  float dx = DIMx*(i-0.5);
  float T1 = myarray.s1[i][j].v;
@@ -53,7 +55,9 @@ n++;
 
 //printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
 TF1 *tfit2 = new TF1("tfit2", "pol2");
-gr6->Fit(tfit2, "BRQE", "", 0.0, 3.0);
+tfit2->SetParameter(2, 0.5);
+tfit2->SetParLimits(2, 0, 50);
+gr6->Fit(tfit2, "", "", 0.0, 3.0);
 float p0 = tfit2->GetParameter(0);
 float p1 = tfit2->GetParameter(1);
 float p2 = tfit2->GetParameter(2);
@@ -62,13 +66,15 @@ float apex = -p1/(2.0*p2);
 	
 //"BRQE"
         
-gr5a->SetPoint(j-12,apex, DIMy*(j-0.5));   
+gr5a->SetPoint(j-q*109,apex, DIMy*(j-0.5));   
 
 
 }
 
 //adjust i to shorten
-for(int i = 20; i < 30; ++i)
+
+
+for(int i = q*17; i < q*24; ++i)
 {
 float DIMx = myarray.DIMx;
 float DIMy = myarray.DIMy;
@@ -78,7 +84,7 @@ float dx = DIMx*(i-0.5);
  
  int n = 0;
 TGraph *gr6 = new TGraph();	 
-for(int j = 4; j < 16; ++j)
+for(int j = q*106; j < q*114; ++j)
 {
  float dy = DIMy*(j-0.5);
  float T1 = myarray.s1[i][j].v;
@@ -90,7 +96,10 @@ n++;
 
 //printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
 TF1 *tfit2 = new TF1("tfit2", "pol2");
-gr6->Fit(tfit2, "BRQE", "", 0.0, 3.0);
+tfit2->SetParameter(2, 0.5);
+tfit2->SetParLimits(2, 0.0001, 2.0);
+
+gr6->Fit(tfit2, "", "", 2.5, 3.0);
 float p0 = tfit2->GetParameter(0);
 float p1 = tfit2->GetParameter(1);
 float p2 = tfit2->GetParameter(2);
@@ -98,23 +107,26 @@ float p2 = tfit2->GetParameter(2);
 float apex = -p1/(2.0*p2);	
 	
 //"BRQE"        
-gr5b->SetPoint(i-24,DIMx*(i-0.5), apex);   
+gr5b->SetPoint(i-q*17,DIMx*(i-0.5), apex);   
 
 
 }
 
+gr->SetPoint(0,0.4,2.8);
+gr->SetPoint(1,0.6,2.6);
+
 TF1 *tfit1 = new TF1("tfit1", "pol1");
-gr5a->Fit(tfit1, "BRQE", "", 0.0, 3.0);
+gr5a->Fit(tfit1, "", "", 0.4, 0.6);
 float cc = tfit1->GetParameter(0);
 float a = tfit1->GetParameter(1);
 
 
 TF1 *tfit11 = new TF1("tfit11", "pol1");
-gr5b->Fit(tfit11, "BRQE", "", 0.0, 3.0);
+gr5b->Fit(tfit11, "", "", 0.0, 3.0);
 float d = tfit11->GetParameter(0);
 float b = tfit11->GetParameter(1);
-
-gr5a->Draw("APc");
+gr->Draw("ap");
+gr5a->Draw("samePc");
 gr5b->Draw("samePc");
 
 float x = (d-cc)/(a-b);
