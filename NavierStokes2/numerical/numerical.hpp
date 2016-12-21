@@ -17,11 +17,11 @@
 using namespace std;
 
 
-#define MAXSIZE (162)
+#define MAXSIZE (122)
 
 #define BIG 10000
-#define maxx 162
-#define maxy 162
+#define maxx 122
+#define maxy 122
 #define PI 3.141592654
 
 //intial conditions
@@ -31,10 +31,10 @@ using namespace std;
 
 //artificial constants
 #define BETA 1.0
-#define ARTVIS 0.01
+#define ARTVIS 0.5
 
 //non-dim constants
-#define RE 125
+#define RE 100
 #define PR 0.7
 #define EC 0.001
 

@@ -748,15 +748,14 @@ for (int i = 1; i < myarray.sizex-1; i++)
 
 
 N = 0;
-for (int i = 1; i < myarray.sizex-1; i++) 
+for (int i = 1; i < myarray2.sizex-1; i++) 
 {
 	
-	for (int j = 1; j < myarray.sizey-1; j++) 
+	for (int j = 1; j < myarray2.sizey-1; j++) 
 	{ float dx = DIMx*(i-0.5);
 	  float dy = DIMy*(j-0.5);
-	  float T1 = myarray.s1[i][j].v;
-      float T2 = myarray.s1[i][j].u;
-      float T = sqrt( pow(T1,2) + pow(T2,2));
+	  float T = myarray2.s1[i][j].v;
+
 	      gr511->SetPoint(N,dx,dy,T);
 	      ++N;
 	 }     
@@ -794,7 +793,7 @@ c44->cd();
    
 c444->cd();   
    gStyle->SetPalette(1);
-   gr511->Draw("cont4z");  
+   gr111->Draw("surf1z");  
    
 }
 

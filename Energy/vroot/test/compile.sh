@@ -13,9 +13,9 @@ echo "Starting compilation"
 echo "Reminder: Make sure root is sourced"
 #rm mtest2
 
-rm v1
+rm FB1
 #macro2
-g++ Vortex.cpp numerical/numerical.cpp vroot/root.cpp -o2 -o v1 `root-config --cflags --glibs` -std=c++0x -pthread
+g++ test.cpp -o2 -o FB1 `root-config --cflags --glibs` -std=c++0x -pthread
 #macro1
 
 #g++ muon.cpp gPT/GPT.cpp mROOT/mroot.cpp -o2 -o mugo `root-config --cflags --glibs` -std=c++0x -pthread

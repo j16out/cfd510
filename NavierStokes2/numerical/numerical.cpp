@@ -162,7 +162,7 @@ printf("Run: %d time: %f diff %f\n",n,ctime, mdiff);
 nt = 10+n;
 } 
 
-if(mdiff<0.00000001)
+if(mdiff<0.0000001)
 break;
  
 ++n;
@@ -542,7 +542,7 @@ double l2P = sqrt(l2sumP/(sx*sy));
 double l2u = sqrt(l2sumu/(sx*sy));
 double l2v = sqrt(l2sumv/(sx*sy));
 
-//cout << setprecision(8) << fixed << "L2 norm (P|u|v): " << l2P << " | " << l2u<< " | "  <<  l2v << "\n";
+cout << setprecision(8) << fixed << "L2 norm (P|u|v): " << l2P << " | " << l2u<< " | "  <<  l2v << "\n";
 mydata.l2normP.push_back(l2P);
 mydata.l2normu.push_back(l2u);
 mydata.l2normv.push_back(l2v);
@@ -585,7 +585,7 @@ double l2P = sqrt(l2sumP/(sx*sy));
 double l2u = sqrt(l2sumu/(sx*sy));
 double l2v = sqrt(l2sumv/(sx*sy));
 
-//cout << setprecision(8) << fixed << "L2 norm (P|u|v): " << l2P << " | " << l2u<< " | "  <<  l2v << "\n";
+cout << setprecision(8) << fixed << "L2 norm (P|u|v): " << l2P << " | " << l2u<< " | "  <<  l2v << "\n";
 mydata.l2normP.push_back(l2P);
 mydata.l2normu.push_back(l2u);
 mydata.l2normv.push_back(l2v);
@@ -1073,7 +1073,7 @@ void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j)
 
 void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i, double & mdiff)
 {
-  double LHS[MAXSIZE][3][3][3], RHS[MAXSIZE][3];
+  double LHS[100][3][3][3], RHS[100][3];
   double tomp = 0;
   int j;
           //|row|col
