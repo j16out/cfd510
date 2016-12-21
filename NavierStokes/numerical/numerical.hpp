@@ -17,11 +17,11 @@
 using namespace std;
 
 
-#define MAXSIZE (275)
+#define MAXSIZE (260)
 
 #define BIG 10000
 #define maxx 95
-#define maxy 275
+#define maxy 260
 #define PI 3.141592654
 
 //intial conditions
@@ -51,7 +51,7 @@ vec ru;
 vec rv;
 };
 
-
+//holds x related Jacobians
 struct LHScX{
 vec3x3 Ax;
 vec3x3 Bx;
@@ -59,6 +59,7 @@ vec3x3 Cx;
 
 };
 
+//holds y related Jacobians
 struct LHScY{
 vec3x3 Ay;
 vec3x3 By;
@@ -78,8 +79,8 @@ int sizey = maxy;
 double DIMx = 0.0;
 double DIMy = 0.0;
 //scheme
-double ctime = 0;
-double UW = 0;
+double ctime = 0.0;
+double UW = 0.0;
 };
 
 
@@ -108,24 +109,24 @@ vec RHS [maxy];
 
 struct surr{
 //surrounding cells
-double Pim1_j = 0;
-double Pip1_j = 0;
-double Pi_j = 0; 
-double Pi_jm1 = 0;
-double Pi_jp1 = 0;
+double Pim1_j = 0.;
+double Pip1_j = 0.;
+double Pi_j = 0.; 
+double Pi_jm1 = 0.;
+double Pi_jp1 = 0.;
 
-double uim1_j = 0;
-double uip1_j = 0;
-double ui_j = 0;
-double ui_jm1 = 0;
-double ui_jp1 = 0; 
+double uim1_j = 0.;
+double uip1_j = 0.;
+double ui_j = 0.;
+double ui_jm1 = 0.;
+double ui_jp1 = 0.; 
 
 
-double vim1_j = 0;
-double vip1_j = 0;
-double vi_j = 0; 
-double vi_jm1 = 0;
-double vi_jp1 = 0;
+double vim1_j = 0.;
+double vip1_j = 0.;
+double vi_j = 0.; 
+double vi_jm1 = 0.;
+double vi_jp1 = 0.;
 };
 
 //------------------------LHS--------------------//
@@ -149,10 +150,13 @@ void set_init_cond(carray & myarray);
 
 void solve_array_IE(carray & myarray, double tmax, double cfl, double UW, cdata & mydata);
 
+void solve_LinSys(carray & myarray, double tstep, double & mdiff);
+
+void update_sol(carray & myarray);
+
 
 //------------------LHS calculation--------------------------------------//
 
-void solve_LinSys(carray & myarray, double tstep, double & mdiff);
 
 void calc_LHS_constX(carray & a1, LHScX & c1, int i, int j, double tstep);
 
@@ -163,7 +167,6 @@ void set_wall(LHScX & temp, int par);
 
 void set_wall(LHScY & temp, int par);
 
-void update_sol(carray & myarray);
 //---------------------Thomas Algorythm Related----------------------------//
 
 void load_row(carray & myarray, crow & myrow, int j, double tstep);
@@ -173,6 +176,7 @@ void load_col(carray & myarray, ccol & mycol, int i, double tstep);
 void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j);
 
 void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i, double & mdiff);
+
 
 //--------------------Flux calculation------------------------------------//
 
@@ -187,17 +191,14 @@ void art_visc(carray myarray, int i, int j, double & artP);
 
 
 //-----------------------Error calc related functions---------------------------//
-/*
 
-double get_l1normD(carray & myarray, carray myarray2);
-
-void get_discrete_Error(carray ray1, carray ray2, carray ray3);
-*/
 void get_l2norm(carray & myarray, carray myarray2, cdata & mydata);
 
 void get_l2norm_tstep(carray & myarray, cdata & mydata);
 
 void set_analytic(carray & myarray);//set analytic solution to a mesh
+
+void get_l2norm_2array(carray & myarray, carray myarray2, cdata & mydata, int N);
 
 
 //-----------------------Print related functions-------------------------------//
@@ -206,11 +207,6 @@ void print_array_sP(carray & myarray);//print array in terminal
 
 void print_array_fP(carray & myarray, double tstep);
 
-/*
-void print_row(crow & myrow, carray & myarray);
-
-void print_col(ccol & mycol, carray & myarray);
-*/
 
 
 

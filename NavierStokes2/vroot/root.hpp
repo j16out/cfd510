@@ -39,7 +39,7 @@
 #include <iterator>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "/home/jerin/cfd510/NavierStokes/numerical/numerical.hpp"
+#include "/home/jerin/cfd510/NavierStokes2/numerical/numerical.hpp"
 
 using namespace std;
 

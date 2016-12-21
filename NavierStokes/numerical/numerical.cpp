@@ -13,9 +13,9 @@ void set_array_size(carray & myarray, int x, int y, double DIMx, double DIMy, in
 {
 	if(x <= maxx && y <= maxy)
 	{
-	myarray.sizex = x+2;
+	myarray.sizex = x+2; //array size+2 for ghost
 	myarray.sizey = y+2;
-	myarray.DIMx = DIMx/(x);
+	myarray.DIMx = DIMx/(x);//set dim between cells
 	myarray.DIMy = DIMy/(y);
 	}
 	else
@@ -30,22 +30,20 @@ void set_array_size(carray & myarray, int x, int y, double DIMx, double DIMy, in
 
 void set_zero(carray & myarray)
 {
-	for(int j = 0; j < myarray.sizey; ++j)
+for(int j = 0; j < myarray.sizey; ++j)
+{
+	for(int i = 0; i < myarray.sizex; ++i)
 	{
-		for(int i = 0; i < myarray.sizex; ++i)
-		{
-		//set solution array zero
-		myarray.s1[i][j].P = 0.0;
-        myarray.s1[i][j].u = 0.0;
-        myarray.s1[i][j].v = 0.0;
-        //set flux array zero
-        myarray.f1[i][j].P = 0.0;
-        myarray.f1[i][j].u = 0.0;
-        myarray.f1[i][j].v = 0.0;
-        
-
-		}
+	//set solution array zero
+	myarray.s1[i][j].P = 0.0;
+    myarray.s1[i][j].u = 0.0;
+    myarray.s1[i][j].v = 0.0;
+    //set flux array zero
+    myarray.f1[i][j].P = 0.0;
+    myarray.f1[i][j].u = 0.0;
+    myarray.f1[i][j].v = 0.0;
 	}
+}
 }
 
 
@@ -84,29 +82,29 @@ double DIMx = myarray.DIMx;
 double DIMy = myarray.DIMy;
 double dx = 0.0;
 double dy = 0.0;
-double Uwall = 0.0;
+
     //set ghost cells top/bottom
 	for(int i = 0; i < myarray.sizex; ++i)
 	{
-	//top
+	//top wall moving at Uwall
 	myarray.s1[i][0].P = myarray.s1[i][1].P ;
 	myarray.s1[i][0].u = (2.0*myarray.UW)-myarray.s1[i][1].u ;
 	myarray.s1[i][0].v = -myarray.s1[i][1].v ;
-	//bottom
+	//bottom stationary
 	myarray.s1[i][myarray.sizey-1].P = myarray.s1[i][myarray.sizey-2].P ;
 	myarray.s1[i][myarray.sizey-1].u = -myarray.s1[i][myarray.sizey-2].u ;
 	myarray.s1[i][myarray.sizey-1].v = -myarray.s1[i][myarray.sizey-2].v ;
 	
 	}	
 	
-    //set ghost cells inflow/outflow	
+    //set ghost cells left/right sides	
 	for(int j = 0; j < myarray.sizey; ++j)
 	{ 
-	//left
+	//left stationary
     myarray.s1[0][j].P = myarray.s1[1][j].P;
     myarray.s1[0][j].u = -myarray.s1[1][j].u;
     myarray.s1[0][j].v = -myarray.s1[1][j].v;
-    //right
+    //right stationary
     myarray.s1[myarray.sizex-1][j].P = myarray.s1[myarray.sizex-2][j].P ;
     myarray.s1[myarray.sizex-1][j].u = -myarray.s1[myarray.sizex-2][j].u ;
     myarray.s1[myarray.sizex-1][j].v = -myarray.s1[myarray.sizex-2][j].v ;
@@ -118,19 +116,15 @@ double Uwall = 0.0;
 //-----------------------------IE Array Solving-----------------------------//
 //==========================================================================//
 
-void solve_array_IE(carray & myarray, double tmax, double cfl, double UW, cdata & mydata)
+void solve_array_IE(carray & myarray, double tmax, double tstep, double UW, cdata & mydata)
 {
 
-//double tstep = (cfl*(myarray.DIMx))/2.0;
 myarray.UW = UW;
-double tstep = cfl;
 double ctime = 0.0;
 
 //set intial conditions/boundaries
 set_init_cond(myarray);
 set_ghostcells(myarray);
-
-//print_array_sP(myarray);
 
 
 printf("\n\nRunning size: %d time step: %f\n",myarray.sizex,tstep);
@@ -144,11 +138,10 @@ while(ctime < tmax-tstep)
 {
 ctime = ctime+tstep;
 
-//update flux
+//calculate and update flux
 update_flux(myarray, tstep);
-//print_array_fP(myarray, 1.0);
 
-//implicit time advance
+//calc implicit time advance
 solve_LinSys(myarray, tstep, mdiff);
 get_l2norm_tstep(myarray, mydata);
 
@@ -162,13 +155,13 @@ printf("Run: %d time: %f diff %f\n",n,ctime, mdiff);
 nt = 10+n;
 } 
 
-if(mdiff<0.00000001)
+if(mdiff<0.000000001)//if convergence reached
 break;
  
 ++n;
 }
 
-myarray.ctime = ctime;
+myarray.ctime = ctime;//record time
 printf("Solved numeric at %f time with tstep %f\n",ctime, tstep);
 
 }
@@ -176,7 +169,7 @@ printf("Solved numeric at %f time with tstep %f\n",ctime, tstep);
 
 
 
-//---------------------------LHS approx factor----------------------------//
+
 
 //==========================================================================//
 //---------------------------LHS Jacobian-----------------------------------//
@@ -188,9 +181,8 @@ printf("Solved numeric at %f time with tstep %f\n",ctime, tstep);
 void solve_LinSys(carray & myarray, double tstep, double & mdiff)
 {
 mdiff = -1.0;
-//--linear system num 1---//
+//load and solve through all rows
 crow myrow;
-//print_arrayu(myarray);
 
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
@@ -199,20 +191,20 @@ solve_block_thomas(myarray, myrow, myarray.sizex, j);
 
 }
 
-//print_array_fP(myarray, 1.0);
-
+//load and solve through all columns
 ccol mycol;
 for(int i = 1; i < myarray.sizex-1; ++i)
 {
 load_col(myarray, mycol, i, tstep);
 solve_block_thomas(myarray, mycol, myarray.sizey, i, mdiff);
 }
-//print_array_sP(myarray);
-//print_array_fP(myarray, 1.0);
 
+//update old solution n with new solution n+1
 update_sol(myarray);
-//print_array_sP(myarray);
+
 }
+
+//---------------------------update solution----------------------------//
 
 void update_sol(carray & myarray)
 {
@@ -227,6 +219,8 @@ void update_sol(carray & myarray)
 }
 
 }
+
+//---------------------------LHS approx factor----------------------------//
 //--------------------------Load row for Thomson---------------------------//
 
 void load_row(carray & myarray, crow & myrow, int j, double tstep)
@@ -408,8 +402,6 @@ c2.Cy.rv.v = tstep*(-1.0/chy)*( ((s1.vi_j+s1.vi_jp1)/2.0) - (1.0/(RE*chy)) );
 
 
 
-
-
 //==========================================================================//
 //-----------------------RHS Compute Flux-----------------------------------//
 //==========================================================================//
@@ -441,20 +433,23 @@ for(int j = 1; j < myarray.sizey-1; ++j)
 
 void get_nsurcells(carray & myarray, int i, int j, surr & mysurr)
 {
+//get all surrounding cell data for one cell ij
 
+//pressure
 mysurr.Pim1_j = myarray.s1[i-1][j].P;
 mysurr.Pip1_j = myarray.s1[i+1][j].P;
 mysurr.Pi_j = myarray.s1[i][j].P; 
 mysurr.Pi_jm1 = myarray.s1[i][j-1].P;
 mysurr.Pi_jp1 = myarray.s1[i][j+1].P;
 
+//velocity u
 mysurr.uim1_j = myarray.s1[i-1][j].u;
 mysurr.uip1_j = myarray.s1[i+1][j].u;
 mysurr.ui_j = myarray.s1[i][j].u; 
 mysurr.ui_jm1 = myarray.s1[i][j-1].u;
 mysurr.ui_jp1 = myarray.s1[i][j+1].u;
  
-
+//velocity v
 mysurr.vi_jm1 = myarray.s1[i][j-1].v;
 mysurr.vi_jp1 = myarray.s1[i][j+1].v;
 mysurr.vi_j = myarray.s1[i][j].v; 
@@ -483,6 +478,7 @@ double fu = (   (pow((s1.uip1_j+s1.ui_j)/2.0, 2) + ((s1.Pip1_j+s1.Pi_j)/2.0) - (
 double fv =   (   (((s1.uip1_j+s1.ui_j)/2.0)*((s1.vip1_j+s1.vi_j)/2.0) - ((s1.vip1_j-s1.vi_j)/(chx*RE)))
             - (((s1.ui_j+s1.uim1_j)/2.0)*((s1.vi_j+s1.vim1_j)/2.0) - ((s1.vi_j-s1.vim1_j)/(chx*RE)))  )/chx;
 
+//y direction
 double gp = (((s1.vi_jp1 + s1.vi_j)/(2.0*BETA)) - ((s1.vi_j + s1.vi_jm1)/(2.0*BETA))) /chy;
 
                         
@@ -492,7 +488,7 @@ double gu =   (   (((s1.ui_jp1+s1.ui_j)/2.0)*((s1.vi_jp1+s1.vi_j)/2.0) - ((s1.ui
 double gv = (   (pow((s1.vi_jp1+s1.vi_j)/2.0, 2) + ((s1.Pi_jp1+s1.Pi_j)/2.0) - ((s1.vi_jp1-s1.vi_j)/(chy*RE)))
             - (pow((s1.vi_j+s1.vi_jm1)/2.0, 2) + ((s1.Pi_j+s1.Pi_jm1)/2.0) - ((s1.vi_j-s1.vi_jm1)/(chy*RE)))  )/chy ;
  
-//Term added to smooth oscillations  
+//Term added to smooth pressure oscillations  
 double artP = ARTVIS*((s1.Pip1_j-2.0*s1.Pi_j+s1.Pim1_j)/(2.0*pow(chx,2)) + (s1.Pi_jp1-2.0*s1.Pi_j+s1.Pi_jm1)/(2.0*pow(chy,2)))*chx*chy;            
             
 ftemp.P = (-fp-gp)+(artP/tstep);
@@ -506,11 +502,6 @@ ftemp.v = -fv-gv;
 //==========================================================================//
 //---------------------------Error Checking---------------------------------//
 //==========================================================================//
-
-
-
-//-------------------------------------l2norm--------------------------//
-
 void get_l2norm_tstep(carray & myarray, cdata & mydata)
 {
 double l2sumP =0;
@@ -543,6 +534,48 @@ double l2u = sqrt(l2sumu/(sx*sy));
 double l2v = sqrt(l2sumv/(sx*sy));
 
 //cout << setprecision(8) << fixed << "L2 norm (P|u|v): " << l2P << " | " << l2u<< " | "  <<  l2v << "\n";
+mydata.l2normP.push_back(l2P);
+mydata.l2normu.push_back(l2u);
+mydata.l2normv.push_back(l2v);
+}
+
+//-------------------------------------l2norm--------------------------//
+
+void get_l2norm_2array(carray & myarray, carray myarray2, cdata & mydata, int N)
+{
+double l2sumP =0;
+double l2sumu =0;
+double l2sumv =0;
+
+
+double sx = myarray.sizex-2;
+double sy = myarray.sizey-2;
+
+for(int j = 1; j < myarray.sizey-1; ++j)
+{	
+	for(int i = 1; i < myarray.sizex-1; ++i)
+	{
+	double P = myarray.s1[i][j].P;
+	double T = myarray2.s1[i*N][j*N].P;
+	l2sumP =  l2sumP + pow((P-T),2);
+	
+	P = myarray.s1[i][j].u;
+	T = myarray2.s1[N*i][N*j].u;
+	l2sumu =  l2sumu + pow((P-T),2);
+	
+	P = myarray.s1[i][j].v;
+	T = myarray2.s1[i*N][j*N].v;
+	l2sumv =  l2sumv + pow((P-T),2);
+
+	}
+
+}
+
+double l2P = sqrt(l2sumP/(sx*sy));
+double l2u = sqrt(l2sumu/(sx*sy));
+double l2v = sqrt(l2sumv/(sx*sy));
+
+cout << setprecision(8) << fixed << "L2 norm (P|u|v): " << l2P << " | " << l2u<< " | "  <<  l2v << "\n";
 mydata.l2normP.push_back(l2P);
 mydata.l2normu.push_back(l2u);
 mydata.l2normv.push_back(l2v);
@@ -811,7 +844,11 @@ cout << "\n\n";
 }
 
 
-// Code for solving block-tridiagonal matrix problems, using the Thomas Algorythm
+//==========================================================================//
+//--------------------Block Thomas Functions--------------------------------//
+//==========================================================================//
+
+
 
 
 static void SpewMatrix(double Source[3][3])
@@ -1012,12 +1049,7 @@ void SolveBlockTri(double LHS[MAXSIZE][3][3][3],
 }
 
 
-/* LHS array is sized as [*][3][3][3].  The last two indices identify
-   the element within a block; the third index is the row and the fourth
-   is the column of the Jacobian matrix.  The second index tells which
-   block it is: 0 is below the main diagonal, 1 is on the main diagonal,
-   2 is above the main diagonal.  The first index tells which block row
-   you're looking at (the i or j index from the discretization). */
+//-----------------------------Solve BT for Rows-------------------------------//
 
 void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j)
 {
@@ -1063,6 +1095,7 @@ void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j)
 
   SolveBlockTri(LHS, RHS, NRows);
   
+  //mv and write over flux n
   for (i = 1; i < NRows-1; i++) {
     myarray.f1[i][j].P = RHS[i][0];
     myarray.f1[i][j].u = RHS[i][1];
@@ -1070,6 +1103,7 @@ void solve_block_thomas(carray & myarray, crow & r1, int NRows, int j)
   }
 }
 
+//-----------------------------Solve BT for Cols-------------------------------//
 
 void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i, double & mdiff)
 {
@@ -1122,6 +1156,7 @@ void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i, double & 
     mdiff = tomp;
   }
   
+  //change in solution saved
   for (j = 1; j < NRows-1; j++) {
     myarray.f1[i][j].P = RHS[j][0];
     myarray.f1[i][j].u = RHS[j][1];
@@ -1132,9 +1167,12 @@ void solve_block_thomas(carray & myarray, ccol & r1, int NRows, int i, double & 
 
 
 
-//----------------------implicit wall boundaries-------------------------//
+//==========================================================================//
+//--------------------implicit wall boundaries------------------------------//
+//==========================================================================//
 
 
+//set in this way for debugging ie easy to see
 void set_wall(LHScX & temp, int par)
 {
 if(par == 1){

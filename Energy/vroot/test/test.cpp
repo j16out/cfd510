@@ -19,14 +19,14 @@ int main()
 
 printf("\nCalculating Error...\n");
 
-double h1 =1/sqrt(18000.0);//= ray1.DIMx;
-double h2 =1/sqrt(4500.0);//= ray2.DIMx;
-double h3 =1/sqrt(980.0);//= ray3.DIMx;
+double h1 =1/(80.0);//= ray1.DIMx;
+double h2 =1/(60.0);//= ray2.DIMx;
+double h3 =1/(40.0);//= ray3.DIMx;
 
 
-float sol1 = 10.7880;
-float sol2 = 10.7250;
-float sol3 = 10.6050;
+float sol1 = 0.097330;
+float sol2 = 0.095894;
+float sol3 = 0.091769 ;
 
 
 printf("h1: %f \nh2: %f \nh3: %f, \nsol1: %f \nsol2: %f \nsol3: %f\n",h1, h2, h3, sol1, sol2, sol3);

@@ -61,9 +61,10 @@ void draw_u(carray myarray);
 
 void draw_3Dgraph_san(carray myarray, carray myarray2);
 
+
 void draw_um(carray myarray, carray myarray2, carray myarray3, carray myarray4);
 
-float get_discrete_Error(carray ray1, carray ray2, carray ray3, double sol1, double sol2, double sol3);
+
 
 void get_vortex(carray myarray);
 

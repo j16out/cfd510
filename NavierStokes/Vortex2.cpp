@@ -32,24 +32,20 @@ int main(int argc, char **argv)
 cdata mydata;
 cdata mydata2;
 
-int N = 10;
+int N = 5;
 
-
+for(int i = 0; N < 60; ++i){
 carray flow1;//my main array
 carray flow2;
-carray flow3;//my main array
-carray flow4;
+
 
 
 set_array_size(flow1, N, N, 1.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(flow2, 3*N, 3*N, 1.0, 1.0, 0);
-set_array_size(flow3, 9*N, 9*N, 1.0, 1.0, 0);//array, xsize, ysize, dimension
-set_array_size(flow4, N, N, 1.0, 1.0, 0);
+set_array_size(flow2, N*2, N*2, 1.0, 1.0, 0);
+
 
 set_zero(flow1);
 set_zero(flow2);
-set_zero(flow3);
-set_zero(flow4);
 
 
 
@@ -60,25 +56,25 @@ solve_array_IE(flow1, 100.0, 0.1, 1.0, mydata);
 
 solve_array_IE(flow2, 100.0, 0.1, 1.0, mydata); 
 
-solve_array_IE(flow3, 100.0, 0.1, 1.0, mydata); 
+get_l2norm_2array(flow1, flow2, mydata2, N);
 
-solve_array_IE(flow4, 100.0, 0.1, 1.0, mydata); 
-
-
+N = N+10;
+}
 
 
 //----------------------Draw Data---------------------//
 if(1)//start root application
 {
-	TApplication theApp("App", &argc, argv);//no more than two subs  
-	//draw_stab_l2(mydata);
-	//draw_3Dgraph_san(flow1, flow2);
-	draw_um(flow1, flow2, flow3, flow4);
-	//draw_order_l2(mydata);
+	TApplication theApp("App", &argc, argv);//no more than two subs 
+	draw_order_l2(mydata2);
+	//draw_3Dgraph_s(flow1, flow2); 
 	theApp.Run();
 }
-
-
+    //get_vortex(flow1);
+	//draw_u(flow1);
+	
+	//draw_stab_l2(mydata);
+	//draw_3Dgraph_s(flow1, flow2);
 
 //end
 }

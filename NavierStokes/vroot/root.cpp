@@ -7,6 +7,241 @@ using namespace std;
 
 
 
+
+
+
+
+//---------------------------------------------------------------------------------------------4/3
+
+
+void draw_um(carray myarray, carray myarray2, carray myarray3, carray myarray4)
+{
+
+ 
+
+TCanvas *c59 = new TCanvas("c59","The FillRandom example",200,50,900,700); 
+TCanvas *c535 = new TCanvas("c535","The FillRandom example",200,50,900,700); 
+//TCanvas *c7 = new TCanvas("c7","The FillRandom example",200,50,900,700);
+c59->cd();
+
+
+string titlefile;
+const char* c; 
+
+titlefile = "Order Evaluation; y vertical; Velocity u";
+c = titlefile.c_str();
+
+TGraph *gr2 = new TGraph();
+gr2->SetTitle(c);	
+
+TGraph *gr52 = new TGraph();	
+	gr52->SetMarkerColor(4);
+	gr52->SetMarkerStyle(21);
+	gr52->SetLineColor(1);
+	gr52->SetTitle(c); 
+	
+	TGraph *gr512 = new TGraph();	
+	gr512->SetMarkerColor(2);
+	gr512->SetMarkerStyle(22);
+	gr512->SetLineColor(1);
+	gr512->SetTitle(c);  
+	
+	TGraph *gr5152 = new TGraph();	
+	gr5152->SetMarkerColor(3);
+	gr5152->SetMarkerStyle(23);
+	gr5152->SetLineColor(1);
+	gr5152->SetTitle(c); 
+
+
+titlefile = "Order Evaluation; y vertical; GCI Velocity u";
+c = titlefile.c_str();
+	
+	TGraph *gr51552 = new TGraph();	
+	gr51552->SetMarkerColor(4);
+	gr51552->SetMarkerStyle(24);
+	gr51552->SetLineColor(1);
+	gr51552->SetTitle(c);
+	
+//c7->cd();
+
+vector<float> gc1;
+vector<float> gc2;
+vector<float> gc3;
+
+
+for(int j = 1; j < myarray.sizey-1; ++j)
+{
+float DIMx = myarray.DIMx;
+float DIMy = myarray.DIMy;
+int i = (myarray.sizex-2)/2.0;
+float dx = DIMx*(i-0.5);
+float dy = DIMy*(j-0.5);
+ 
+double t1 = myarray.s1[i-1][j].u;
+double t2 = myarray.s1[i][j].u;
+double t3 = myarray.s1[i+1][j].u;
+double t4 = myarray.s1[i+2][j].u;
+
+TGraph *gr62 = new TGraph();	
+         gr62->SetPoint(0,DIMx*(i-0.5-1),t1);
+		 gr62->SetPoint(1,DIMx*(i-0.5),t2);
+		 gr62->SetPoint(2,DIMx*(i-0.5+1),t3);
+		 gr62->SetPoint(3,DIMx*(i-0.5+2),t4);
+
+//printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
+		
+		TF1 *tfit2 = new TF1("tfit2", "pol2");
+        gr62->Fit(tfit2, "BRQE", "", 0.4, 0.6);
+        float p0 = tfit2->GetParameter(0);
+        float p1 = tfit2->GetParameter(1);
+        float p2 = tfit2->GetParameter(2);
+        
+        float u = p2*pow(0.5,2)+p1*(0.5)+p0;
+//"BRQE"        
+        gr52->SetPoint(j-1,DIMy*(j-0.5),u);   
+gc1.push_back(u);
+
+}
+
+
+for(int j = 1; j < myarray2.sizey-1; ++j)
+{
+float DIMx = myarray2.DIMx;
+float DIMy = myarray2.DIMy;
+int i = (myarray2.sizex-2)/2.0;
+float dx = DIMx*(i-0.5);
+float dy = DIMy*(j-0.5);
+ 
+double t1 = myarray2.s1[i-1][j].u;
+double t2 = myarray2.s1[i][j].u;
+double t3 = myarray2.s1[i+1][j].u;
+double t4 = myarray2.s1[i+2][j].u;
+
+TGraph *gr61 = new TGraph();	
+         gr61->SetPoint(0,DIMx*(i-0.5-1),t1);
+		 gr61->SetPoint(1,DIMx*(i-0.5),t2);
+		 gr61->SetPoint(2,DIMx*(i-0.5+1),t3);
+		 gr61->SetPoint(3,DIMx*(i-0.5+2),t4);
+
+//printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
+		
+		TF1 *tfit2 = new TF1("tfit2", "pol2");
+        gr61->Fit(tfit2, "BRQE", "", 0.4, 0.6);
+        float p0 = tfit2->GetParameter(0);
+        float p1 = tfit2->GetParameter(1);
+        float p2 = tfit2->GetParameter(2);
+        
+        float u = p2*pow(0.5,2)+p1*(0.5)+p0;
+//"BRQE"        
+        gr512->SetPoint(j-1,DIMy*(j-0.5),u);   
+gc2.push_back(u);
+//gr6->Draw("A*c");
+}
+
+
+for(int j = 1; j < myarray3.sizey-1; ++j)
+{
+float DIMx = myarray3.DIMx;
+float DIMy = myarray3.DIMy;
+int i = (myarray3.sizex-2)/2.0;
+float dx = DIMx*(i-0.5);
+float dy = DIMy*(j-0.5);
+ 
+double t1 = myarray3.s1[i-1][j].u;
+double t2 = myarray3.s1[i][j].u;
+double t3 = myarray3.s1[i+1][j].u;
+double t4 = myarray3.s1[i+2][j].u;
+
+TGraph *gr63 = new TGraph();	
+         gr63->SetPoint(0,DIMx*(i-0.5-1),t1);
+		 gr63->SetPoint(1,DIMx*(i-0.5),t2);
+		 gr63->SetPoint(2,DIMx*(i-0.5+1),t3);
+		 gr63->SetPoint(3,DIMx*(i-0.5+2),t4);
+
+//printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
+		
+		TF1 *tfit2 = new TF1("tfit2", "pol2");
+        gr63->Fit(tfit2, "BRQE", "", 0.4, 0.6);
+        float p0 = tfit2->GetParameter(0);
+        float p1 = tfit2->GetParameter(1);
+        float p2 = tfit2->GetParameter(2);
+        
+        float u = p2*pow(0.5,2)+p1*(0.5)+p0;
+//"BRQE"        
+        gr5152->SetPoint(j-1,DIMy*(j-0.5),u);   
+gc3.push_back(u);
+//gr6->Draw("A*c");
+}
+
+
+for(int j = 1; j < myarray4.sizey-1; ++j)
+{
+float DIMx = myarray4.DIMx;
+float DIMy = myarray4.DIMy;
+int i = (myarray4.sizex-2)/2.0;
+float dx = DIMx*(i-0.5);
+float dy = DIMy*(j-0.5);
+ 
+double t1 = myarray4.s1[i-1][j].u;
+double t2 = myarray4.s1[i][j].u;
+double t3 = myarray4.s1[i+1][j].u;
+double t4 = myarray4.s1[i+2][j].u;
+
+TGraph *gr6 = new TGraph();	
+         gr6->SetPoint(0,DIMx*(i-0.5-1),t1);
+		 gr6->SetPoint(1,DIMx*(i-0.5),t2);
+		 gr6->SetPoint(2,DIMx*(i-0.5+1),t3);
+		 gr6->SetPoint(3,DIMx*(i-0.5+2),t4);
+
+//printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
+		
+		TF1 *tfit2 = new TF1("tfit2", "pol2");
+        gr6->Fit(tfit2, "BRQE", "", 0.4, 0.6);
+        float p0 = tfit2->GetParameter(0);
+        float p1 = tfit2->GetParameter(1);
+        float p2 = tfit2->GetParameter(2);
+        
+        float u = p2*pow(0.5,2)+p1*(0.5)+p0;
+//"BRQE"        
+        //gr5155->SetPoint(j-1,DIMy*(j-0.5),u);   
+
+//gr6->Draw("A*c");
+}
+
+c59->cd();
+
+gr2->SetPoint(0,-4,0);
+gr2->SetPoint(1,0,-10);
+
+c59->SetGridx();
+c59->SetGridy();
+c59->SetTickx(1);
+c59->SetTicky(1);
+//c5->SetLogy();
+//gr->Draw("AP");
+
+
+
+gr52->Draw("APc");
+gr512->Draw("samePc");
+gr5152->Draw("samePc");
+
+TLegend *leg2 = new TLegend(0.75,0.9,0.9,0.8);
+
+leg2->AddEntry(gr52,"Velocity u 10x30","AP");
+leg2->AddEntry(gr512,"Velocity u 20x60","AP");
+leg2->AddEntry(gr5152,"Velocity u 40x120","AP");
+
+//leg2->AddEntry(gr51,"velocity u log(l2)","AP");
+leg2->Draw();
+
+
+c535->cd();
+gr51552->Draw("aPl");
+
+}
+//--------------------------------------------------------------------------------------------
+ 
 void get_vortex(carray myarray)
 {
 TCanvas *ca = new TCanvas("ca","The FillRandom example",200,50,900,700); 
@@ -144,310 +379,9 @@ printf("intercept x = %f y = %f\n",x, y);
 }
 
 //first one is finest array
-float get_discrete_Error(carray ray1, carray ray2, carray ray3, double sol1, double sol2, double sol3)
-{
-//Calculating error as described in paper "procedure for estimation and reporting of uncertainty due to discretization in CFD applications"//
 
-printf("\nCalculating Error...\n");
 
-double h1 = 1.0/sqrt(ray1.sizex-2);
-double h2 = 1.0/sqrt(ray2.sizex-2);
-double h3 = 1.0/sqrt(ray3.sizex-2);
 
-
-//sol1 = ray1.P1[40][20];
-// sol2 = ray2.P1[20][10];
-// sol3 = ray3.P1[10][5];
-
-
-printf("h1: %f \nh2: %f \nh3: %f, \nsol1: %f \nsol2: %f \nsol3: %f\n",h1, h2, h3, sol1, sol2, sol3);
-
-double r21 = h2/h1;
-double r32 = h3/h2;
-
-printf("\nr32: %f \nr21: %f\n",r32, r21);
-
-double e32 = sol3-sol2;
-double e21 = sol2-sol1;
-
-double s = (e32/e21);
-if(s >= 0)
-s = 1;
-else
-s = -1;
-
-double p_n = 0;
-double p = (1/log(r21))*(abs(log(abs(e32/e21))+0));
-
-printf("intial guess: %f \n", p);
-
-double diff = 1;
-
-	while(diff > 0.0000001)
-	{
-
-	double p_n = (1/log(r21))*(abs(log(abs(e32/e21))+log((pow(r21,p)-s)/(pow(r32,p)-s)) ));
-	diff = abs(p_n -p);
-	//printf("p_n: %f p: %f diff: %f\n",p_n, p, diff);
-
-	p = p_n;
-	}
- 
-//
-double sol_ext21 = (pow(r21, p)*sol1-sol2)/(pow(r21,p)-1.0);
-double sol_ext32 = (pow(r32, p)*sol2-sol3)/(pow(r32,p)-1.0);
-
-printf("order: %f \nphi_ext21: %f \nphi_ext32 %f\n",p, sol_ext21, sol_ext32);
-
-double ea21 = abs((sol1-sol2)/sol1);
-double e_ext21 = abs((sol_ext21-sol1)/sol_ext21);
-double GCI_21 = (1.25*ea21)/(pow(r21,p)-1.0);
-printf("ea21: %f  \ne_ext21: %f  \nGC121 %f \n", ea21, e_ext21, GCI_21);
-
-return GCI_21;
-}
-//---------------------------------------------------------------------------------------------3.3
-
-void draw_um(carray myarray, carray myarray2, carray myarray3, carray myarray4)
-{
-
-
-string titlefile;
-const char* c;  
-
-TCanvas *c5 = new TCanvas("c5","The FillRandom example",200,50,900,700); 
-//TCanvas *c7 = new TCanvas("c7","The FillRandom example",200,50,900,700);
-c5->cd();
-titlefile = "Order Evaluation; y vertical; Velocity u";
-c = titlefile.c_str();
-
-TGraph *gr = new TGraph();
-gr->SetTitle(c);	
-
-TGraph *gr5 = new TGraph();	
-	gr5->SetMarkerColor(4);
-	gr5->SetMarkerStyle(21);
-	gr5->SetLineColor(1);
-	gr5->SetTitle(c); 
-	
-	TGraph *gr51 = new TGraph();	
-	gr51->SetMarkerColor(2);
-	gr51->SetMarkerStyle(22);
-	gr51->SetLineColor(1);
-	gr51->SetTitle(c);  
-	
-	TGraph *gr515 = new TGraph();	
-	gr515->SetMarkerColor(3);
-	gr515->SetMarkerStyle(23);
-	gr515->SetLineColor(1);
-	gr515->SetTitle(c); 
-
-
-titlefile = "Order Evaluation; y vertical; GCI Velocity u";
-c = titlefile.c_str();
-	
-	TGraph *gr5155 = new TGraph();	
-	gr5155->SetMarkerColor(4);
-	gr5155->SetMarkerStyle(24);
-	gr5155->SetLineColor(1);
-	gr5155->SetTitle(c);
-	
-//c7->cd();
-
-vector<float> gc1;
-vector<float> gc2;
-vector<float> gc3;
-
-
-for(int j = 1; j < myarray.sizey-1; ++j)
-{
-float DIMx = myarray.DIMx;
-float DIMy = myarray.DIMy;
-int i = (myarray.sizex-2)/2;
-float dx = DIMx*(i-0.5);
-float dy = DIMy*(j-0.5);
- 
-double t1 = myarray.s1[i-1][j].u;
-double t2 = myarray.s1[i][j].u;
-double t3 = myarray.s1[i+1][j].u;
-double t4 = myarray.s1[i+2][j].u;
-
-TGraph *gr6 = new TGraph();	
-         gr6->SetPoint(0,DIMx*(i-0.5-1),t1);
-		 gr6->SetPoint(1,DIMx*(i-0.5),t2);
-		 gr6->SetPoint(2,DIMx*(i-0.5+1),t3);
-		 gr6->SetPoint(3,DIMx*(i-0.5+2),t4);
-
-//printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
-		
-		TF1 *tfit2 = new TF1("tfit2", "pol2");
-        gr6->Fit(tfit2, "BRQE", "", 0.4, 0.6);
-        float p0 = tfit2->GetParameter(0);
-        float p1 = tfit2->GetParameter(1);
-        float p2 = tfit2->GetParameter(2);
-        
-        float u = p2*pow(0.5,2)+p1*(0.5)+p0;
-//"BRQE"        
-        gr5->SetPoint(j-1,DIMy*(j-0.5),u);   
-gc1.push_back(u);
-//gr6->Draw("A*c");
-}
-
-
-for(int j = 1; j < myarray2.sizey-1; ++j)
-{
-float DIMx = myarray2.DIMx;
-float DIMy = myarray2.DIMy;
-int i = (myarray2.sizex-2)/2;
-float dx = DIMx*(i-0.5);
-float dy = DIMy*(j-0.5);
- 
-double t1 = myarray2.s1[i-1][j].u;
-double t2 = myarray2.s1[i][j].u;
-double t3 = myarray2.s1[i+1][j].u;
-double t4 = myarray2.s1[i+2][j].u;
-
-TGraph *gr6 = new TGraph();	
-         gr6->SetPoint(0,DIMx*(i-0.5-1),t1);
-		 gr6->SetPoint(1,DIMx*(i-0.5),t2);
-		 gr6->SetPoint(2,DIMx*(i-0.5+1),t3);
-		 gr6->SetPoint(3,DIMx*(i-0.5+2),t4);
-
-//printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
-		
-		TF1 *tfit2 = new TF1("tfit2", "pol2");
-        gr6->Fit(tfit2, "BRQE", "", 0.4, 0.6);
-        float p0 = tfit2->GetParameter(0);
-        float p1 = tfit2->GetParameter(1);
-        float p2 = tfit2->GetParameter(2);
-        
-        float u = p2*pow(0.5,2)+p1*(0.5)+p0;
-//"BRQE"        
-        gr51->SetPoint(j-1,DIMy*(j-0.5),u);   
-gc2.push_back(u);
-//gr6->Draw("A*c");
-}
-
-
-for(int j = 1; j < myarray3.sizey-1; ++j)
-{
-float DIMx = myarray3.DIMx;
-float DIMy = myarray3.DIMy;
-int i = (myarray3.sizex-2)/2;
-float dx = DIMx*(i-0.5);
-float dy = DIMy*(j-0.5);
- 
-double t1 = myarray3.s1[i-1][j].u;
-double t2 = myarray3.s1[i][j].u;
-double t3 = myarray3.s1[i+1][j].u;
-double t4 = myarray3.s1[i+2][j].u;
-
-TGraph *gr6 = new TGraph();	
-         gr6->SetPoint(0,DIMx*(i-0.5-1),t1);
-		 gr6->SetPoint(1,DIMx*(i-0.5),t2);
-		 gr6->SetPoint(2,DIMx*(i-0.5+1),t3);
-		 gr6->SetPoint(3,DIMx*(i-0.5+2),t4);
-
-//printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
-		
-		TF1 *tfit2 = new TF1("tfit2", "pol2");
-        gr6->Fit(tfit2, "BRQE", "", 0.4, 0.6);
-        float p0 = tfit2->GetParameter(0);
-        float p1 = tfit2->GetParameter(1);
-        float p2 = tfit2->GetParameter(2);
-        
-        float u = p2*pow(0.5,2)+p1*(0.5)+p0;
-//"BRQE"        
-        gr515->SetPoint(j-1,DIMy*(j-0.5),u);   
-gc3.push_back(u);
-//gr6->Draw("A*c");
-}
-
-
-for(int j = 1; j < myarray4.sizey-1; ++j)
-{
-float DIMx = myarray4.DIMx;
-float DIMy = myarray4.DIMy;
-int i = (myarray4.sizex-2)/2;
-float dx = DIMx*(i-0.5);
-float dy = DIMy*(j-0.5);
- 
-double t1 = myarray4.s1[i-1][j].u;
-double t2 = myarray4.s1[i][j].u;
-double t3 = myarray4.s1[i+1][j].u;
-double t4 = myarray4.s1[i+2][j].u;
-
-TGraph *gr6 = new TGraph();	
-         gr6->SetPoint(0,DIMx*(i-0.5-1),t1);
-		 gr6->SetPoint(1,DIMx*(i-0.5),t2);
-		 gr6->SetPoint(2,DIMx*(i-0.5+1),t3);
-		 gr6->SetPoint(3,DIMx*(i-0.5+2),t4);
-
-//printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
-		
-		TF1 *tfit2 = new TF1("tfit2", "pol2");
-        gr6->Fit(tfit2, "BRQE", "", 0.4, 0.6);
-        float p0 = tfit2->GetParameter(0);
-        float p1 = tfit2->GetParameter(1);
-        float p2 = tfit2->GetParameter(2);
-        
-        float u = p2*pow(0.5,2)+p1*(0.5)+p0;
-//"BRQE"        
-        //gr5155->SetPoint(j-1,DIMy*(j-0.5),u);   
-
-//gr6->Draw("A*c");
-}
-
-for(int i = 0; i < myarray.sizey-2; ++i)
-{
-float DIMy = myarray.DIMy;
-float sol1 = gc1.at(i);
-float sol2 = gc2.at(i*3);
-float sol3 = gc3.at(i*9);
-
-float GCI = get_discrete_Error(myarray3, myarray2, myarray, sol3, sol2,  sol1);
-gr5155->SetPoint(i,DIMy*(i-0.5+1), abs(GCI));
-}
-
-c5->cd();
-
-gr->SetPoint(0,-4,0);
-gr->SetPoint(1,0,-10);
-
-c5->SetGridx();
-c5->SetGridy();
-c5->SetTickx(1);
-c5->SetTicky(1);
-//c5->SetLogy();
-//gr->Draw("AP");
-
-
-
-gr5->Draw("APc");
-gr51->Draw("samePc");
-gr515->Draw("samePc");
-
-TLegend *leg2 = new TLegend(0.75,0.9,0.9,0.8);
-
-leg2->AddEntry(gr5,"Velocity u 10x10","AP");
-leg2->AddEntry(gr51,"Velocity u 30x30","AP");
-leg2->AddEntry(gr515,"Velocity u 90x90","AP");
-
-//leg2->AddEntry(gr51,"velocity u log(l2)","AP");
-leg2->Draw();
-
-TCanvas *c55 = new TCanvas("c55","The FillRandom example",200,50,900,700); 
-c55->cd();
-gr5155->Draw("aPl");
-
-
-//gr51->Draw("samePc");
-
-
-
-
-
-}
 
 //------------------------------------------------------------------------3.22
 
@@ -597,6 +531,10 @@ TGraph *gr5 = new TGraph();
 	
 //c7->cd();
 
+vector<double> u1;
+vector<double> d1;
+
+
 for(int j = 1; j < myarray.sizey-1; ++j)
 {
 float DIMx = myarray.DIMx;
@@ -609,6 +547,8 @@ double t1 = myarray.s1[i-1][j].u;
 double t2 = myarray.s1[i][j].u;
 double t3 = myarray.s1[i+1][j].u;
 double t4 = myarray.s1[i+2][j].u;
+
+
 
 TGraph *gr6 = new TGraph();	
          gr6->SetPoint(0,DIMx*(i-0.5-1),t1);
@@ -627,7 +567,8 @@ TGraph *gr6 = new TGraph();
         float u = p2*pow(0.5,2)+p1*(0.5)+p0;
 //"BRQE"        
         gr5->SetPoint(j-1,DIMy*(j-0.5),u);   
-
+   u1.push_back(u); 
+   d1.push_back(DIMy*(j-0.5));     
 //gr6->Draw("A*c");
 }
 
@@ -642,25 +583,136 @@ c5->SetTickx(1);
 c5->SetTicky(1);
 //c5->SetLogy();
 //gr->Draw("AP");
-
-
-
 gr5->Draw("APc");
 
 
 //gr51->Draw("samePc");
 
-
 TLegend *leg2 = new TLegend(0.75,0.9,0.9,0.8);
 
 leg2->AddEntry(gr5,"Velocity u at x = 0.5","AP");
 //leg2->AddEntry(gr51,"velocity u log(l2)","AP");
-
-
 leg2->Draw();
+
+//--------------------------------------------------vortice strength
+while(1)
+{
+float rr1 = 0.0;
+float rr2 = 0.8;
+int r1 = (myarray.sizex-2)*rr1;
+int r2 = (myarray.sizex-2)*rr2;
+
+float n = 0;
+float p = 0;
+
+float sum = 0;
+float sum2 = 0;
+for(int i = r1; i < r2; ++i)
+{
+
+float temp = u1.at(i)*myarray.DIMy;
+//printf("i %d temp %f\n", i , temp );
+if(temp < 0)
+{
+sum2 = temp + sum2;
+++n;
+}
+else
+{
+sum = temp + sum;
+++p;
+}
+}
+float avep = sum/p;
+
+float aven = sum/n;
+printf("vortice #1 strength p %f strength n %f averages p %f, n %f\n",sum, sum2, avep, aven); 
+break;
+}
+
+while(1)
+{
+float rr1 = 0.8;
+float rr2 = 1.8;
+int r1 = (myarray.sizex-2)*rr1;
+int r2 = (myarray.sizex-2)*rr2;
+
+float n = 0;
+float p = 0;
+
+float sum = 0;
+float sum2 = 0;
+for(int i = r1; i < r2; ++i)
+{
+
+float temp = u1.at(i)*myarray.DIMy;
+//printf("i %d temp %f\n", i , temp );
+if(temp < 0)
+{
+sum2 = temp + sum2;
+++n;
+}
+else
+{
+sum = temp + sum;
+++p;
+}
+}
+float avep = sum/p;
+
+float aven = sum/n;
+printf("vortice #2 strength p %f strength n %f averages p %f, n %f\n",sum, sum2, avep, aven); 
+break;
+}
+
+while(1)
+{
+float rr1 = 1.8;
+float rr2 = 3.0;
+int r1 = (myarray.sizex-2)*rr1;
+int r2 = (myarray.sizex-2)*rr2;
+
+float n = 0;
+float p = 0;
+
+float sum = 0;
+float sum2 = 0;
+for(int i = r1; i < r2; ++i)
+{
+
+float temp = u1.at(i)*myarray.DIMy;
+//printf("i %d temp %f\n", i , temp );
+if(temp < 0)
+{
+sum2 = temp + sum2;
+++n;
+}
+else
+{
+sum = temp + sum;
+++p;
+}
+}
+float avep = sum/p;
+
+float aven = sum/n;
+printf("vortice #3 strength p %f strength n %f averages p %f, n %f\n",sum, sum2, avep, aven); 
+break;
+}
 
 
 }
+
+
+
+
+
+
+
+//--------------------------------------------------------------------------
+
+
+
 
 void draw_stab_l2(cdata & mydata)
 {
@@ -1161,22 +1213,22 @@ TGraph *gr5 = new TGraph();
 
 
 int size = mydata.l2normP.size();
-int n = 5;
+float n = 5;
 printf("array size %d\n", size);
 
 for(int i = 0; i < size; ++i)
 {
 double temp = mydata.l2normP.at(i);
-gr5->SetPoint(i,log(1.0/n),log(temp));
+gr5->SetPoint(i,log(1.0/(n)),log(temp));
 
 temp = mydata.l2normu.at(i);
-gr51->SetPoint(i,log(1.0/n),log(temp));
+gr51->SetPoint(i,log(1.0/(n)),log(temp));
 
 temp = mydata.l2normv.at(i);
-gr52->SetPoint(i,log(1.0/n),log(temp));
+gr52->SetPoint(i,log(1.0/(n)),log(temp));
 
-printf("l2P: %f change x: %d\n", temp, n);
-n = n+5;
+printf("l2P: %f change x: %f\n", temp, n);
+n = n+1;
 }
 
 
@@ -1193,21 +1245,21 @@ gr->Draw("AP");
 TF1 *tfit2 = new TF1("tfit2", "pol1");
 tfit2->SetLineColor(2);
 tfit2->SetLineWidth(1);
-gr5->Fit(tfit2, "", "", -10, 10);
+gr5->Fit(tfit2, "", "", -100, 100);
 gStyle->SetOptFit();
 gr5->Draw("sameP");
 
 TF1 *tfit21 = new TF1("tfit21", "pol1");
 tfit21->SetLineColor(3);
 tfit21->SetLineWidth(2);
-gr51->Fit(tfit21, "", "", -10, 10);
+gr51->Fit(tfit21, "", "", -100, 100);
 gStyle->SetOptFit();
 gr51->Draw("sameP");
 
 TF1 *tfit22 = new TF1("tfit22", "pol1");
 tfit22->SetLineColor(4);
 tfit22->SetLineWidth(1);
-gr52->Fit(tfit22, "", "", -10, 10);
+gr52->Fit(tfit22, "", "", -100, 100);
 gStyle->SetOptFit();
 gr52->Draw("sameP");
 
