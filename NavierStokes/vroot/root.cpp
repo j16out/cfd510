@@ -6,6 +6,131 @@ using namespace std;
 
 
 
+
+void get_vortex(carray myarray)
+{
+TCanvas *ca = new TCanvas("ca","The FillRandom example",200,50,900,700); 
+string titlefile;
+const char* c; 
+
+
+titlefile = "Order Evaluation; y vertical; parabola center";
+c = titlefile.c_str();
+	
+	TGraph *gr5a = new TGraph();	
+	gr5a->SetMarkerColor(4);
+	gr5a->SetMarkerStyle(24);
+	gr5a->SetLineColor(1);
+	gr5a->SetTitle(c);
+	
+	TGraph *gr5b = new TGraph();	
+	gr5b->SetMarkerColor(2);
+	gr5b->SetMarkerStyle(24);
+	gr5b->SetLineColor(1);
+	gr5b->SetTitle(c);
+	
+
+//adjust j to shorten
+for(int j = 8; j < 16; ++j)
+{
+float DIMx = myarray.DIMx;
+float DIMy = myarray.DIMy;
+
+
+float dy = DIMy*(j-0.5);
+ 
+ int n = 0;
+TGraph *gr6 = new TGraph();	 
+for(int i = 20; i < 28; ++i)
+{
+ float dx = DIMx*(i-0.5);
+ float T1 = myarray.s1[i][j].v;
+ float T2 = myarray.s1[i][j].u;
+ float T = sqrt( pow(T1,2) + pow(T2,2));
+gr6->SetPoint(n,dx,T);
+n++;
+}
+
+//printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
+TF1 *tfit2 = new TF1("tfit2", "pol2");
+gr6->Fit(tfit2, "BRQE", "", 0.0, 3.0);
+float p0 = tfit2->GetParameter(0);
+float p1 = tfit2->GetParameter(1);
+float p2 = tfit2->GetParameter(2);
+
+float apex = -p1/(2.0*p2);	
+	
+//"BRQE"
+        
+gr5a->SetPoint(j-12,apex, DIMy*(j-0.5));   
+
+
+}
+
+//adjust i to shorten
+for(int i = 20; i < 30; ++i)
+{
+float DIMx = myarray.DIMx;
+float DIMy = myarray.DIMy;
+
+
+float dx = DIMx*(i-0.5);
+ 
+ int n = 0;
+TGraph *gr6 = new TGraph();	 
+for(int j = 4; j < 16; ++j)
+{
+ float dy = DIMy*(j-0.5);
+ float T1 = myarray.s1[i][j].v;
+ float T2 = myarray.s1[i][j].u;
+ float T = sqrt( pow(T1,2) + pow(T2,2));
+gr6->SetPoint(n,dy,T);
+n++;
+}
+
+//printf("t1 %f t2 %f t3 %f t4 %f\n", t1, t2, t3, t4);
+TF1 *tfit2 = new TF1("tfit2", "pol2");
+gr6->Fit(tfit2, "BRQE", "", 0.0, 3.0);
+float p0 = tfit2->GetParameter(0);
+float p1 = tfit2->GetParameter(1);
+float p2 = tfit2->GetParameter(2);
+
+float apex = -p1/(2.0*p2);	
+	
+//"BRQE"        
+gr5b->SetPoint(i-24,DIMx*(i-0.5), apex);   
+
+
+}
+
+TF1 *tfit1 = new TF1("tfit1", "pol1");
+gr5a->Fit(tfit1, "BRQE", "", 0.0, 3.0);
+float cc = tfit1->GetParameter(0);
+float a = tfit1->GetParameter(1);
+
+
+TF1 *tfit11 = new TF1("tfit11", "pol1");
+gr5b->Fit(tfit11, "BRQE", "", 0.0, 3.0);
+float d = tfit11->GetParameter(0);
+float b = tfit11->GetParameter(1);
+
+gr5a->Draw("APc");
+gr5b->Draw("samePc");
+
+float x = (d-cc)/(a-b);
+float y = a*((d-cc)/(a-b))+cc;
+
+
+printf("intercept x = %f y = %f\n",x, y); 
+
+
+
+
+
+
+
+}
+
 //first one is finest array
 float get_discrete_Error(carray ray1, carray ray2, carray ray3, double sol1, double sol2, double sol3)
 {
@@ -712,7 +837,7 @@ for (int i = 1; i < myarray2.sizex-1; i++)
 	  float dy = DIMy*(j-0.5);
 	  float T = myarray2.s1[i][j].u;
 
-	      gr51->SetPoint(N,dx,dy,T);
+	      //gr51->SetPoint(N,dx,dy,T);
 	      ++N;
 	 }     
 }
@@ -758,6 +883,7 @@ for (int i = 1; i < myarray.sizex-1; i++)
       float T2 = myarray.s1[i][j].u;
       float T = sqrt( pow(T1,2) + pow(T2,2));
 	      gr511->SetPoint(N,dx,dy,T);
+	      gr51->SetPoint(N,dx,dy,T);
 	      ++N;
 	 }     
 }
@@ -777,7 +903,7 @@ c4->cd();
    
 c4->cd();   
    gStyle->SetPalette(1);
-   gr1->Draw("surf1z");  
+   gr51->Draw("surf1z");  
    
    c22->cd();   
    gStyle->SetPalette(1);
@@ -785,7 +911,7 @@ c4->cd();
    
 c44->cd();   
    gStyle->SetPalette(1);
-   gr11->Draw("surf1z"); 
+   gr51->Draw("cont1z"); 
    
    
    c222->cd();   

@@ -69,15 +69,15 @@ solve_array_IE(flow1, 100.0, 0.1, 1.0, mydata);
 //----------------------Draw Data---------------------//
 if(1)//start root application
 {
-	TApplication theApp("App", &argc, argv);//no more than two subs  
-	//draw_stab_l2(mydata);
-	draw_3Dgraph_s(flow1, flow2);
-	draw_u(flow1);
-	//draw_order_l2(mydata);
+	TApplication theApp("App", &argc, argv);//no more than two subs 
+	draw_3Dgraph_s(flow1, flow2); 
+	get_vortex(flow1);
 	theApp.Run();
 }
-
-
+	//draw_u(flow1);
+	//draw_order_l2(mydata);
+	//draw_stab_l2(mydata);
+	//draw_3Dgraph_s(flow1, flow2);
 
 //end
 }
